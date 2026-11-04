@@ -2,6 +2,8 @@
 
 An agent skill for the [pi coding agent](https://github.com/badlogic/pi-mono) that builds **stunning, research-backed web slide decks**. Decks are React 19 + Vite + Motion apps on a 1920×1080 stage. Every slide is screenshotted and linted automatically, and the deck exports to PDF and PNG.
 
+![Demo of building and presenting a deck](examples/demo.gif)
+
 ![Contact sheet of the example deck](examples/screenshots/contact-sheet.png)
 
 ## What it does
