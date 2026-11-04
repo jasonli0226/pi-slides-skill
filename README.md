@@ -2,7 +2,13 @@
 
 An agent skill for the [pi coding agent](https://github.com/badlogic/pi-mono) that builds **stunning, research-backed web slide decks**. Decks are React 19 + Vite + Motion apps on a 1920×1080 stage. Every slide is screenshotted and linted automatically, and the deck exports to PDF and PNG.
 
-![Demo of building and presenting a deck](examples/demo.gif)
+Dark theme, styled from the Apple website as a reference:
+
+![Demo of a dark-theme deck styled from the Apple website](examples/demo-dark-theme.gif)
+
+Light theme, with images researched from the web and motion:
+
+![Demo of a light-theme deck with web-researched images and motion](examples/demo-light-theme.gif)
 
 ![Contact sheet of the example deck](examples/screenshots/contact-sheet.png)
 
@@ -26,7 +32,7 @@ An agent skill for the [pi coding agent](https://github.com/badlogic/pi-mono) th
 This repo is a pi package. `package.json` declares `"pi": { "skills": ["./skills"] }`.
 
 ```bash
-# from GitHub (private repo: your git must be able to clone it, e.g. `gh auth setup-git` or SSH)
+# from GitHub
 pi install git:github.com/jasonli0226/pi-slides-skill
 
 # or from a local clone
