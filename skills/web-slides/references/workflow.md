@@ -43,7 +43,8 @@ cd ./decks/<slug> && npm install && npx playwright install chromium
 ## 5. Build
 
 - Make one file per slide, `src/slides/NN-id.tsx`, register each in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`.
-- Run `npm run dev` for a live preview at http://127.0.0.1:5173 (keys: arrows, N, O, F).
+- **Live preview (HMR):** `npm run dev` → http://127.0.0.1:5173. Edit a slide `.tsx` or `sources.ts` and the browser updates immediately (keys: arrows, N, O, F).
+- **Live + outline:** `npm run live` also watches `content/deck.outline.md` and regenerates `src/slides/generated/from-outline.tsx`. Uncomment `outlineSlides` in `index.ts` to preview stubs; refine into real slide files before review.
 - Run `npm run typecheck` to catch prop mistakes early.
 
 ## 6 and 7. Review loop
@@ -74,3 +75,9 @@ Include:
 - How to present: `npm run dev`, or serve `dist/`; press F for fullscreen and N for notes.
 - The sources list.
 - Open issues: anything unsourced, illustrative, or still waiting for the brand.
+
+## Live editing tips
+
+- Prefer editing the polished `src/slides/NN-id.tsx` files under `npm run dev` — that is the beauty path.
+- Use the outline file for titles/bullets scaffolding only; it will not recreate LayeredArchitecture / C4 / Motion for you.
+- After outline changes, if stubs are wired into `index.ts`, Vite HMR picks up the regenerated TSX automatically.

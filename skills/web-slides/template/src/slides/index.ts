@@ -14,6 +14,9 @@ import quote from "./09-quote";
 import governance from "./10-governance";
 import lessons from "./11-lessons";
 import closing from "./12-closing";
+// Live outline stubs (optional): uncomment the next two lines while using `npm run live`
+// and editing content/deck.outline.md. Replace stubs with polished slide files before ship.
+// import { outlineSlides } from "./generated/from-outline";
 
 export const deck = defineDeck({
   title: "Agent-authored web decks",
@@ -23,5 +26,6 @@ export const deck = defineDeck({
     title, agenda, bigNumber, comparison, architecture,
     layeredPlatform, c4Context, chatSequence,
     timeline, code, results, quote, governance, lessons, closing,
+    // ...outlineSlides,
   ],
 });

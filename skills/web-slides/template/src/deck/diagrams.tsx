@@ -203,6 +203,9 @@ export type C4Node = {
   /** 1-based grid placement */
   row: number;
   col: number;
+  /** optional grid span (system often spans 1×1 but visually heavier via CSS) */
+  rowSpan?: number;
+  colSpan?: number;
   highlight?: boolean;
 };
 
@@ -214,33 +217,76 @@ export type C4Relation = {
   dashed?: boolean;
 };
 
+/** Orthogonal (elbow) path in viewBox units; returns { d, labelX, labelY }. */
+function elbow(
+  p: { x: number; y: number },
+  q: { x: number; y: number },
+  inset = 11,
+): { d: string; labelX: number; labelY: number } {
+  const dx = q.x - p.x;
+  const dy = q.y - p.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const x1 = p.x + (dx / len) * inset;
+  const y1 = p.y + (dy / len) * inset;
+  const x2 = q.x - (dx / len) * inset;
+  const y2 = q.y - (dy / len) * inset;
+  // Prefer a clean H-V-H or V-H-V elbow through the midpoints.
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    const mx = (x1 + x2) / 2;
+    return {
+      d: `M ${x1.toFixed(2)} ${y1.toFixed(2)} L ${mx.toFixed(2)} ${y1.toFixed(2)} L ${mx.toFixed(2)} ${y2.toFixed(2)} L ${x2.toFixed(2)} ${y2.toFixed(2)}`,
+      labelX: mx,
+      labelY: (y1 + y2) / 2,
+    };
+  }
+  const my = (y1 + y2) / 2;
+  return {
+    d: `M ${x1.toFixed(2)} ${y1.toFixed(2)} L ${x1.toFixed(2)} ${my.toFixed(2)} L ${x2.toFixed(2)} ${my.toFixed(2)} L ${x2.toFixed(2)} ${y2.toFixed(2)}`,
+    labelX: (x1 + x2) / 2,
+    labelY: my,
+  };
+}
+
 /**
- * C4-style boxes + labeled relations drawn with SVG overlays.
- * Prefer ≤8 boxes. Place nodes with row/col on a small grid (max ~3×4).
- * For dense layered stacks use LayeredArchitecture instead.
+ * C4-style boxes + labeled orthogonal relations (SVG elbows, no graph lib).
+ * Prefer ≤8 boxes on a ≤3×4 grid. One zoom level per slide.
+ * Nodes fade in (no translate) so Appear never fights the grid layout.
  */
 export function C4Container({
   nodes,
   relations = [],
   cols = 3,
   rows,
-  legend = false,
+  legend = true,
   showRelationList = false,
 }: {
   nodes: C4Node[];
   relations?: C4Relation[];
   cols?: number;
   rows?: number;
+  /** Compact kind key under the stage. Default on — kinds are also on each box. */
   legend?: boolean;
-  /** Bottom chip list of relations — off by default (use edge labels + notes). */
+  /** Bottom chip list of relations — off by default (edge labels cover this). */
   showRelationList?: boolean;
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
-  const rMax = rows ?? Math.max(...nodes.map((n) => n.row), 1);
+  const rMax = rows ?? Math.max(...nodes.map((n) => n.row + (n.rowSpan ?? 1) - 1), 1);
   const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
-  const center = (n: C4Node) => ({
-    x: ((n.col - 0.5) / cols) * 100,
-    y: ((n.row - 0.5) / rMax) * 100,
+  const center = (n: C4Node) => {
+    const rs = n.rowSpan ?? 1;
+    const cs = n.colSpan ?? 1;
+    return {
+      x: ((n.col - 1 + cs / 2) / cols) * 100,
+      y: ((n.row - 1 + rs / 2) / rMax) * 100,
+    };
+  };
+
+  const edges = relations.flatMap((rel, i) => {
+    const a = byId[rel.from];
+    const b = byId[rel.to];
+    if (!a || !b) return [];
+    const e = elbow(center(a), center(b));
+    return [{ ...e, rel, i }];
   });
 
   return (
@@ -248,34 +294,34 @@ export function C4Container({
       <div className="dg-c4-stage">
         <svg className="dg-c4-edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
           <defs>
-            <marker id={`dg-arrow-${uid}`} markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6 Z" fill="var(--text-muted)" />
+            <marker id={`dg-arrow-${uid}`} markerWidth="5" markerHeight="5" refX="4.5" refY="2.5" orient="auto">
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="var(--text-muted)" />
+            </marker>
+            <marker id={`dg-arrow-hi-${uid}`} markerWidth="5" markerHeight="5" refX="4.5" refY="2.5" orient="auto">
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="var(--accent)" />
             </marker>
           </defs>
-          {relations.map((rel, i) => {
-            const a = byId[rel.from];
-            const b = byId[rel.to];
-            if (!a || !b) return null;
-            const p = center(a);
-            const q = center(b);
-            const dx = q.x - p.x;
-            const dy = q.y - p.y;
-            const len = Math.hypot(dx, dy) || 1;
-            const inset = 10;
+          {edges.map(({ d, rel, i }) => {
+            const toSystem = byId[rel.to]?.kind === "system" || byId[rel.from]?.kind === "system";
             return (
-              <line key={i}
-                x1={p.x + (dx / len) * inset} y1={p.y + (dy / len) * inset}
-                x2={q.x - (dx / len) * inset} y2={q.y - (dy / len) * inset}
-                stroke="var(--text-muted)" strokeWidth="0.4"
-                strokeDasharray={rel.dashed ? "1.2 1" : undefined}
-                markerEnd={`url(#dg-arrow-${uid})`} vectorEffect="non-scaling-stroke" />
+              <path key={i} d={d} fill="none"
+                stroke={toSystem ? "var(--accent)" : "var(--text-muted)"}
+                strokeWidth={toSystem ? 0.55 : 0.4}
+                strokeOpacity={toSystem ? 0.85 : 0.55}
+                strokeDasharray={rel.dashed ? "1.4 1.1" : undefined}
+                markerEnd={`url(#${toSystem ? `dg-arrow-hi-${uid}` : `dg-arrow-${uid}`})`}
+                vectorEffect="non-scaling-stroke" />
             );
           })}
         </svg>
         <div className="dg-c4-grid">
-          {nodes.map((n) => (
-            <Appear key={n.id} delay={0.05 * (n.row + n.col)} className={`dg-c4-node kind-${n.kind}${n.highlight ? " is-hi" : ""}`}
-              style={{ gridRow: n.row, gridColumn: n.col }}>
+          {nodes.map((n, i) => (
+            <Appear key={n.id} variant="fade" delay={0.06 * i}
+              className={`dg-c4-node kind-${n.kind}${n.highlight || n.kind === "system" ? " is-hi" : ""}`}
+              style={{
+                gridRow: `${n.row} / span ${n.rowSpan ?? 1}`,
+                gridColumn: `${n.col} / span ${n.colSpan ?? 1}`,
+              }}>
               <div className="dg-c4-kind">{n.kind}</div>
               <div className="dg-c4-label">{n.label}</div>
               {n.description && <div className="dg-c4-desc">{n.description}</div>}
@@ -283,18 +329,22 @@ export function C4Container({
             </Appear>
           ))}
         </div>
-        {relations.map((rel, i) => {
-          const a = byId[rel.from];
-          const b = byId[rel.to];
-          if (!a || !b || !rel.label) return null;
-          const p = center(a);
-          const q = center(b);
-          return (
-            <div key={`lbl-${i}`} className="dg-c4-edge-label" style={{ left: `${(p.x + q.x) / 2}%`, top: `${(p.y + q.y) / 2}%` }}>
+        {edges.map(({ labelX, labelY, rel, i }) => (
+          rel.label ? (
+            <div key={`lbl-${i}`} className={`dg-c4-edge-label${rel.dashed ? " is-dashed" : ""}`}
+              style={{ left: `${labelX}%`, top: `${labelY}%` }}>
               {rel.label}
             </div>
-          );
-        })}
+          ) : null
+        ))}
+        {legend && (
+          <div className="dg-c4-legend" aria-hidden>
+            <span className="kind-person">Person</span>
+            <span className="kind-system">System</span>
+            <span className="kind-container">Container</span>
+            <span className="kind-external">External</span>
+          </div>
+        )}
       </div>
       {showRelationList && relations.length > 0 && (
         <ul className="dg-c4-rels">
@@ -305,14 +355,6 @@ export function C4Container({
               <span className="dg-c4-rel-label">{rel.label}</span></li>
           ))}
         </ul>
-      )}
-      {legend && (
-        <div className="dg-c4-legend" aria-hidden>
-          <span className="kind-person">Person</span>
-          <span className="kind-system">System</span>
-          <span className="kind-container">Container</span>
-          <span className="kind-external">External</span>
-        </div>
       )}
     </div>
   );

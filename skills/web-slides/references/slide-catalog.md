@@ -56,8 +56,8 @@ Re-exported from `components.tsx`. Read `diagram-guide.md` before picking one.
   - Swimlanes for dense stacks. Soft limit: 3–6 layers, ≤5 cells per layer.
 - **FlowSteps** `{ steps: {title, body?, icon?, tone?}[], stepwise? }` — 3–6 memorable steps.
 - **Sequence** `{ actors: {id, label, tone?}[], messages: {from, to, label, dashed?, note?}[], stepwise? }` — ≤6 actors, ≤8 messages.
-- **C4Container** `{ nodes: {id, label, kind: "person"|"system"|"container"|"external", description?, tech?, highlight?, row, col}[], relations?: {from, to, label, dashed?}[], cols?, rows?, legend?, showRelationList? }`
-  - SVG edges + on-canvas edge labels. Keep `showRelationList` false unless there is spare footer space.
+- **C4Container** `{ nodes: {id, label, kind: "person"|"system"|"container"|"external", description?, tech?, highlight?, row, col, rowSpan?, colSpan?}[], relations?: {from, to, label, dashed?}[], cols?, rows?, legend?, showRelationList? }`
+  - Orthogonal SVG elbows + pill edge labels. Nodes fade in (`Appear variant="fade"`) so motion does not shift the grid. `legend` overlays the stage (default on). Keep `showRelationList` false unless there is spare footer space.
 - **DiagramLegend** `{ items: {tone?, label}[] }` — tone/kind key chips.
 
 ## Layout helpers (deck.css)

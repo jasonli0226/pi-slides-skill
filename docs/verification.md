@@ -18,3 +18,9 @@ Run on the build box on 4 Nov 2026 (Asia/Hong_Kong): Node v24.22.1, npm 11.21.1,
 | pi install | `pi install` (isolated HOME) | installed, listed by `pi list` |
 
 Example screenshots for the diagram work: `examples/screenshots/slide-06-layered-platform.png`, `slide-07-c4-context.png`, `slide-08-chat-sequence.png`.
+
+### 4 Nov 2026 (evening, Asia/Hong_Kong) — C4 polish + live mode
+
+- Refined `C4Container` (orthogonal elbows, kind hierarchy, fade Appear, overlay legend).
+- Added `npm run live` / `npm run outline` + `content/deck.outline.md`.
+- `npm run verify`: 15 slides, 0 errors, PDF OK.

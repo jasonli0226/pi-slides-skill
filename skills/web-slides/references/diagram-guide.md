@@ -45,7 +45,7 @@ A good pattern for technical talks: **overview (C4 or layered) → one happy-pat
 - **Spacing:** use the component defaults (12–28px gaps). Do not hand-place with `position: absolute` unless you are drawing SVG edges inside `C4Container`.
 - **Motion:** reveal lanes or messages with `stepwise` + `Appear`/`Stagger` so you can walk the story. Static and print modes show the final state — the diagram must still read with motion off.
 - **Icons:** lucide only, via the `icon` prop on layer cells or FlowSteps. No emoji.
-- **Edges:** unidirectional, specifically labelled ("Retrieves docs", "Completions HTTPS"). Dashed = async, return, or optional [3][5]. `C4Container` draws SVG lines and short **edge labels** on the canvas; keep `showRelationList` off unless you have spare footer space for chips.
+- **Edges:** unidirectional, specifically labelled ("Retrieves docs", "Completions HTTPS"). Dashed = async, return, or optional [3][5]. `C4Container` draws **orthogonal SVG elbows** (no graph library) with pill edge labels on the bend; keep `showRelationList` off. The kind legend overlays the stage (top) so it never hits the footer.
 - **Contrast:** body text on cells uses `--text` / `--text-muted` on `--surface`. Run `npm run review` after any custom CSS.
 
 ## Anti-patterns
@@ -67,7 +67,7 @@ A good pattern for technical talks: **overview (C4 or layered) → one happy-pat
 | `FlowSteps` | Memorable 3–6 step path | ≤6 steps |
 | `LayeredArchitecture` | Stack / zone maps | 3–6 layers, ≤5 cells/layer |
 | `Sequence` | One request over time | ≤6 actors, ≤8 messages |
-| `C4Container` | Context / container view | ≤8 boxes, ≤3×4 grid |
+| `C4Container` | Context / container view (elbow edges, kind legend overlay) | ≤8 boxes, ≤3×4 grid; optional `rowSpan`/`colSpan` |
 | `DiagramLegend` | Tone / kind key | — |
 
 Import from `../deck/components` (re-exported) or `../deck/diagrams`. Examples: `template/src/slides/13-layered-platform.tsx`, `14-c4-context.tsx`, `15-chat-sequence.tsx`.

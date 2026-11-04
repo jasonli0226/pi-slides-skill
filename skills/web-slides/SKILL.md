@@ -4,7 +4,7 @@ description: Build stunning, research-backed web slide decks (React + Vite + Mot
 license: MIT
 compatibility: Needs Node.js 20+ and npm, network access for npm install, and a Chromium for Playwright (npx playwright install chromium, or CHROME_PATH).
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
   stack: "react 19, vite 8, motion 14, playwright, mermaid, shiki, lucide-react"
 ---
 
@@ -32,7 +32,7 @@ Follow these steps in order, and stop at the approval gate. The full details are
 2. **Research.** Collect sources into a working notes file with URLs and the exact figures and quotes. Prefer primary sources such as official docs, papers, filings and the user's own data.
 3. **Outline, then approval.** Write `outline.md` with one line per slide. Each line gives the slide number, the slide type from `references/slide-catalog.md`, the takeaway title, the key visual, and the source ids. **Show it to the user and wait for approval** before writing any TSX, unless they explicitly said to skip approval.
 4. **Scaffold.** Run `node scripts/new-deck.mjs <dir> --title "<takeaway title>" [--theme midnight|aurora|paper]`, then `cd <dir> && npm install && npx playwright install chromium`. Use `--keep-examples` only if you want the 12 example slides as a reference; delete them afterwards.
-5. **Build the slides.** Make one file per slide in `src/slides/NN-id.tsx`, register it in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`. Copy patterns from `template/src/slides/*` (one example per slide type) and follow `references/design-guide.md`. For any architecture or flow visual, open `references/diagram-guide.md` and pick Mermaid vs `LayeredArchitecture` / `FlowSteps` / `Sequence` / `C4Container`. Use `npm run dev` for a live preview if useful.
+5. **Build the slides.** Make one file per slide in `src/slides/NN-id.tsx`, register it in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`. Copy patterns from `template/src/slides/*` (one example per slide type) and follow `references/design-guide.md`. For any architecture or flow visual, open `references/diagram-guide.md` and pick Mermaid vs `LayeredArchitecture` / `FlowSteps` / `Sequence` / `C4Container`. Use **`npm run dev`** (HMR present mode) or **`npm run live`** (HMR + outline watcher) while building — see Live mode below.
 6. **Screenshots and review.** Run `npm run review`. It builds the deck, screenshots every slide in its final state into `review/`, writes `review/contact-sheet.png` and `review/report.md`, and exits non-zero on errors.
 7. **Self-review.** Open the contact sheet and every slide PNG and look at them; do not trust the lint alone. Go through `references/review-checklist.md`. Fix the issues and run review again until there are 0 errors and every warning is fixed or justified. Use `npm run review -- --steps` to check click-step states.
 8. **Export.** Run `npm run export:pdf`, which writes `export/deck.pdf` with vector, selectable text. If blur or glow effects print wrong, also run `npm run export:pdf -- --raster` for `export/deck-raster.pdf`. `npm run export:png` writes PNGs to `export/png/`. `npm run verify` runs the token check, build, review and PDF export in one go.
@@ -46,6 +46,15 @@ Follow these steps in order, and stop at the approval gate. The full details are
 - Components (`src/deck/components.tsx`): `SlideFrame`, `Appear`, `Stagger`, `Card`, `Icon`, `Pill`, `Stat`, `BarChart`, `Mermaid`, `Code`, `Timeline`, `Quote`, `IconList`, `Gradient`, `Cite`.
 - Diagrams (`src/deck/diagrams.tsx`, re-exported): `LayeredArchitecture`, `FlowSteps`, `Sequence`, `C4Container`, `DiagramLegend`. **Read `references/diagram-guide.md`** before drawing — Mermaid for ≤8-node flows; React+CSS for swimlanes, C4 and sequences. Prop tables are in `references/slide-catalog.md`.
 - Motion follows the viewer's `prefers-reduced-motion` setting through `MotionConfig reducedMotion="user"`.
+
+## Live mode (real-time preview)
+
+React slides are the source of truth for beauty. Two loops:
+
+1. **`npm run dev`** — Vite present mode at http://127.0.0.1:5173 with HMR. Edit any `src/slides/*.tsx`, `sources.ts`, theme CSS, or diagram component; the browser updates immediately. Keys: ←/→, Space, **N** notes, **O** overview, **F** fullscreen.
+2. **`npm run live`** — same as dev, plus watches `content/deck.outline.md` and regenerates stub slides into `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import in `src/slides/index.ts` to preview stubs, then replace each stub with a polished typed slide before ship. `npm run outline` regenerates once without Vite.
+
+Do not treat outline stubs as final deck quality. Diagrams, motion and tight layout stay in hand-written React.
 
 ## Don'ts
 

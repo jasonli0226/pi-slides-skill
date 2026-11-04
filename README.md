@@ -41,7 +41,9 @@ Requirements: Node.js 20+, npm, and Chromium for Playwright (`npx playwright ins
 ```bash
 node skills/web-slides/scripts/new-deck.mjs ./my-deck --title "Our pilot cut triage time in half." --theme midnight
 cd my-deck && npm install && npx playwright install chromium
-npm run dev          # present at http://127.0.0.1:5173
+npm run dev          # present mode + HMR — edit slides, browser updates live
+npm run live         # HMR + watch content/deck.outline.md → generated stub slides
+npm run outline      # regenerate outline stubs once (no Vite)
 npm run review       # screenshots + lint → review/ (contact-sheet.png, report.md)
 npm run export:pdf   # export/deck.pdf   (add -- --raster for a pixel-exact PDF)
 npm run verify       # tokens + build + review + pdf, exit code for CI
@@ -60,16 +62,26 @@ skills/web-slides/
     workflow.md                  step-by-step commands and approval gate
     review-checklist.md          automated + visual + facts checklist
   scripts/new-deck.mjs           create a deck from the template
-  template/                      the deck engine + 12 example slides
+  template/                      the deck engine + example slides + live outline
     src/deck/                    Deck (modes, keys, transitions), components, CSS
     src/theme/tokens.css         all design tokens + 3 themes
     src/theme/brand.css          where the brand theme goes
     src/slides/                  one file per slide, sources.ts bibliography
-    scripts/                     review.mjs, lint-in-page.js, export-pdf.mjs, check-tokens.mjs
+    content/deck.outline.md      optional live outline (titles/bullets)
+    scripts/                     review, live, watch-outline, export-pdf, check-tokens
 docs/research.md                 stack comparison, decision, sources
 docs/verification.md             what was run and the results
 examples/                        example-deck.pdf, review-report.md, screenshots/
 ```
+
+## Live mode
+
+**React slides stay the source of truth.** For real-time updates:
+
+1. `npm run dev` — Vite HMR present mode at http://127.0.0.1:5173. Change any slide TSX, theme token, or diagram component and the stage refreshes immediately.
+2. `npm run live` — same server, plus a watcher on `content/deck.outline.md` that rewrites `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import in `src/slides/index.ts` to see stubs in the deck; then promote each stub into a hand-crafted slide file (diagrams, motion, layout) before `npm run review`.
+
+Caveat: the outline → TSX path is intentionally thin (title + bullets). It will not invent C4 / swimlanes / charts. Beauty work stays in React.
 
 ## Research summary
 
