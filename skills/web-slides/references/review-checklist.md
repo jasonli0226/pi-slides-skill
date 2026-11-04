@@ -24,7 +24,10 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] Gradient text and text over glows are clearly readable, since the lint can't measure these.
 - [ ] Icons are all lucide with the same stroke, and the same concept uses the same icon everywhere.
 - [ ] Charts are labelled with units and timeframes, start at zero, and highlight the bar the title mentions.
-- [ ] Diagrams have 8 nodes or fewer, labels aren't cut off, and arrows read left-to-right or top-to-bottom.
+- [ ] Diagram type matches the scenario (see `diagram-guide.md`): Mermaid only if ≤8 nodes; swimlanes / C4 / sequence use the React components.
+- [ ] Layered maps: ≤6 layers, ≤5 cells per layer; C4: one zoom level, ≤8 boxes; Sequence: ≤6 actors, ≤8 messages.
+- [ ] Diagram labels aren't cut off; arrows are unidirectional and specifically labelled; no emoji; text ≥18px.
+- [ ] Illustrative / generic rebuilds of vendor architectures are marked as such (Pill or caption), never copied proprietary.
 - [ ] The technical deck includes architecture, results, governance and lessons slides.
 - [ ] The final slide has a clear ask or next step and lists references.
 

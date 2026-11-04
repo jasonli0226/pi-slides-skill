@@ -12,6 +12,10 @@ export const S = {
   motionA11y: { id: "motionA11y", label: "Motion docs, React accessibility", url: "https://motion.dev/docs/react-accessibility" },
   playwright: { id: "playwright", label: "Playwright docs, Screenshots", url: "https://playwright.dev/docs/screenshots" },
   piSkills: { id: "piSkills", label: "pi-mono, coding-agent docs/skills.md", url: "https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/skills.md" },
+  c4Diagrams: { id: "c4Diagrams", label: "C4 model, Diagrams", url: "https://c4model.com/diagrams" },
+  c4Notation: { id: "c4Notation", label: "C4 model, Notation", url: "https://c4model.com/diagrams/notation" },
+  azureDiagrams: { id: "azureDiagrams", label: "Microsoft Learn, Architecture design diagrams", url: "https://learn.microsoft.com/en-us/azure/well-architected/architect-role/design-diagrams" },
+  archPresenting: { id: "archPresenting", label: "Software Architecture Guild, Diagraming and Presenting", url: "https://software-architecture-guild.com/guide/architecture/documentation/diagraming-and-presenting/" },
   verifyRun: { id: "verifyRun", label: "Measured with npm run review + export:pdf on the build box, 4 Nov 2026" },
 } satisfies Record<string, SourceRef>;
 

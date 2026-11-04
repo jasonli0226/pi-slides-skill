@@ -62,3 +62,12 @@ From `packages/coding-agent/docs/skills.md` and `docs/packages.md` in badlogic/p
 10. pi-mono, coding-agent docs/packages.md: https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/packages.md
 
 npm versions checked on 4 Nov 2026: spectacle 10.2.4, @slidev/cli 53.0.0, reveal.js 6.0.2, motion 14.9.1, mermaid 12.3.0, shiki 4.6.0, playwright 1.64.1, react 19.3.1, vite 8.3.5.
+
+
+## Presentation diagrams (added 4 Nov 2026)
+
+For dense architecture pictures we stay on React + CSS + light SVG (no React Flow / AntV X6 unless interactive editing is required). Practices we encode in `skills/web-slides/references/diagram-guide.md`:
+
+- C4 zoom levels: context, containers, components, code — use only the levels that add value; context + containers usually suffice [C4 diagrams](https://c4model.com/diagrams). One level per diagram; label types, short descriptions, unidirectional specifically labelled relationships [C4 notation](https://c4model.com/diagrams/notation).
+- Layer / progressive disclosure instead of one whole-system hairball [Software Architecture Guild](https://software-architecture-guild.com/guide/architecture/documentation/diagraming-and-presenting/), [Microsoft Learn architecture diagrams](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/design-diagrams).
+- Split when over ~15 nodes or when structure and a single request path both matter; rebuild vendor wall-charts as simplified illustrative stacks rather than copying them.

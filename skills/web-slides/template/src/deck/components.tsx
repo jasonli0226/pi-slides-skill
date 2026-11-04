@@ -226,7 +226,7 @@ export function BarChart({ data, unit = "", cite, illustrative, max, highlight, 
 
 const cssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-/** Mermaid diagram rendered with theme tokens. Keep diagrams to <= 12 nodes. */
+/** Mermaid diagram rendered with theme tokens. Keep Mermaid diagrams to ≤8 nodes; use LayeredArchitecture / C4Container / Sequence for denser pictures. */
 export function Mermaid({ chart, height = 620 }: { chart: string; height?: number }) {
   const id = useId().replace(/[^a-zA-Z0-9]/g, "");
   const [svg, setSvg] = useState("");
@@ -368,3 +368,12 @@ export function IconList({ items, stepwise = false, startAt = 1 }: {
 export function Gradient({ children }: { children: ReactNode }) {
   return <span className="text-gradient">{children}</span>;
 }
+
+
+/* Diagram primitives (React + CSS). Prefer over Mermaid for >8 nodes / swimlanes. */
+export {
+  LayeredArchitecture, FlowSteps, Sequence, C4Container, DiagramLegend,
+  type ArchitectureLayer, type LayerItem, type SideRail,
+  type FlowStep, type SequenceActor, type SequenceMessage,
+  type C4Node, type C4Relation, type C4Kind, type DiagramTone,
+} from "./diagrams";

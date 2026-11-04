@@ -8,7 +8,7 @@ Every type has a working example in `template/src/slides/` (in the skill dir). C
 | `agenda` | 3 to 5 parts, revealed per click | `02-agenda.tsx` | `Stagger stepwise` + `Card icon` in `.grid-4` / `.grid-3` |
 | `big-number` | One headline metric (+ one supporting metric) | `03-big-number.tsx` | `Stat size="xl" cite`, second `Stat size="md"` |
 | `comparison` | Options side by side, recommended column highlighted | `04-comparison.tsx` | `table.compare`, `.col-hi`, `<Cite>` inside cells |
-| `architecture` | System or data flow, at most 8 nodes | `05-architecture.tsx` | `Mermaid chart height` (flowchart LR/TB) |
+| `architecture` | System or data flow | `05-architecture.tsx`, `13-layered-platform.tsx`, `14-c4-context.tsx`, `15-chat-sequence.tsx` | `Mermaid` (≤8 nodes) **or** `LayeredArchitecture` / `C4Container` / `Sequence` / `FlowSteps` — see `diagram-guide.md` |
 | `timeline` | Phases, roadmap, process steps | `06-timeline.tsx` | `Timeline items` (stepwise by default) |
 | `code` | Show a config or snippet and walk through it | `07-code.tsx` | `Code lang filename focus={["2-3","5-6"]}` + `steps` |
 | `results` | Measured outcome, before/after, KPIs | `08-results.tsx` | `Stat` + `BarChart cite highlight` |
@@ -46,6 +46,19 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
 - **IconList** `{ items: {icon, text, tone?}[], stepwise? }`. Use 5 items or fewer.
 - **Gradient** wraps one or two key words in the title or hero in accent gradient text. Use it at most once per slide.
 - **Cite** `{ id }` is an inline citation marker for text claims and table cells.
+
+
+## Diagram components (`src/deck/diagrams.tsx`)
+
+Re-exported from `components.tsx`. Read `diagram-guide.md` before picking one.
+
+- **LayeredArchitecture** `{ layers: {id, label, tone?, items: {label, sub?, highlight?, icon?}[]}[], leftRail?, rightRail?, caption?, stepwise? }`
+  - Swimlanes for dense stacks. Soft limit: 3–6 layers, ≤5 cells per layer.
+- **FlowSteps** `{ steps: {title, body?, icon?, tone?}[], stepwise? }` — 3–6 memorable steps.
+- **Sequence** `{ actors: {id, label, tone?}[], messages: {from, to, label, dashed?, note?}[], stepwise? }` — ≤6 actors, ≤8 messages.
+- **C4Container** `{ nodes: {id, label, kind: "person"|"system"|"container"|"external", description?, tech?, highlight?, row, col}[], relations?: {from, to, label, dashed?}[], cols?, rows?, legend?, showRelationList? }`
+  - SVG edges + on-canvas edge labels. Keep `showRelationList` false unless there is spare footer space.
+- **DiagramLegend** `{ items: {tone?, label}[] }` — tone/kind key chips.
 
 ## Layout helpers (deck.css)
 

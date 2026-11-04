@@ -4,3 +4,4 @@ review/
 export/
 .DS_Store
 *.log
+*.tsbuildinfo

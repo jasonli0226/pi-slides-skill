@@ -12,7 +12,8 @@ An agent skill for the [pi coding agent](https://github.com/badlogic/pi-mono) th
   - Titles must be full-sentence takeaways.
   - Contrast is checked against WCAG 2.2 AA, both at the token level and in the rendered DOM.
   - The lint fails on emoji icons, template leftovers (lorem, TODO, `{{ }}`, NaN), overflow and text under 18px.
-- **13 slide types with working examples:** title, agenda, big number, architecture (Mermaid), comparison, timeline, code walkthrough (Shiki with per-step focus), quote, results (count-up stat + animated bars), governance, lessons, closing and section.
+- **13 slide types with working examples:** title, agenda, big number, architecture (Mermaid **or** React swimlanes / C4 / sequence), comparison, timeline, code walkthrough (Shiki with per-step focus), quote, results (count-up stat + animated bars), governance, lessons, closing and section.
+- **Diagram guide:** `skills/web-slides/references/diagram-guide.md` teaches when to use Mermaid (≤8 nodes) vs `LayeredArchitecture`, `FlowSteps`, `Sequence`, `C4Container` (React + CSS, no heavy graph library).
 - **Swappable theme tokens:** the built-in themes are `midnight`, `aurora` and `paper`. A brand palette goes in `brand.css` and is a single-file change.
 - **Presenting:** arrow keys or clicks with click-steps, **N** notes, **O** overview, **F** fullscreen, and `prefers-reduced-motion` respected.
 
@@ -54,6 +55,7 @@ skills/web-slides/
   SKILL.md                       entry point pi loads (frontmatter + workflow + standard)
   references/
     design-guide.md              story, layout, type scale, color, icons, motion, data
+    diagram-guide.md             scenario → diagram type, beauty rules, anti-patterns
     slide-catalog.md             slide types, component props, file skeleton
     workflow.md                  step-by-step commands and approval gate
     review-checklist.md          automated + visual + facts checklist

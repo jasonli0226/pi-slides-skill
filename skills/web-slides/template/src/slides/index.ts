@@ -4,6 +4,9 @@ import agenda from "./02-agenda";
 import bigNumber from "./03-big-number";
 import comparison from "./04-comparison";
 import architecture from "./05-architecture";
+import layeredPlatform from "./13-layered-platform";
+import c4Context from "./14-c4-context";
+import chatSequence from "./15-chat-sequence";
 import timeline from "./06-timeline";
 import code from "./07-code";
 import results from "./08-results";
@@ -14,7 +17,11 @@ import closing from "./12-closing";
 
 export const deck = defineDeck({
   title: "Agent-authored web decks",
-  theme: "midnight", // midnight | aurora | paper | your brand theme from brand.css
+  theme: "midnight",
   transition: "fade",
-  slides: [title, agenda, bigNumber, comparison, architecture, timeline, code, results, quote, governance, lessons, closing],
+  slides: [
+    title, agenda, bigNumber, comparison, architecture,
+    layeredPlatform, c4Context, chatSequence,
+    timeline, code, results, quote, governance, lessons, closing,
+  ],
 });

@@ -47,5 +47,8 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 
 ## Diagrams
 
-- Use Mermaid flowcharts with 8 nodes or fewer, short labels (3 words or fewer per line), and dotted arrows for feedback loops.
-- For more complex systems, split the diagram across two slides or show layers with Cards.
+- Read `references/diagram-guide.md` before drawing. Pick the type from the scenario matrix; do not default to Mermaid for dense stacks.
+- **Mermaid** only for ≤8-node flows or small decision trees. Short labels (≤3–4 words), dotted arrows for feedback.
+- **React + CSS components** for everything denser: `LayeredArchitecture` (swimlanes), `FlowSteps`, `Sequence`, `C4Container`. Stay in-stack; do not add React Flow / X6 unless the user asks for interactive edges.
+- One C4 zoom level per slide. Split overview vs request-path vs governance. Rebuild vendor wall-charts as a simplified, illustrative generic stack — never copy proprietary diagrams.
+- Color by layer/kind via `tone` props; no hard-coded hex; no emoji; diagram text ≥18px (lint-enforced).
