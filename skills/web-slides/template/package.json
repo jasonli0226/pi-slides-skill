@@ -14,7 +14,7 @@
     "review": "node scripts/review.mjs",
     "export:pdf": "node scripts/export-pdf.mjs",
     "export:png": "node scripts/review.mjs --out export/png --no-lint",
-    "verify": "npm run check:tokens && npm run build && node scripts/review.mjs --no-build && node scripts/export-pdf.mjs --no-build",
+    "verify": "npm run check:tokens && npm run typecheck && npm run build && node scripts/review.mjs --no-build && node scripts/export-pdf.mjs --no-build",
     "outline": "node scripts/watch-outline.mjs",
     "live": "node scripts/live.mjs"
   },

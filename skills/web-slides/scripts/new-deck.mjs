@@ -25,7 +25,8 @@ if (!argv.includes("--keep-examples")) {
   const slides = join(dest, "src/slides");
   rmSync(slides, { recursive: true, force: true });
   mkdirSync(slides);
-  const esc = (s) => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  // JSON.stringify gives a valid JS string literal; in JSX it goes inside {} (attribute strings have no escapes).
+  const lit = (s) => JSON.stringify(s);
   writeFileSync(join(slides, "sources.ts"), `import type { SourceRef } from "../deck/types";
 
 /** Bibliography for this deck. Every number, chart and quote must cite one of these ids.
@@ -42,7 +43,7 @@ export default defineSlide({
   id: "title",
   transition: "blur",
   Component: () => (
-    <SlideFrame kind="title" background="aurora" footer={false} title="${esc(title)}" />
+    <SlideFrame kind="title" background="aurora" footer={false} title={${lit(title)}} />
   ),
 });
 `);
@@ -50,8 +51,8 @@ export default defineSlide({
 import title from "./01-title";
 
 export const deck = defineDeck({
-  title: "${esc(title)}",
-  theme: "${esc(theme)}",
+  title: ${lit(title)},
+  theme: ${lit(theme)},
   transition: "fade",
   slides: [title],
 });
