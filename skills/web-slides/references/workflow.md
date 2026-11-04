@@ -38,7 +38,7 @@ cd ./decks/<slug> && npm install && npx playwright install chromium
 ```
 
 - If Chromium download is blocked, set `CHROME_PATH=/path/to/chrome`; the scripts fall back to `/usr/bin/google-chrome` or `/usr/bin/chromium`.
-- `--keep-examples` copies the 12 example slides; delete the ones you don't use, and their sources.
+- `--keep-examples` copies the 16 example slides; delete the ones you don't use, and their sources.
 
 ## 4b. Style import (optional)
 
@@ -56,7 +56,7 @@ Check `style-import/style-spec.json`, then preview with `npm run dev` → `/?the
 
 - Make one file per slide, `src/slides/NN-id.tsx`, register each in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`.
 - **Live preview (HMR):** `npm run dev` → http://127.0.0.1:5173. Edit a slide `.tsx` or `sources.ts` and the browser updates immediately (keys: arrows, N, O, F).
-- **Live + outline:** `npm run live` also watches `content/deck.outline.md` and regenerates `src/slides/generated/from-outline.tsx`. Uncomment `outlineSlides` in `index.ts` to preview stubs; refine into real slide files before review.
+- **Live + outline:** `npm run live` also watches `content/deck.outline.md` and regenerates `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import and spread in `index.ts` to preview stubs; refine into real slide files before review.
 - Run `npm run typecheck` to catch prop mistakes early.
 
 ## 5b. User-provided media (agent does this)
@@ -87,7 +87,7 @@ npm run review -- --steps   # also every click step
 npm run export:pdf                 # export/deck.pdf (vector text, one 1920×1080 page per slide)
 npm run export:pdf -- --raster     # export/deck-raster.pdf (pixel-identical to screenshots)
 npm run export:png                 # export/png/slide-NN-id.png
-npm run verify                     # tokens + build + review + pdf in one go (CI-friendly)
+npm run verify                     # tokens + typecheck + build + review + pdf in one go (CI-friendly)
 ```
 
 - `npm run build` writes `dist/`, a static site (relative paths) that opens from any static host.
