@@ -16,8 +16,9 @@ const outDir = join(root, "src", "slides", "generated");
 const outFile = join(outDir, "from-outline.tsx");
 const watching = process.argv.includes("--watch");
 
-function esc(s) {
-  return s.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$");
+/** Outline text as a JSX expression: `{"..."}` is safe for both attributes and children. */
+function jsx(s) {
+  return `{${JSON.stringify(s)}}`;
 }
 
 function parseOutline(md) {
@@ -55,15 +56,15 @@ function render({ deckTitle, theme, slides }) {
     const bullets = s.bullets.slice(0, 5);
     const list = bullets.length
       ? `<ul className="muted" style={{ fontSize: 28, lineHeight: 1.45, margin: 0, paddingLeft: "1.1em" }}>
-${bullets.map((b) => `          <li>${esc(b)}</li>`).join("\n")}
+${bullets.map((b) => `          <li>${jsx(b)}</li>`).join("\n")}
         </ul>`
       : `<p className="muted">Refine this stub in a dedicated slide file for layout and diagrams.</p>`;
     return `const s${i} = defineSlide({
   id: "outline-${id}",
   notes: "Generated from content/deck.outline.md — refine into a typed slide file for production beauty.",
   Component: () => (
-    <SlideFrame kind="${id === "title" ? "title" : id === "closing" ? "closing" : "content"}" kicker="${esc(s.kicker)}"
-      title="${esc(s.title)}"${id === "title" ? ' background="aurora" center' : ""}>
+    <SlideFrame kind="${id === "title" ? "title" : id === "closing" ? "closing" : "content"}" kicker=${jsx(s.kicker)}
+      title=${jsx(s.title)}${id === "title" ? ' background="aurora" center' : ""}>
       ${list}
     </SlideFrame>
   ),

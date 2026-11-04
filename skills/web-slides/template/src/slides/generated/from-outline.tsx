@@ -6,11 +6,11 @@ const s0 = defineSlide({
   id: "outline-title",
   notes: "Generated from content/deck.outline.md — refine into a typed slide file for production beauty.",
   Component: () => (
-    <SlideFrame kind="title" kicker="Opening"
-      title="Research-backed decks that look like a design team built them." background="aurora" center>
+    <SlideFrame kind="title" kicker={"Opening"}
+      title={"Research-backed decks that look like a design team built them."} background="aurora" center>
       <ul className="muted" style={{ fontSize: 28, lineHeight: 1.45, margin: 0, paddingLeft: "1.1em" }}>
-          <li>React 19 + Motion</li>
-          <li>Playwright review loop</li>
+          <li>{"React 19 + Motion"}</li>
+          <li>{"Playwright review loop"}</li>
         </ul>
     </SlideFrame>
   ),
@@ -20,13 +20,13 @@ const s1 = defineSlide({
   id: "outline-agenda",
   notes: "Generated from content/deck.outline.md — refine into a typed slide file for production beauty.",
   Component: () => (
-    <SlideFrame kind="content" kicker="Roadmap"
-      title="Four gates stand between a draft and a shippable deck.">
+    <SlideFrame kind="content" kicker={"Roadmap"}
+      title={"Four gates stand between a draft and a shippable deck."}>
       <ul className="muted" style={{ fontSize: 28, lineHeight: 1.45, margin: 0, paddingLeft: "1.1em" }}>
-          <li>Brief and research</li>
-          <li>Outline approval</li>
-          <li>Build with HMR</li>
-          <li>Review then export</li>
+          <li>{"Brief and research"}</li>
+          <li>{"Outline approval"}</li>
+          <li>{"Build with HMR"}</li>
+          <li>{"Review then export"}</li>
         </ul>
     </SlideFrame>
   ),
@@ -36,11 +36,11 @@ const s2 = defineSlide({
   id: "outline-big-number",
   notes: "Generated from content/deck.outline.md — refine into a typed slide file for production beauty.",
   Component: () => (
-    <SlideFrame kind="content" kicker="Proof"
-      title="The scaffold reviews every slide and ships a PDF in under a minute.">
+    <SlideFrame kind="content" kicker={"Proof"}
+      title={"The scaffold reviews every slide and ships a PDF in under a minute."}>
       <ul className="muted" style={{ fontSize: 28, lineHeight: 1.45, margin: 0, paddingLeft: "1.1em" }}>
-          <li>Stat: 0 blocking lint errors</li>
-          <li>Note: numbers must cite a real source before the final deck</li>
+          <li>{"Stat: 0 blocking lint errors"}</li>
+          <li>{"Note: numbers must cite a real source before the final deck"}</li>
         </ul>
     </SlideFrame>
   ),
@@ -50,12 +50,12 @@ const s3 = defineSlide({
   id: "outline-architecture",
   notes: "Generated from content/deck.outline.md — refine into a typed slide file for production beauty.",
   Component: () => (
-    <SlideFrame kind="content" kicker="How it fits"
-      title="Dense stacks need swimlanes; C4 context shows who talks to whom.">
+    <SlideFrame kind="content" kicker={"How it fits"}
+      title={"Dense stacks need swimlanes; C4 context shows who talks to whom."}>
       <ul className="muted" style={{ fontSize: 28, lineHeight: 1.45, margin: 0, paddingLeft: "1.1em" }}>
-          <li>LayeredArchitecture for the stack</li>
-          <li>C4Container for system context</li>
-          <li>Sequence for one request path</li>
+          <li>{"LayeredArchitecture for the stack"}</li>
+          <li>{"C4Container for system context"}</li>
+          <li>{"Sequence for one request path"}</li>
         </ul>
     </SlideFrame>
   ),
@@ -65,11 +65,11 @@ const s4 = defineSlide({
   id: "outline-closing",
   notes: "Generated from content/deck.outline.md — refine into a typed slide file for production beauty.",
   Component: () => (
-    <SlideFrame kind="closing" kicker="Ask"
-      title="Approve the outline, then we polish the React slides live.">
+    <SlideFrame kind="closing" kicker={"Ask"}
+      title={"Approve the outline, then we polish the React slides live."}>
       <ul className="muted" style={{ fontSize: 28, lineHeight: 1.45, margin: 0, paddingLeft: "1.1em" }}>
-          <li>Next: npm run review</li>
-          <li>Hand-off: PDF + contact sheet</li>
+          <li>{"Next: npm run review"}</li>
+          <li>{"Hand-off: PDF + contact sheet"}</li>
         </ul>
     </SlideFrame>
   ),
