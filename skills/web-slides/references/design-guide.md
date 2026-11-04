@@ -45,6 +45,12 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 - Charts should start at zero and use 3 to 7 bars. Highlight the bar that the title talks about.
 - If a figure is an example or a projection that you were asked to show, mark it `illustrative` and say so in the notes.
 
+## Media (photos, logos, screenshots)
+
+- Read `references/media-guide.md`. User assets live in `public/media/` and render through `<Figure>`.
+- Lucide for icons; Figure for anything the user supplied. Never invent logos or stock art.
+- Always set `alt` and `cite` or `illustrative`. Keep logos `fit="contain"`; check text-over-image by eye.
+
 ## Diagrams
 
 - Read `references/diagram-guide.md` before drawing. Pick the type from the scenario matrix; do not default to Mermaid for dense stacks.

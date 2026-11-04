@@ -370,6 +370,45 @@ export function Gradient({ children }: { children: ReactNode }) {
 }
 
 
+
+/** Raster/SVG media from public/media or imported assets. Requires alt + cite|illustrative. */
+export function Figure({
+  src, alt, fit = "contain", caption, cite, illustrative, frame = true, shadow = true,
+  maxHeight = 620, className = "",
+}: {
+  src: string;
+  alt: string;
+  fit?: "contain" | "cover";
+  caption?: ReactNode;
+  cite?: string;
+  illustrative?: boolean;
+  frame?: boolean;
+  shadow?: boolean;
+  maxHeight?: number | string;
+  className?: string;
+}) {
+  const onError = () => reportError(`figure: failed to load ${src}`);
+  const h = typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight;
+  return (
+    <figure
+      className={`deck-figure ${frame ? "is-framed" : ""} ${shadow ? "is-shadow" : ""} ${className}`}
+      data-figure="media"
+      style={{ ["--figure-max-h" as string]: h }}
+    >
+      <div className={`deck-figure-stage fit-${fit}`}>
+        <img src={src} alt={alt} loading="lazy" decoding="async" onError={onError} />
+      </div>
+      {(caption || cite || illustrative) && (
+        <figcaption className="deck-figure-cap">
+          {caption && <span className="deck-figure-caption">{caption}</span>}
+          <FigureMark cite={cite} illustrative={illustrative} />
+        </figcaption>
+      )}
+      {!caption && !cite && !illustrative && <span data-uncited="true" />}
+    </figure>
+  );
+}
+
 /* Diagram primitives (React + CSS). Prefer over Mermaid for >8 nodes / swimlanes. */
 export {
   LayeredArchitecture, FlowSteps, Sequence, C4Container, DiagramLegend,

@@ -47,6 +47,18 @@ cd ./decks/<slug> && npm install && npx playwright install chromium
 - **Live + outline:** `npm run live` also watches `content/deck.outline.md` and regenerates `src/slides/generated/from-outline.tsx`. Uncomment `outlineSlides` in `index.ts` to preview stubs; refine into real slide files before review.
 - Run `npm run typecheck` to catch prop mistakes early.
 
+## 5b. User-provided media (agent does this)
+
+If the user attaches or pastes an image, logo, screenshot or says "use this asset":
+
+1. Write the bytes to `public/media/<kebab-name>.<ext>` (create the folder if needed).
+2. On the slide, import `Figure` and render `<Figure src="/media/…" alt="…" cite|illustrative maxHeight={…} />`.
+3. Prefer Lucide for abstract UI icons; use Figure for brand/photo/screenshot evidence.
+4. Do **not** invent logos or download unlicensed stock. If the asset is missing, ask.
+5. Re-run `npm run review` so screenshots and `img-alt` / `img-broken` lint cover the new media.
+
+Details and sizing: `media-guide.md`.
+
 ## 6 and 7. Review loop
 
 ```bash

@@ -17,7 +17,7 @@ Every type has a working example in `template/src/slides/` (in the skill dir). C
 | `lessons` | What we learned / would do differently | `11-lessons.tsx` | `IconList stepwise` |
 | `closing` | The ask or next step, plus references | `12-closing.tsx` | `background="aurora"`, references from `allSources` |
 | `section` | Divider between parts (title may be short) | (use `title` pattern) | `SlideFrame kind="section" center` |
-| `content` | Anything else | — | `.grid-2/3/4`, `Card`, `IconList` |
+| `content` | Anything else; media showcase | `16-media-figure.tsx` | `.grid-2/3/4`, `Card`, `IconList`, `Figure` |
 
 A technical deck must include `architecture`, `results`, `governance` and `lessons`.
 
@@ -46,6 +46,8 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
 - **IconList** `{ items: {icon, text, tone?}[], stepwise? }`. Use 5 items or fewer.
 - **Gradient** wraps one or two key words in the title or hero in accent gradient text. Use it at most once per slide.
 - **Cite** `{ id }` is an inline citation marker for text claims and table cells.
+- **Figure** `{ src, alt, fit?: "contain"|"cover", caption?, cite | illustrative, frame?, shadow?, maxHeight? }`
+  - User-provided media from `public/media/` (URL `/media/…`). Requires `alt` and `cite` or `illustrative`. See `media-guide.md` and example `16-media-figure.tsx`.
 
 
 ## Diagram components (`src/deck/diagrams.tsx`)

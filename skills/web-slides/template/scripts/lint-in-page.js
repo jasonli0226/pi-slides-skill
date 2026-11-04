@@ -1,6 +1,6 @@
 // Runs inside the browser on one static slide. Returns a list of issues.
 // Rules: frame, title-sentence, source-missing, cite-unknown, leftover, emoji-icon,
-//        off-stage, footer-overlap, clipped, tiny-text, contrast.
+//        img-alt, img-broken, off-stage, footer-overlap, clipped, tiny-text, contrast.
 (() => {
   const issues = [];
   const add = (level, rule, msg, el) =>
@@ -22,9 +22,18 @@
 
   /* ---- sources ---- */
   stage.querySelectorAll("[data-uncited]").forEach((el) =>
-    add("error", "source-missing", "A Stat/BarChart/Quote has no `cite` (or `illustrative`).", el.parentElement));
+    add("error", "source-missing", "A Stat/BarChart/Quote/Figure has no `cite` (or `illustrative`).", el.parentElement));
   stage.querySelectorAll("[data-cite-missing]").forEach((el) =>
     add("error", "cite-unknown", `<Cite id="${el.dataset.cite}"> is not in this slide's sources.`, el.parentElement));
+
+  /* ---- media / images ---- */
+  stage.querySelectorAll("img").forEach((el) => {
+    if (!el.hasAttribute("alt")) add("error", "img-alt", "Image is missing an alt attribute. Use <Figure alt=\"...\">.", el);
+    else if (!(el.getAttribute("alt") || "").trim() && el.getAttribute("data-decorative") !== "true")
+      add("error", "img-alt", "Image alt is empty. Describe the image, or mark it data-decorative=\"true\".", el);
+    if (el.complete && el.naturalWidth === 0)
+      add("error", "img-broken", `Image failed to load: ${el.getAttribute("src") || "(no src)"}.`, el);
+  });
 
   /* ---- leftovers ---- */
   const text = stage.innerText;

@@ -6,7 +6,8 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 
 - [ ] `frame`: every slide uses SlideFrame.
 - [ ] `title-sentence`: titles have 5 or more words and end with punctuation.
-- [ ] `source-missing` / `cite-unknown`: every Stat, BarChart and Quote cites a source listed on that slide.
+- [ ] `source-missing` / `cite-unknown`: every Stat, BarChart, Quote and Figure cites a source listed on that slide (or is `illustrative`).
+- [ ] `img-alt` / `img-broken`: every `<img>` / `<Figure>` has meaningful alt text and loads successfully.
 - [ ] `leftover`: no lorem, TODO, TBD, FIXME, placeholder, `{{ }}`, undefined or NaN.
 - [ ] `emoji-icon`: no emoji.
 - [ ] `off-stage`, `footer-overlap`, `clipped`: nothing spills off the stage, into the footer, or out of a container.
@@ -23,6 +24,7 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] There's enough whitespace: no slide feels crammed (over 40 words is a smell).
 - [ ] Gradient text and text over glows are clearly readable, since the lint can't measure these.
 - [ ] Icons are all lucide with the same stroke, and the same concept uses the same icon everywhere.
+- [ ] User-provided media sits under `public/media/`, uses `<Figure>`, and is cited or marked illustrative (see `media-guide.md`). No invented logos.
 - [ ] Charts are labelled with units and timeframes, start at zero, and highlight the bar the title mentions.
 - [ ] Diagram type matches the scenario (see `diagram-guide.md`): Mermaid only if ≤8 nodes; swimlanes / C4 / sequence use the React components.
 - [ ] Layered maps: ≤6 layers, ≤5 cells per layer; C4: one zoom level, ≤8 boxes; Sequence: ≤6 actors, ≤8 messages.

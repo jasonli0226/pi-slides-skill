@@ -281,3 +281,24 @@ table.compare th.col-hi { color: var(--accent); }
 .dg-c4-legend .kind-system::before { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 40%, transparent); }
 .dg-c4-legend .kind-container::before { border-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 30%, transparent); }
 .dg-c4-legend .kind-external::before { border-style: dashed; border-color: var(--text-muted); background: transparent; }
+
+
+/* ---- media / Figure ---- */
+.deck-figure { display: flex; flex-direction: column; gap: 12px; margin: 0; min-width: 0; max-width: 100%; }
+.deck-figure-stage { position: relative; display: flex; align-items: center; justify-content: center; width: 100%;
+  max-height: var(--figure-max-h, 620px); overflow: hidden; border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 80%, transparent); flex: 0 1 auto; }
+.deck-figure.is-framed .deck-figure-stage { border: 1px solid var(--border); }
+.deck-figure.is-shadow .deck-figure-stage { box-shadow: 0 18px 48px color-mix(in srgb, var(--bg) 50%, transparent); }
+.deck-figure-stage img { display: block; width: 100%; height: 100%; max-height: var(--figure-max-h, 620px); object-position: center; }
+.deck-figure-stage.fit-contain img { object-fit: contain; }
+.deck-figure-stage.fit-cover img { object-fit: cover; }
+.deck-figure-cap { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  font: 500 18px/1.35 var(--font-body); color: var(--text-muted); }
+.deck-figure-caption { flex: 1 1 auto; }
+.deck-figure .illustrative, .deck-figure .cite { flex: 0 0 auto; }
+/* Text overlay when placing copy on top of a photo — agent must ensure WCAG by eye */
+.deck-figure-overlay { position: relative; }
+.deck-figure-overlay .deck-figure-stage::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--bg) 88%, transparent) 100%);
+  pointer-events: none; }

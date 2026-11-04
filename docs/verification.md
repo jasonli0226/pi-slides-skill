@@ -24,3 +24,9 @@ Example screenshots for the diagram work: `examples/screenshots/slide-06-layered
 - Refined `C4Container` (orthogonal elbows, kind hierarchy, fade Appear, overlay legend).
 - Added `npm run live` / `npm run outline` + `content/deck.outline.md`.
 - `npm run verify`: 15 slides, 0 errors, PDF OK.
+
+### 4 Nov 2026 (evening, Asia/Hong_Kong) — Figure / media for agents
+
+- Added `<Figure>` + `public/media/` + `media-guide.md` so the agent inserts user assets end-to-end.
+- Lint: `img-alt`, `img-broken`; example slide `16-media-figure.tsx` with illustrative SVG.
+- `npm run verify`: 16 slides, 0 errors.
