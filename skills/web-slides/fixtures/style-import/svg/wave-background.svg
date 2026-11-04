@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generated fixture for web-slides style import; CC0 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <metadata>fixture</metadata>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1f2a"/>
+      <stop offset="1" stop-color="#102a36"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#g)"/>
+  <path d="M0 820 C 400 700 800 960 1200 840 S 1800 760 1920 800 V1080 H0Z" fill="#14b8a6" opacity="0.18"/>
+  <path d="M0 900 C 500 820 900 1020 1400 920 S 1800 880 1920 900 V1080 H0Z" fill="#ff7a59" opacity="0.14"/>
+</svg>

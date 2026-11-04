@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Screenshot every slide (final state) + run the lint rules + build a contact sheet.
-// Usage: node scripts/review.mjs [--no-build] [--steps] [--out review] [--no-lint]
+// Usage: node scripts/review.mjs [--no-build] [--steps] [--out review] [--no-lint] [--theme brand]
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { args, argValue, buildAndServe, launch, waitReady, W, H } from "./lib.mjs";
@@ -8,6 +8,7 @@ import { args, argValue, buildAndServe, launch, waitReady, W, H } from "./lib.mj
 const out = argValue("--out", "review");
 const lint = !args.has("--no-lint");
 const withSteps = args.has("--steps");
+const themeQ = argValue("--theme", "") ? `&theme=${encodeURIComponent(argValue("--theme", ""))}` : "";
 const lintSrc = readFileSync(new URL("./lint-in-page.js", import.meta.url), "utf8");
 
 const t0 = Date.now();
@@ -22,7 +23,7 @@ const consoleErrors = [];
 page.on("pageerror", (e) => consoleErrors.push(String(e)));
 page.on("console", (m) => { if (m.type() === "error") consoleErrors.push(m.text()); });
 
-await page.goto(`${url}?static&slide=1`);
+await page.goto(`${url}?static&slide=1${themeQ}`);
 await waitReady(page);
 const deck = await page.evaluate(() => window.__DECK__);
 const results = [];
@@ -33,7 +34,7 @@ for (let i = 0; i < deck.slides.length; i++) {
   const n = String(i + 1).padStart(2, "0");
   const steps = withSteps ? [...Array(s.steps + 1).keys()] : ["final"];
   for (const step of steps) {
-    await page.goto(`${url}?static&slide=${i + 1}&step=${step}`);
+    await page.goto(`${url}?static&slide=${i + 1}&step=${step}${themeQ}`);
     await waitReady(page);
     const file = join(out, step === "final" ? `slide-${n}-${s.id}.png` : `slide-${n}-${s.id}-step${step}.png`);
     await page.screenshot({ path: file });

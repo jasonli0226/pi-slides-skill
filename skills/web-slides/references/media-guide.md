@@ -56,7 +56,8 @@ Never mix emoji or a second icon pack with Lucide.
 
 ## WCAG and text over images
 
-- Every `<Figure>` / `<img>` needs a meaningful **`alt`**. Empty alt only for purely decorative images marked `data-decorative="true"` (avoid this in decks).
+- Every `<Figure>` / `<img>` needs a meaningful **`alt`**. Purely decorative art (imported SVG backgrounds or ornaments from `npm run style:svg`) uses `<Figure decorative>`, which gives an empty alt and `data-decorative="true"`.
+- To derive a theme from the user's images or SVGs, see `style-import.md`.
 - **Do not put body text directly on a busy photo** without a scrim. If you must overlay a title, wrap with `className="deck-figure-overlay"` (adds a bottom gradient) **and** check the screenshot by eye — automated contrast lint cannot measure text over images.
 - Prefer text beside the image (`.grid-2`) rather than on top of it.
 - Captions stay ≥18px (theme caption size).

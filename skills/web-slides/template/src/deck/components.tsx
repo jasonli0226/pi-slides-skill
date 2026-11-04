@@ -16,6 +16,15 @@ const variants: Record<AppearVariant, Variants> = {
   right: { hidden: { opacity: 0, x: 48 }, shown: { opacity: 1, x: 0 } },
 };
 
+/** Motion restraint from the theme (`--motion-scale`, 0.4–1.4). Read once per page. */
+let _motionScale: number | undefined;
+function motionScale() {
+  if (_motionScale !== undefined) return _motionScale;
+  const v = typeof document === "undefined" ? NaN : parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--motion-scale"));
+  _motionScale = Number.isFinite(v) ? Math.min(1.4, Math.max(0.4, v)) : 1;
+  return _motionScale;
+}
+
 /** Reveal children. `at` = click step that shows it (0 = on slide enter). */
 export function Appear({ at = 0, variant = "up", delay = 0, className, style, children }: {
   at?: number; variant?: AppearVariant; delay?: number; className?: string; style?: CSSProperties; children: ReactNode;
@@ -26,7 +35,7 @@ export function Appear({ at = 0, variant = "up", delay = 0, className, style, ch
   return (
     <motion.div className={className} style={style} variants={variants[variant]}
       initial={isStatic ? (shown ? "shown" : "hidden") : "hidden"} animate={shown ? "shown" : "hidden"}
-      transition={{ duration: isStatic ? 0 : 0.6, delay: isStatic ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}>
+      transition={{ duration: isStatic ? 0 : 0.6 * motionScale(), delay: isStatic ? 0 : delay * motionScale(), ease: [0.22, 1, 0.36, 1] }}>
       {children}
     </motion.div>
   );
@@ -374,10 +383,13 @@ export function Gradient({ children }: { children: ReactNode }) {
 /** Raster/SVG media from public/media or imported assets. Requires alt + cite|illustrative. */
 export function Figure({
   src, alt, fit = "contain", caption, cite, illustrative, frame = true, shadow = true,
-  maxHeight = 620, className = "",
+  maxHeight = 620, className = "", decorative = false,
 }: {
   src: string;
-  alt: string;
+  /** required unless `decorative` */
+  alt?: string;
+  /** purely ornamental (imported SVG background / corner shape): empty alt, hidden from AT, no cite needed */
+  decorative?: boolean;
   fit?: "contain" | "cover";
   caption?: ReactNode;
   cite?: string;
@@ -396,7 +408,9 @@ export function Figure({
       style={{ ["--figure-max-h" as string]: h }}
     >
       <div className={`deck-figure-stage fit-${fit}`}>
-        <img src={src} alt={alt} loading="lazy" decoding="async" onError={onError} />
+        {decorative
+          ? <img src={src} alt="" aria-hidden="true" data-decorative="true" loading="lazy" decoding="async" onError={onError} />
+          : <img src={src} alt={alt ?? ""} loading="lazy" decoding="async" onError={onError} />}
       </div>
       {(caption || cite || illustrative) && (
         <figcaption className="deck-figure-cap">
@@ -404,7 +418,7 @@ export function Figure({
           <FigureMark cite={cite} illustrative={illustrative} />
         </figcaption>
       )}
-      {!caption && !cite && !illustrative && <span data-uncited="true" />}
+      {!caption && !cite && !illustrative && !decorative && <span data-uncited="true" />}
     </figure>
   );
 }

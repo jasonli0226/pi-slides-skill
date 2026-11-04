@@ -14,7 +14,14 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] `tiny-text`: nothing under 18px, including chart and diagram text.
 - [ ] `contrast`: solid-background text meets 4.5:1 (3:1 if large).
 - [ ] `render` / console: no Mermaid or Shiki errors and no runtime errors.
-- [ ] `npm run check:tokens` passes for the theme in use.
+- [ ] `npm run check:tokens` passes for the theme in use (including an imported `brand` theme).
+
+## Style import (if a URL, images or SVGs set the look)
+
+- [ ] Contrast passes, and any auto-adjusted brand colors (`contrastFixes` in `style-import/style-spec.json`) were reported to the user.
+- [ ] Licensing is confirmed. Only style was borrowed from third-party sites: no logos, product photos, illustrations or captures in `public/` or on slides. User images and SVGs are owned or licensed, and Canva elements were confirmed by the user.
+- [ ] Fonts are swapped. No proprietary font (SF Pro, Söhne, Circular and so on) is referenced or embedded, and any non-bundled free font is installed and imported in `main.tsx`.
+- [ ] The theme reads as the brand in the contact sheet (bg, accent, type weight, radius), and the hand-off names what was borrowed.
 
 ## Visual (you judge, from the PNGs)
 

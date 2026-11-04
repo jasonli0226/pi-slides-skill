@@ -46,7 +46,7 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
 - **IconList** `{ items: {icon, text, tone?}[], stepwise? }`. Use 5 items or fewer.
 - **Gradient** wraps one or two key words in the title or hero in accent gradient text. Use it at most once per slide.
 - **Cite** `{ id }` is an inline citation marker for text claims and table cells.
-- **Figure** `{ src, alt, fit?: "contain"|"cover", caption?, cite | illustrative, frame?, shadow?, maxHeight? }`
+- **Figure** `{ src, alt, fit?: "contain"|"cover", caption?, cite | illustrative, frame?, shadow?, maxHeight?, decorative? }`. Use `decorative` for imported SVG backgrounds or ornaments: empty alt, hidden from assistive tech, no cite.
   - User-provided media from `public/media/` (URL `/media/…`). Requires `alt` and `cite` or `illustrative`. See `media-guide.md` and example `16-media-figure.tsx`.
 
 

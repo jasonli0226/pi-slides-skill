@@ -9,6 +9,9 @@ import { Deck } from "./deck/Deck";
 import { deck } from "./slides";
 
 // set theme before first render so async renderers (mermaid) read the right tokens
+// `?theme=brand` previews another theme without editing index.ts (review: --theme brand)
+const themeOverride = new URLSearchParams(location.search).get("theme");
+if (themeOverride) deck.theme = themeOverride;
 document.documentElement.dataset.theme = deck.theme;
 
 createRoot(document.getElementById("root")!).render(<Deck config={deck} />);

@@ -40,6 +40,18 @@ cd ./decks/<slug> && npm install && npx playwright install chromium
 - If Chromium download is blocked, set `CHROME_PATH=/path/to/chrome`; the scripts fall back to `/usr/bin/google-chrome` or `/usr/bin/chromium`.
 - `--keep-examples` copies the 12 example slides; delete the ones you don't use, and their sources.
 
+## 4b. Style import (optional)
+
+If the user gives a site to match, brand images or SVG artwork, run this before building:
+
+```bash
+npm run style:url -- https://brand.example.com --apply   # or
+npm run style:images -- ./refs --apply                   # or
+npm run style:svg -- ./art --apply
+```
+
+Check `style-import/style-spec.json`, then preview with `npm run dev` → `/?theme=brand`. The rules are in `style-import.md`.
+
 ## 5. Build
 
 - Make one file per slide, `src/slides/NN-id.tsx`, register each in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`.

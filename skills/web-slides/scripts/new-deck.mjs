@@ -16,7 +16,7 @@ const dest = resolve(target);
 if (existsSync(dest) && readdirSync(dest).length) { console.error(`refusing: ${dest} exists and is not empty`); process.exit(2); }
 
 const tpl = join(dirname(fileURLToPath(import.meta.url)), "..", "template");
-const skip = new Set(["node_modules", "dist", "review", "export"]);
+const skip = new Set(["node_modules", "dist", "review", "export", "style-import"]);
 mkdirSync(dest, { recursive: true });
 cpSync(tpl, dest, { recursive: true, filter: (src) => !skip.has(src.split(/[\\/]/).pop()) });
 

@@ -16,6 +16,7 @@ An agent skill for the [pi coding agent](https://github.com/badlogic/pi-mono) th
 - **Diagram guide:** `skills/web-slides/references/diagram-guide.md` teaches when to use Mermaid (≤8 nodes) vs `LayeredArchitecture`, `FlowSteps`, `Sequence`, `C4Container` (React + CSS, no heavy graph library).
 - **Media guide:** `skills/web-slides/references/media-guide.md` teaches the **agent** to copy user-provided logos/screenshots into `public/media/` and render them with `<Figure>` (alt + cite/illustrative, lint for missing alt / broken src).
 - **Swappable theme tokens:** the built-in themes are `midnight`, `aurora` and `paper`. A brand palette goes in `brand.css` and is a single-file change.
+- **Style import:** `npm run style:url -- <url>`, `style:images -- <dir>` and `style:svg -- <dir>` turn a website, a mood board or SVG artwork into `style-spec.json` plus a WCAG-checked `[data-theme="brand"]`. The importer extracts colors, swaps proprietary fonts for free ones, maps layout feel to tokens and normalizes SVGs. It borrows style, never assets.
 - **Presenting:** arrow keys or clicks with click-steps, **N** notes, **O** overview, **F** fullscreen, and `prefers-reduced-motion` respected.
 
 ## Install into pi
@@ -61,6 +62,8 @@ skills/web-slides/
     diagram-guide.md             scenario → diagram type, beauty rules, anti-patterns
     slide-catalog.md             slide types, component props, file skeleton
     workflow.md                  step-by-step commands and approval gate
+    style-import.md              URL / images / SVG → brand theme, font swaps, licensing
+  fixtures/style-import/         generated CC0 sample images + SVGs for the importers
     review-checklist.md          automated + visual + facts checklist
   scripts/new-deck.mjs           create a deck from the template
   template/                      the deck engine + example slides + live outline
@@ -70,6 +73,7 @@ skills/web-slides/
     src/slides/                  one file per slide, sources.ts bibliography
     content/deck.outline.md      optional live outline (titles/bullets)
     scripts/                     review, live, watch-outline, export-pdf, check-tokens
+    scripts/style/               style:url, style:images, style:svg (+ shared color/k-means lib)
 docs/research.md                 stack comparison, decision, sources
 docs/verification.md             what was run and the results
 examples/                        example-deck.pdf, review-report.md, screenshots/
@@ -109,7 +113,8 @@ We compared Slidev, reveal.js, Spectacle and a custom React + Motion scaffold (d
 - Automatic contrast checking covers text on solid or semi-transparent backgrounds. Gradient text and text over glows or images must be checked by eye (it's on the checklist).
 - There is no editable PPTX output; hand-off is PDF and PNG.
 - The vector PDF drops the grain overlay and renders gradient text in the solid accent color. Use `--raster` for a pixel-exact copy.
-- The brand theme is not defined yet. Add it in `template/src/theme/brand.css` once the palette arrives.
+- The committed `brand.css` is empty. Generate one with `npm run style:*` or write it by hand.
+- Style import is heuristic. A page with a full-bleed hero photo or video, or a cookie wall, can skew bg or accent detection, so check the spec against the captures. Sites that block headless browsers need a user screenshot passed to `style:images`. SVG parsing is regex-based (no svgo unless installed) and does not resolve CSS classes in `<style>` blocks.
 
 ## License
 
