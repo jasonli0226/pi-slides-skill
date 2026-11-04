@@ -6,7 +6,7 @@ Dark theme, styled from the Apple website as a reference:
 
 ![Demo of a dark-theme deck styled from the Apple website](examples/demo-dark-theme.gif)
 
-Light theme, with images researched from the web and motion:
+Light theme, with images researched from the web and added motion:
 
 ![Demo of a light-theme deck with web-researched images and motion](examples/demo-light-theme.gif)
 
