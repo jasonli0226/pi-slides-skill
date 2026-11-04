@@ -1,0 +1,94 @@
+/* Design tokens. Every color, font and size used by slides comes from here.
+   To apply a company brand, override variables in brand.css (do not edit components).
+   Run `npm run check:tokens` after any color change: it enforces WCAG 2.2 AA contrast. */
+
+:root {
+  --font-display: "Space Grotesk Variable", "Inter Variable", system-ui, sans-serif;
+  --font-body: "Inter Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* type scale for the 1920x1080 stage (px). Never go below --fs-caption. */
+  --fs-hero: 112px;
+  --fs-title: 60px;
+  --fs-h3: 36px;
+  --fs-body: 30px;
+  --fs-small: 24px;
+  --fs-caption: 18px;
+
+  --space-1: 8px; --space-2: 16px; --space-3: 24px; --space-4: 32px;
+  --space-6: 48px; --space-8: 64px; --space-12: 96px;
+  --pad-x: 120px; --pad-top: 96px; --pad-bottom: 88px;
+
+  --radius: 20px;
+  --radius-sm: 12px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* midnight: dark navy, cyan + violet accents (default) */
+[data-theme="midnight"] {
+  --bg: #070b1a;
+  --bg-elev: #0d1430;
+  --surface: #111a3a;
+  --surface-2: #17224a;
+  --border: #2a3768;
+  --text: #f5f7ff;
+  --text-muted: #a9b4d6;
+  --accent: #38bdf8;
+  --accent-2: #a78bfa;
+  --accent-3: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --on-accent: #04111f;
+  --code-bg: #0a1027;
+  --code-theme: github-dark-default;
+  --glow-1: rgba(56, 189, 248, 0.35);
+  --glow-2: rgba(167, 139, 250, 0.32);
+  --glow-3: rgba(52, 211, 153, 0.18);
+  --accent-gradient: linear-gradient(90deg, #38bdf8, #a78bfa);
+}
+
+/* aurora: near-black with teal + pink, high drama for keynotes */
+[data-theme="aurora"] {
+  --bg: #05060a;
+  --bg-elev: #0b0d14;
+  --surface: #11131d;
+  --surface-2: #181b28;
+  --border: #2a2e40;
+  --text: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --accent: #2dd4bf;
+  --accent-2: #f472b6;
+  --accent-3: #a3e635;
+  --warning: #facc15;
+  --danger: #fb7185;
+  --on-accent: #03201c;
+  --code-bg: #0b0d14;
+  --code-theme: github-dark-default;
+  --glow-1: rgba(45, 212, 191, 0.30);
+  --glow-2: rgba(244, 114, 182, 0.30);
+  --glow-3: rgba(163, 230, 53, 0.14);
+  --accent-gradient: linear-gradient(90deg, #2dd4bf, #f472b6);
+}
+
+/* paper: light theme for daylight rooms and printed handouts */
+[data-theme="paper"] {
+  --bg: #f8fafc;
+  --bg-elev: #f1f5f9;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --border: #cbd5e1;
+  --text: #0b1220;
+  --text-muted: #475569;
+  --accent: #0369a1;
+  --accent-2: #6d28d9;
+  --accent-3: #047857;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  --on-accent: #ffffff;
+  --code-bg: #0f172a;
+  --code-theme: github-dark-default;
+  --glow-1: rgba(3, 105, 161, 0.14);
+  --glow-2: rgba(109, 40, 217, 0.12);
+  --glow-3: rgba(4, 120, 87, 0.10);
+  --accent-gradient: linear-gradient(90deg, #0369a1, #6d28d9);
+}

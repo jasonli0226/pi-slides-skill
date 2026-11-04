@@ -1,0 +1,76 @@
+# Workflow (detailed)
+
+## 1. Brief: ask once, briefly
+
+- Who is the audience, and what do they decide or do after the talk?
+- What is the duration or slide count? Will it be presented live, sent as a PDF, or both?
+- What must be in it, and what must not?
+- What are the brand palette, fonts and logo? If there's no brand yet, pick a built-in theme and say the brand can be swapped later in `brand.css`.
+- Which sources should be used: user documents, internal data, or public research?
+
+## 2. Research
+
+- Keep `research/notes.md` in the deck directory. For each source, record the id, title, publisher, date, URL, and the exact figures and quotes (copied verbatim) with page or section.
+- Prefer primary sources. Write down the date you accessed each one.
+- If a needed number does not exist, say so in the outline. Do not estimate silently.
+
+## 3. Outline and approval gate
+
+Write `outline.md` like this:
+
+```
+# <Deck title> · <audience> · <minutes>
+Theme: midnight (brand pending)
+
+01 title — "<takeaway sentence>." — visual: aurora bg — sources: —
+02 agenda — "<…>." — 4 cards
+03 big-number — "<…>." — Stat 48% — sources: pilotReport
+…
+```
+
+Then send it to the user with one question: approve, or what to change. Do not build until it is approved.
+
+## 4. Scaffold
+
+```bash
+node <skill>/scripts/new-deck.mjs ./decks/<slug> --title "<title-slide takeaway>." --theme midnight
+cd ./decks/<slug> && npm install && npx playwright install chromium
+```
+
+- If Chromium download is blocked, set `CHROME_PATH=/path/to/chrome`; the scripts fall back to `/usr/bin/google-chrome` or `/usr/bin/chromium`.
+- `--keep-examples` copies the 12 example slides; delete the ones you don't use, and their sources.
+
+## 5. Build
+
+- Make one file per slide, `src/slides/NN-id.tsx`, register each in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`.
+- Run `npm run dev` for a live preview at http://127.0.0.1:5173 (keys: arrows, N, O, F).
+- Run `npm run typecheck` to catch prop mistakes early.
+
+## 6 and 7. Review loop
+
+```bash
+npm run review              # build + screenshot + lint → review/
+npm run review -- --steps   # also every click step
+```
+
+- Read `review/report.md`, open `review/contact-sheet.png`, then open every `review/slide-*.png`. The lint can't judge taste, so look at each image.
+- Go through `review-checklist.md`, fix the problems, and run review again. Repeat until there are 0 errors.
+
+## 8. Export
+
+```bash
+npm run export:pdf                 # export/deck.pdf (vector text, one 1920×1080 page per slide)
+npm run export:pdf -- --raster     # export/deck-raster.pdf (pixel-identical to screenshots)
+npm run export:png                 # export/png/slide-NN-id.png
+npm run verify                     # tokens + build + review + pdf in one go (CI-friendly)
+```
+
+- `npm run build` writes `dist/`, a static site (relative paths) that opens from any static host.
+
+## 9. Hand-off message
+
+Include:
+- The PDF path and contact sheet.
+- How to present: `npm run dev`, or serve `dist/`; press F for fullscreen and N for notes.
+- The sources list.
+- Open issues: anything unsourced, illustrative, or still waiting for the brand.

@@ -1,0 +1,5 @@
+/* Company brand overrides.
+   1. Copy one theme block from tokens.css, rename it e.g. [data-theme="brand"].
+   2. Replace the hex values with the official brand palette and fonts.
+   3. Set `theme: "brand"` in src/slides/index.ts and run `npm run check:tokens`.
+   Leave this file empty of rules until a brand is supplied. */

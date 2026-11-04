@@ -1,0 +1,51 @@
+# Design guide
+
+The goal is a deck that looks designed rather than generated: one clear idea per slide, generous space, deliberate motion, and every number sourced.
+
+## Story
+
+- Use a pyramid structure: the title slide states the answer, the agenda gives 3 to 5 parts, each part proves one claim, and the closing slide makes the ask.
+- **Titles are the story.** Read only the titles in order and they should form a coherent argument. Each one is a full sentence (5 or more words, ending with a period) that states the takeaway, ideally with the number in it.
+- One idea per slide. If a slide needs two takeaways, make it two slides.
+- Put the detail in `notes`; the slide carries the evidence.
+- Rough length: 1 to 2 minutes per slide, so a 20-minute talk is about 12 to 16 slides.
+
+## Layout (1920×1080 stage)
+
+- The safe area is 120px left/right padding, 96px top and 88px bottom; SlideFrame applies it. Never place content in the footer band.
+- Use the type scale only: hero 112, title 60, h3 36, body 30, small 24, caption 18. Nothing smaller than 18px.
+- Body text should be 40 words per slide or fewer, with at most 5 bullets or 6 cards, and lines no longer than about 60 characters.
+- Prefer grids (`.grid-2/3/4`) to manual positioning. Use asymmetric grids (`0.55fr 1.45fr`) for a hero number next to a chart.
+- Give every slide one focal point: a big number, a highlighted column, a highlighted bar or a highlighted card. Make one thing the accent color, not everything.
+
+## Color and theme
+
+- Every color comes from the tokens: `--bg`, `--surface`, `--text`, `--text-muted`, `--accent`, `--accent-2`, `--accent-3`, `--warning`, `--danger`, `--on-accent`.
+- The built-in themes are `midnight` (dark, the default), `aurora` (dark violet) and `paper` (light, for printing or bright rooms).
+- Brand swap: copy a theme block into `src/theme/brand.css` as `[data-theme="brand"]`, set `theme: "brand"` in `src/slides/index.ts`, then run `npm run check:tokens`. Do not touch components.
+- Contrast follows WCAG 2.2 AA. Text needs 4.5:1, or 3:1 if it is 24px or larger (or 18.66px bold). UI and graphics need 3:1 (SC 1.4.11).
+- Gradient text and text over glows or images can't be measured automatically. Check those by eye in the screenshots, and keep gradient text for large headline words only.
+
+## Icons
+
+- Use lucide-react only, through `Icon`, `Card icon` or `IconList`. The stroke is 1.75 and the sizes are fixed (28/40/56/88).
+- Use the same icon for the same concept throughout the deck. Icons support meaning; they don't decorate. Never use emoji.
+
+## Motion
+
+- Transitions between slides are `fade` by default. Use `blur` for the title or quote slides and `zoom` for the closing; avoid mixing more than 2 or 3 kinds.
+- Inside a slide, use `Appear` for entrance (0.5 to 0.7s with an ease-out curve) and stagger groups by about 80ms. Use click steps to reveal an argument piece by piece, not to show off.
+- Animate opacity and transform only. Don't loop animations on content; the background blobs are slow and subtle.
+- Reduced motion is respected automatically (`MotionConfig reducedMotion="user"`). Static, print and screenshot modes render the final state with no motion, so the slide must read well without animation.
+
+## Data and evidence
+
+- Every `Stat`, `BarChart` and `Quote` needs `cite="sourceId"`, and the id must be in the slide's `sources`. Text claims get `<Cite id>`.
+- Label units and timeframes, for example "median minutes, Q3 2026, n=1,240 tickets", using only what the source says.
+- Charts should start at zero and use 3 to 7 bars. Highlight the bar that the title talks about.
+- If a figure is an example or a projection that you were asked to show, mark it `illustrative` and say so in the notes.
+
+## Diagrams
+
+- Use Mermaid flowcharts with 8 nodes or fewer, short labels (3 words or fewer per line), and dotted arrows for feedback loops.
+- For more complex systems, split the diagram across two slides or show layers with Cards.
