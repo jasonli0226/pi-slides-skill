@@ -21,10 +21,12 @@ const transitions: Record<TransitionName, { initial: TargetAndTransition; animat
   none: { initial: {}, animate: {}, exit: {} },
 };
 
-function parseHash(total: number) {
+/** `#/slide/step` → position, clamped to the deck and to the slide's steps. */
+function parseHash(slides: DeckConfig["slides"]) {
   const m = location.hash.match(/^#\/(\d+)(?:\/(\d+))?/);
-  const index = m ? Math.min(Math.max(parseInt(m[1], 10) - 1, 0), total - 1) : 0;
-  return { index, step: m && m[2] ? parseInt(m[2], 10) : 0 };
+  const index = m ? Math.min(Math.max(parseInt(m[1], 10) - 1, 0), slides.length - 1) : 0;
+  const step = m && m[2] ? Math.min(parseInt(m[2], 10), slides[index].steps ?? 0) : 0;
+  return { index, step };
 }
 
 function useStageScale(enabled: boolean) {
@@ -98,7 +100,7 @@ function StaticSlide({ config }: { config: DeckConfig }) {
 function PresentDeck({ config }: { config: DeckConfig }) {
   const { slides } = config;
   const total = slides.length;
-  const [{ index, step }, setPos] = useState(() => parseHash(total));
+  const [{ index, step }, setPos] = useState(() => parseHash(slides));
   const [showNotes, setShowNotes] = useState(false);
   const [overview, setOverview] = useState(false);
   const scale = useStageScale(true);
@@ -108,6 +110,13 @@ function PresentDeck({ config }: { config: DeckConfig }) {
   useEffect(() => {
     history.replaceState(null, "", `#/${index + 1}${step ? `/${step}` : ""}`);
   }, [index, step]);
+
+  // a hand-edited URL (or back/forward) moves the deck; replaceState above does not fire this
+  useEffect(() => {
+    const onHash = () => setPos(parseHash(slides));
+    addEventListener("hashchange", onHash);
+    return () => removeEventListener("hashchange", onHash);
+  }, [slides]);
 
   const next = useCallback(() => {
     setPos((p) => {
@@ -128,6 +137,7 @@ function PresentDeck({ config }: { config: DeckConfig }) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return; // leave browser shortcuts (Ctrl+F, Cmd+N, …) alone
       if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
       else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); prev(); }
       else if (e.key === "Home") setPos({ index: 0, step: 0 });
