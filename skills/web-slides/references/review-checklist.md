@@ -5,6 +5,7 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 ## Automated (from review/report.md; must be 0 errors)
 
 - [ ] `frame`: every slide uses SlideFrame.
+- [ ] `duplicate-id`: every slide id in `index.ts` is unique.
 - [ ] `title-sentence`: titles have 5 or more words and end with punctuation.
 - [ ] `source-missing` / `cite-unknown`: every Stat, BarChart, Quote and Figure cites a source listed on that slide (or is `illustrative`).
 - [ ] `img-alt` / `img-broken`: every `<img>` / `<Figure>` has meaningful alt text and loads successfully.
@@ -14,7 +15,7 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] `tiny-text`: nothing under 18px, including chart and diagram text.
 - [ ] `contrast`: solid-background text meets 4.5:1 (3:1 if large).
 - [ ] `render` / console: no Mermaid or Shiki errors and no runtime errors.
-- [ ] `npm run check:tokens` passes for the theme in use (including an imported `brand` theme).
+- [ ] `npm run check:tokens` passes for the theme in use (including an imported `brand` theme). Every theme must define each checked token as 6-digit hex (`#rrggbb`); `#fff`, `rgb()` or a missing token fails.
 
 ## Style import (if a URL, images or SVGs set the look)
 

@@ -26,6 +26,13 @@ page.on("console", (m) => { if (m.type() === "error") consoleErrors.push(m.text(
 await page.goto(`${url}?static&slide=1${themeQ}`);
 await waitReady(page);
 const deck = await page.evaluate(() => window.__DECK__);
+// deck-level rules: slide ids key React, URLs and screenshot names, so they must be unique
+const deckIssues = [];
+const firstSeen = new Map();
+deck.slides.forEach((s, i) => {
+  if (!firstSeen.has(s.id)) return firstSeen.set(s.id, i + 1);
+  deckIssues.push({ slide: i + 1, id: s.id, level: "error", rule: "duplicate-id", msg: `Slide id "${s.id}" is already used by slide ${firstSeen.get(s.id)}; ids must be unique.` });
+});
 const results = [];
 const shots = [];
 
@@ -57,16 +64,17 @@ await page.screenshot({ path: join(out, "contact-sheet.png"), fullPage: true });
 await browser.close();
 await server.close();
 
-const all = results.flatMap((r) => r.issues.map((x) => ({ slide: r.slide, id: r.id, ...x })));
+const all = [...deckIssues, ...results.flatMap((r) => r.issues.map((x) => ({ slide: r.slide, id: r.id, ...x })))];
 if (consoleErrors.length) all.push(...[...new Set(consoleErrors)].map((m) => ({ slide: 0, id: "console", level: "warn", rule: "console", msg: m })));
 const errors = all.filter((x) => x.level === "error");
 const warns = all.filter((x) => x.level === "warn");
 const timing = { buildMs, reviewMs: Date.now() - tReview, totalMs: Date.now() - t0 };
-writeFileSync(join(out, "report.json"), JSON.stringify({ deck: deck.title, timing, errors: errors.length, warnings: warns.length, slides: results, consoleErrors }, null, 2));
+writeFileSync(join(out, "report.json"), JSON.stringify({ deck: deck.title, timing, errors: errors.length, warnings: warns.length, deckIssues, slides: results, consoleErrors }, null, 2));
 
 const md = [`# Review: ${deck.title}`, "", `Slides: ${deck.slides.length} · errors: ${errors.length} · warnings: ${warns.length}`,
   `Build ${(buildMs / 1000).toFixed(1)}s · review ${(timing.reviewMs / 1000).toFixed(1)}s`, "",
   "Open `contact-sheet.png` first, then each `slide-*.png`. Fix every error; justify or fix every warning.", "",
+  ...(deckIssues.length ? ["## Deck", ...deckIssues.map((x) => `- **${x.level}** [${x.rule}] ${x.msg}`), ""] : []),
   ...results.map((r) => [`## ${r.slide}. ${r.id} (${r.kind})`, `Title: ${r.title}`, `Screenshot: ${r.file}`,
     ...(r.issues.length ? r.issues.map((x) => `- **${x.level}** [${x.rule}] ${x.msg}${x.text ? ` — "${x.text}"` : ""}`) : ["- ok"]), ""].join("\n")),
   consoleErrors.length ? `## Console\n${[...new Set(consoleErrors)].map((m) => `- ${m}`).join("\n")}` : ""].join("\n");

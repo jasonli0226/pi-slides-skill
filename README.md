@@ -48,8 +48,16 @@ npm run live         # HMR + watch content/deck.outline.md → generated stub sl
 npm run outline      # regenerate outline stubs once (no Vite)
 npm run review       # screenshots + lint → review/ (contact-sheet.png, report.md)
 npm run export:pdf   # export/deck.pdf   (add -- --raster for a pixel-exact PDF)
-npm run verify       # tokens + build + review + pdf, exit code for CI
+npm run verify       # tokens + typecheck + build + review + pdf, exit code for CI
 ```
+
+## Develop this repo
+
+```bash
+npm test   # scaffold smoke test, token/scaffold checks, present-mode browser tests
+```
+
+The tests scaffold decks into a temp dir and run `npm ci` there, so they need network or an npm cache, plus Chromium for Playwright. CI runs them on Node 20, 22 and 24.
 
 ## Repo layout
 
@@ -63,8 +71,9 @@ skills/web-slides/
     slide-catalog.md             slide types, component props, file skeleton
     workflow.md                  step-by-step commands and approval gate
     style-import.md              URL / images / SVG → brand theme, font swaps, licensing
-  fixtures/style-import/         generated CC0 sample images + SVGs for the importers
+    media-guide.md               user logos/screenshots → public/media + <Figure>
     review-checklist.md          automated + visual + facts checklist
+  fixtures/style-import/         generated CC0 sample images + SVGs for the importers
   scripts/new-deck.mjs           create a deck from the template
   template/                      the deck engine + example slides + live outline
     src/deck/                    Deck (modes, keys, transitions), components, CSS
@@ -74,6 +83,7 @@ skills/web-slides/
     content/deck.outline.md      optional live outline (titles/bullets)
     scripts/                     review, live, watch-outline, export-pdf, check-tokens
     scripts/style/               style:url, style:images, style:svg (+ shared color/k-means lib)
+test/                            scaffold smoke, check and present-mode tests (npm test)
 docs/research.md                 stack comparison, decision, sources
 docs/verification.md             what was run and the results
 examples/                        example-deck.pdf, review-report.md, screenshots/
@@ -84,7 +94,7 @@ examples/                        example-deck.pdf, review-report.md, screenshots
 **React slides stay the source of truth.** For real-time updates:
 
 1. `npm run dev` — Vite HMR present mode at http://127.0.0.1:5173. Change any slide TSX, theme token, or diagram component and the stage refreshes immediately.
-2. `npm run live` — same server, plus a watcher on `content/deck.outline.md` that rewrites `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import in `src/slides/index.ts` to see stubs in the deck; then promote each stub into a hand-crafted slide file (diagrams, motion, layout) before `npm run review`.
+2. `npm run live` — same server, plus a watcher on `content/deck.outline.md` that rewrites `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import and the `...outlineSlides` spread in `src/slides/index.ts` to see stubs in the deck; then promote each stub into a hand-crafted slide file (diagrams, motion, layout) before `npm run review`.
 
 Caveat: the outline → TSX path is intentionally thin (title + bullets). It will not invent C4 / swimlanes / charts. Beauty work stays in React.
 

@@ -4,7 +4,7 @@ description: Build stunning, research-backed web slide decks (React + Vite + Mot
 license: MIT
 compatibility: Needs Node.js 20+ and npm, network access for npm install, and a Chromium for Playwright (npx playwright install chromium, or CHROME_PATH).
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
   stack: "react 19, vite 8, motion 14, playwright, mermaid, shiki, lucide-react"
 ---
 
@@ -32,7 +32,7 @@ Follow these steps in order, and stop at the approval gate. The full details are
 1. **Brief.** Get the audience, goal, length (minutes or slide count), the decision or ask, and the deadline. Also ask whether a brand palette exists, or a website, images or SVGs to match (step 5). If there is none, use `midnight`, `aurora` or `paper`.
 2. **Research.** Collect sources into a working notes file with URLs and the exact figures and quotes. Prefer primary sources such as official docs, papers, filings and the user's own data.
 3. **Outline, then approval.** Write `outline.md` with one line per slide. Each line gives the slide number, the slide type from `references/slide-catalog.md`, the takeaway title, the key visual, and the source ids. **Show it to the user and wait for approval** before writing any TSX, unless they explicitly said to skip approval.
-4. **Scaffold.** Run `node scripts/new-deck.mjs <dir> --title "<takeaway title>" [--theme midnight|aurora|paper]`, then `cd <dir> && npm install && npx playwright install chromium`. Use `--keep-examples` only if you want the 12 example slides as a reference; delete them afterwards.
+4. **Scaffold.** Run `node scripts/new-deck.mjs <dir> --title "<takeaway title>" [--theme midnight|aurora|paper]`, then `cd <dir> && npm install && npx playwright install chromium`. Use `--keep-examples` only if you want the 16 example slides as a reference; delete them afterwards.
 5. **Style import (when the user gives a look to match).** If they give a website URL, brand images or SVG artwork, run one of these in the deck:
    - `npm run style:url -- <url>`
    - `npm run style:images -- <dir>`
@@ -42,12 +42,12 @@ Follow these steps in order, and stop at the approval gate. The full details are
 6. **Build the slides.** Make one file per slide in `src/slides/NN-id.tsx`, register it in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`. Copy patterns from `template/src/slides/*` (one example per slide type) and follow `references/design-guide.md`. For any architecture or flow visual, open `references/diagram-guide.md` and pick Mermaid vs `LayeredArchitecture` / `FlowSteps` / `Sequence` / `C4Container`. **When the user provides images, logos, screenshots or says "use this asset", follow `references/media-guide.md` end-to-end:** copy into `public/media/`, render with `<Figure src="/media/…" alt="…" cite|illustrative>`, then re-screenshot. Never invent logos or stock photos. Use **`npm run dev`** (HMR present mode) or **`npm run live`** (HMR + outline watcher) while building — see Live mode below.
 7. **Screenshots and review.** Run `npm run review`. It builds the deck, screenshots every slide in its final state into `review/`, writes `review/contact-sheet.png` and `review/report.md`, and exits non-zero on errors.
 8. **Self-review.** Open the contact sheet and every slide PNG and look at them; do not trust the lint alone. Go through `references/review-checklist.md`. Fix the issues and run review again until there are 0 errors and every warning is fixed or justified. Use `npm run review -- --steps` to check click-step states.
-9. **Export.** Run `npm run export:pdf`, which writes `export/deck.pdf` with vector, selectable text. If blur or glow effects print wrong, also run `npm run export:pdf -- --raster` for `export/deck-raster.pdf`. `npm run export:png` writes PNGs to `export/png/`. `npm run verify` runs the token check, build, review and PDF export in one go.
+9. **Export.** Run `npm run export:pdf`, which writes `export/deck.pdf` with vector, selectable text. If blur or glow effects print wrong, also run `npm run export:pdf -- --raster` for `export/deck-raster.pdf`. `npm run export:png` writes PNGs to `export/png/`. `npm run verify` runs the token check, typecheck, build, review and PDF export in one go.
 10. **Hand-off.** Give the user the PDF, the contact sheet, how to present (`npm run dev`, or open `dist/` from any static host), the list of sources, and anything you could not source.
 
 ## Engine at a glance
 
-- The stage is 1920×1080 and scaled to fit. Present mode keys: ←/→, Space, PgUp/PgDn, Home/End, **N** notes, **O** overview, **F** fullscreen. URLs look like `#/slide/step`.
+- The stage is 1920×1080 and scaled to fit. Present mode keys: ←/→, Space, PgUp/PgDn, Home/End, **N** notes, **O** overview, **F** fullscreen (keys with Ctrl/Cmd/Alt are left to the browser). URLs look like `#/slide/step`; editing the hash jumps there, and a step past the slide's last is clamped.
 - `?static&slide=N&step=final` renders one slide for screenshots, and `?print` renders all slides for PDF. In both, motion is off and every step is shown.
 - Click steps: set `steps: n` on the slide, then use `<Appear at={k}>`, `<Stagger stepwise>`, `<IconList stepwise>`, `<Timeline>`, or `<Code focus={[...]}>`.
 - Components (`src/deck/components.tsx`): `SlideFrame`, `Appear`, `Stagger`, `Card`, `Icon`, `Pill`, `Stat`, `BarChart`, `Figure`, `Mermaid`, `Code`, `Timeline`, `Quote`, `IconList`, `Gradient`, `Cite`.
@@ -81,7 +81,7 @@ Then run `npm run review`, look at the contact sheet, and report the palette, th
 React slides are the source of truth for beauty. Two loops:
 
 1. **`npm run dev`** — Vite present mode at http://127.0.0.1:5173 with HMR. Edit any `src/slides/*.tsx`, `sources.ts`, theme CSS, or diagram component; the browser updates immediately. Keys: ←/→, Space, **N** notes, **O** overview, **F** fullscreen.
-2. **`npm run live`** — same as dev, plus watches `content/deck.outline.md` and regenerates stub slides into `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import in `src/slides/index.ts` to preview stubs, then replace each stub with a polished typed slide before ship. `npm run outline` regenerates once without Vite.
+2. **`npm run live`** — same as dev, plus watches `content/deck.outline.md` and regenerates stub slides into `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import and the `...outlineSlides` spread in `src/slides/index.ts` to preview stubs, then replace each stub with a polished typed slide before ship. `npm run outline` regenerates once without Vite.
 
 Do not treat outline stubs as final deck quality. Diagrams, motion and tight layout stay in hand-written React.
 
