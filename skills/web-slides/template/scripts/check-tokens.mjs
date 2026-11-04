@@ -18,13 +18,15 @@ const pairs = [
   ["text-muted", "bg", 4.5], ["text-muted", "surface", 4.5], ["text-muted", "bg-elev", 4.5],
   ["accent", "bg", 4.5], ["accent", "surface", 4.5], ["accent-2", "bg", 4.5], ["accent-2", "surface", 4.5],
   ["accent-3", "bg", 4.5], ["accent-3", "surface", 4.5], ["warning", "bg", 4.5], ["danger", "bg", 4.5],
-  ["on-accent", "accent", 4.5], ["accent", "surface", 3.0],
+  ["on-accent", "accent", 4.5],
 ];
 let fail = 0;
 for (const [name, v] of Object.entries(themes)) {
   console.log(`theme ${name}`);
   for (const [fg, bg, min] of pairs) {
-    if (!v[fg] || !v[bg]) { console.log(`  skip ${fg} on ${bg} (not defined)`); continue; }
+    // every theme must define every pair as #rrggbb; anything else is unchecked, so it fails
+    const unreadable = [fg, bg].filter((t) => !v[t]);
+    if (unreadable.length) { fail++; console.log(`  FAIL ${fg.padEnd(10)} on ${bg.padEnd(9)} not a 6-digit hex: --${unreadable.join(", --")}`); continue; }
     const r = ratio(v[fg], v[bg]);
     const ok = r >= min;
     if (!ok) fail++;
