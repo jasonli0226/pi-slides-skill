@@ -159,3 +159,73 @@ slides:
   assert.match(yaml, /layout:\s*layout-kpi/);
   assert.match(yaml, /pattern:\s*kpi/);
 });
+
+test("style-lib apply title-hero keeps the word center in slide text", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "style-lib-center-"));
+  fs.mkdirSync(path.join(tmp, "src/slides"), { recursive: true });
+  fs.writeFileSync(
+    path.join(tmp, "src/slides/01-title.tsx"),
+    `export default defineSlide({
+  id: "title",
+  Component: () => (
+    <SlideFrame kind="title" center title="Moving the data center to the cloud" subtitle="Org" />
+  ),
+});
+`,
+  );
+  const r = run(["apply", "--id", "title-hero-light", "--deck", tmp]);
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  const title = fs.readFileSync(path.join(tmp, "src/slides/01-title.tsx"), "utf8");
+  assert.match(title, /title="Moving the data center to the cloud"/);
+  assert.doesNotMatch(title, /\scenter\s+title=/);
+});
+
+test("style-lib apply navy pack leaves generic content slides alone", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "style-lib-content-"));
+  fs.mkdirSync(path.join(tmp, "content"), { recursive: true });
+  fs.writeFileSync(
+    path.join(tmp, "content/deck.spec.yaml"),
+    `title: Navy
+theme: midnight
+approved: false
+slides:
+  - n: 1
+    id: overview
+    type: content
+    title: Three teams now share one intake queue.
+    layout: grid-2
+    status: stub
+`,
+  );
+  const r = run(["apply", "--id", "navy-pitch-snapshot", "--deck", tmp]);
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  const yaml = fs.readFileSync(path.join(tmp, "content/deck.spec.yaml"), "utf8");
+  assert.match(yaml, /layout:\s*grid-2/);
+  assert.doesNotMatch(yaml, /layout-kpi/);
+});
+
+test("style-lib apply --patterns-only does not switch the deck to brand theme", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "style-lib-patterns-only-"));
+  fs.mkdirSync(path.join(tmp, "content"), { recursive: true });
+  fs.writeFileSync(
+    path.join(tmp, "content/deck.spec.yaml"),
+    `title: Navy
+theme: midnight
+approved: false
+slides:
+  - n: 1
+    id: metrics
+    type: big-number
+    title: Pipeline hit four million dollars this quarter.
+    status: stub
+`,
+  );
+  const r = run(["apply", "--id", "navy-pitch-snapshot", "--deck", tmp, "--patterns-only"]);
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.ok(!fs.existsSync(path.join(tmp, "src/theme/brand.css")));
+  const pack = JSON.parse(fs.readFileSync(path.join(tmp, "content/style-pack.json"), "utf8"));
+  assert.equal(pack.themeFile, null);
+  const yaml = fs.readFileSync(path.join(tmp, "content/deck.spec.yaml"), "utf8");
+  assert.match(yaml, /^theme:\s*midnight/m);
+  assert.match(yaml, /layout:\s*layout-kpi/);
+});
