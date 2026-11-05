@@ -28,6 +28,7 @@ Light theme, with images researched from the web and added motion:
 - **Swappable theme tokens:** built-ins `midnight`, `aurora`, `paper`, plus inspiration presets `tech-dark`, `bento-minimal`, `navy-pitch`. A user brand goes in `brand.css`. Prefer presets over re-scraping free packs (see `docs/template-inspiration.md`).
 - **Template inspiration:** curated free tech Google Slides / PowerPoint packs (SlidesCarnival, Slidesgo, …) used as **style references** only — palettes + layout recipes via `style:images`, never vendored PPTX. See [docs/template-inspiration.md](docs/template-inspiration.md).
 - **Style import:** `npm run style:url -- <url>`, `style:images -- <dir>` and `style:svg -- <dir>` turn a website, a mood board or SVG artwork into `style-spec.json` plus a WCAG-checked `[data-theme="brand"]`. The importer extracts colors, swaps proprietary fonts for free ones, maps layout feel to tokens and normalizes SVGs. It borrows style, never assets.
+- **Style library** (`skills/style-library/`): save / list / apply / update **named packs** (theme tokens + React/CSS patterns such as title-hero, KPI, timeline). Reuse a look you liked without re-scraping. Packs are original CSS/TSX snapshots — never vendored PPTX. `npm run style-lib -- list`.
 - **Presenting:** arrow keys or clicks with click-steps, **N** notes, **O** overview, **F** fullscreen, and `prefers-reduced-motion` respected.
 
 ## Install into pi
@@ -43,6 +44,7 @@ git clone https://github.com/jasonli0226/pi-slides-skill && pi install ./pi-slid
 
 # or copy only the skill
 cp -r pi-slides-skill/skills/web-slides ~/.pi/agent/skills/web-slides
+cp -r pi-slides-skill/skills/style-library ~/.pi/agent/skills/style-library
 ```
 
 Add `-l` to `pi install` to write to the project's `.pi/settings.json` instead of `~/.pi/agent/settings.json`. Then ask pi for a deck ("make a 10-minute deck on …"), or force the skill with `/skill:web-slides`. After editing the skill, run `/reload`.
@@ -66,7 +68,8 @@ npm run verify       # tokens + typecheck + build + review + pdf, exit code for 
 ## Develop this repo
 
 ```bash
-npm test   # scaffold smoke test, token/scaffold checks, present-mode browser tests
+npm test              # scaffold smoke, token checks, present-mode, style-lib
+npm run style-lib -- list
 ```
 
 The tests scaffold decks into a temp dir and run `npm ci` there, so they need network or an npm cache, plus Chromium for Playwright. CI runs them on Node 20, 22 and 24.
@@ -74,8 +77,8 @@ The tests scaffold decks into a temp dir and run `npm ci` there, so they need ne
 ## Repo layout
 
 ```
-package.json                     pi package manifest
-skills/web-slides/
+package.json                     pi package manifest (`"pi": { "skills": ["./skills"] }`)
+skills/web-slides/               deck builder skill
   SKILL.md                       entry point pi loads (frontmatter + workflow + standard)
   references/
     design-guide.md              story, layout, type scale, color, icons, motion, data
@@ -98,9 +101,15 @@ skills/web-slides/
     content/deck.outline.md      optional light outline (titles/bullets)
     scripts/                     review, live, spec, watch-outline, export-pdf, check-tokens
     scripts/style/               style:url, style:images, style:svg (+ shared color/k-means lib)
-test/                            scaffold smoke, check and present-mode tests (npm test)
+skills/style-library/            named style packs (theme + component patterns)
+  SKILL.md                       save / list / apply / update workflow
+  references/                    pack schema, workflow, examples
+  scripts/style-lib.mjs          CLI: save | list | apply | update | show
+  styles/                        shipped example packs (title-hero-light, navy-pitch-snapshot)
+test/                            scaffold smoke, check, present-mode, style-lib tests
 docs/research.md                 stack comparison, decision, sources
 docs/verification.md             what was run and the results
+docs/template-inspiration.md     free-pack inspiration → presets (not vendored PPTX)
 examples/                        example-deck.pdf, review-report.md, screenshots/
 ```
 
