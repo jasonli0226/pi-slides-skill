@@ -33,11 +33,107 @@ html[data-mode="print"] * { animation-play-state: paused !important; }
 /* ================================ frame ================================ */
 .frame { position: absolute; inset: 0; display: flex; flex-direction: column;
   padding: var(--pad-top) var(--pad-x) var(--pad-bottom); }
-.frame > *:not(.bg) { position: relative; z-index: 1; }
+.frame > *:not(.bg):not(.title-backdrop):not(.title-scrim):not(.title-hero-label) { position: relative; z-index: 1; }
 .frame-header { margin-bottom: var(--space-6); max-width: 1560px; }
 .frame-center { justify-content: center; }
 .frame-center .frame-header { margin-bottom: var(--space-8); }
 .frame-body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; overflow: hidden; padding-bottom: 20px; }
+
+/* Title hero: full-bleed photo + soft LEFT scrim (~45–55%) + left copy (not centered) */
+.title-backdrop {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.title-backdrop img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.title-backdrop img.fit-contain { object-fit: contain; }
+.title-scrim {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+}
+/* Photo pattern: soft white/light band on the left; right stays vivid */
+.title-scrim-light {
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0.97) 0%,
+    rgb(255 255 255 / 0.94) 18%,
+    rgb(255 255 255 / 0.82) 32%,
+    rgb(255 255 255 / 0.48) 44%,
+    rgb(255 255 255 / 0.16) 54%,
+    transparent 62%
+  );
+}
+/* Dark-theme / no-photo fallback: ink from --bg */
+.title-scrim-dark {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--bg) 96%, transparent) 0%,
+    color-mix(in oklab, var(--bg) 88%, transparent) 28%,
+    color-mix(in oklab, var(--bg) 55%, transparent) 48%,
+    color-mix(in oklab, var(--bg) 18%, transparent) 62%,
+    transparent 72%
+  );
+}
+.frame-title-hero {
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+}
+.frame-title-hero .frame-header {
+  max-width: 920px;
+  width: min(920px, 52%);
+  margin-bottom: var(--space-5);
+  align-self: flex-start;
+}
+.frame-title-hero .kicker {
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+.frame-title-hero .hero-title {
+  max-width: 880px;
+  line-height: 1.08;
+  text-wrap: pretty;
+}
+.frame-title-hero .subtitle {
+  max-width: 720px;
+  margin-top: var(--space-6);
+  font-size: 28px;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+.frame-title-hero .frame-body {
+  flex: 0 0 auto;
+  max-width: 900px;
+  width: min(900px, 52%);
+  align-self: flex-start;
+  justify-content: flex-start;
+  overflow: visible;
+  padding-bottom: 0;
+}
+.frame-title-hero .frame-body .row { justify-content: flex-start; }
+.title-hero-label {
+  position: absolute;
+  left: var(--pad-x);
+  bottom: 40px;
+  z-index: 2;
+  font: 600 var(--fs-caption)/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  max-width: 60%;
+}
+/* Light scrim: dark type for WCAG contrast on the white band */
+.frame-title-hero[data-scrim="light"] .kicker,
+.frame-title-hero[data-scrim="light"] .title-hero-label {
+  color: color-mix(in oklab, #0f2744 72%, #0e7490);
+}
+.frame-title-hero[data-scrim="light"] .hero-title,
+.frame-title-hero[data-scrim="light"] .slide-title {
+  color: #0b1220;
+}
+.frame-title-hero[data-scrim="light"] .subtitle {
+  color: color-mix(in oklab, #0b1220 78%, #475569);
+}
 .frame-architecture .slide-title { font-size: 48px; line-height: 1.15; }
 .frame-architecture .frame-header { margin-bottom: 12px; }
 .kicker { font: 600 var(--fs-small)/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase;

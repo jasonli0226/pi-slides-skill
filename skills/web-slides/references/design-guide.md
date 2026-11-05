@@ -15,7 +15,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 - The safe area is 120px left/right padding, 96px top and 88px bottom; SlideFrame applies it. Never place content in the footer band.
 - Use the type scale only: hero 112, title 60, h3 36, body 30, small 24, caption 18. Nothing smaller than 18px.
 - Body text should be 40 words per slide or fewer, with at most 5 bullets or 6 cards, and lines no longer than about 60 characters.
-- **Grid for stage columns, Flex for rows.** Prefer named recipes over ad-hoc positioning: `.layout-stack` (title+body), `.layout-kpi` (equal Stat strip), `.layout-compare` (two cards), `.layout-media` (figure column), `.layout-hero` / `.layout-hero-flip` (asymmetric `0.55fr 1.45fr`). Also `.grid-2/3/4` and `.row`. Full recipes, safe patterns (`gap`, `min-width:0`, `flex:1 1 0`, stretch) and anti-patterns: **`references/layout-guide.md`** (cites [CSS Tricks Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) and [Grid](https://css-tricks.com/snippets/css/complete-guide-grid/)).
+- **Grid for stage columns, Flex for rows.** Prefer named recipes over ad-hoc positioning: **title hero** (`SlideFrame hero` + optional `backdrop` + automatic left scrim — not centered), `.layout-stack` (title+body), `.layout-kpi` (equal Stat strip), `.layout-compare` (two cards), `.layout-media` (figure column), `.layout-hero` / `.layout-hero-flip` (asymmetric `0.55fr 1.45fr`). Also `.grid-2/3/4` and `.row`. Full recipes, safe patterns (`gap`, `min-width:0`, `flex:1 1 0`, stretch) and anti-patterns: **`references/layout-guide.md`** (cites [CSS Tricks Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) and [Grid](https://css-tricks.com/snippets/css/complete-guide-grid/)).
 - Give every slide one focal point: a big number, a highlighted column, a highlighted bar or a highlighted card. Make one thing the accent color, not everything.
 
 ## Color and theme
@@ -53,6 +53,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 - Read `references/media-guide.md`. User assets live in `public/media/` and render through `<Figure>`.
 - Lucide for icons; Figure for anything the user supplied. Never invent logos or stock art.
 - Always set `alt` and `cite` or `illustrative`. Keep logos `fit="contain"`; check text-over-image by eye.
+- Title openers: full-bleed **photo** via `SlideFrame backdrop` + `scrim="light"` (soft white left band, dark type, vivid image on the right). Use `heroLabel` for the bottom-left uppercase tag. Do not center; do not rely on heavy colored orbs when a photo is available. Real photos live in `public/media/` (rights-cleared only).
 
 ## Diagrams
 

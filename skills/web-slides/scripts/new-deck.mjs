@@ -43,8 +43,11 @@ import { defineSlide } from "../deck/types";
 export default defineSlide({
   id: "title",
   transition: "blur",
+  // Prefer photo hero: backdrop + scrim="light" + kicker/subtitle/heroLabel (see layout-guide.md)
   Component: () => (
-    <SlideFrame kind="title" background="aurora" footer={false} title={${lit(title)}} />
+    <SlideFrame kind="title" hero background="plain" footer={false} scrim="light"
+      backdrop={{ src: "/media/title-hero-photo-placeholder.jpg", decorative: true }}
+      title={${lit(title)}} />
   ),
 });
 `);

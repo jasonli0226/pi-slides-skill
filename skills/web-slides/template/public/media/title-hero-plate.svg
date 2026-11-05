@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#070b16"/>
+      <stop offset="45%" stop-color="#0c1830"/>
+      <stop offset="100%" stop-color="#102a4a"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="78%" cy="32%" r="42%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.55"/>
+      <stop offset="55%" stop-color="#6366f1" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="18%" cy="88%" r="38%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#base)"/>
+  <rect width="1920" height="1080" fill="url(#glowA)"/>
+  <rect width="1920" height="1080" fill="url(#glowB)"/>
+  <g fill="none" stroke="#7dd3fc" stroke-opacity="0.32" stroke-width="2.2">
+    <path d="M80 840 C360 560, 560 1000, 840 640 S1400 360, 1840 520"/>
+    <path d="M40 360 C320 160, 520 480, 800 280 S1360 120, 1880 320"/>
+    <path d="M120 1000 C440 720, 680 1040, 1040 800 S1560 600, 1880 840"/>
+  </g>
+  <g fill="#38bdf8" fill-opacity="0.9">
+    <circle cx="440" cy="600" r="9"/><circle cx="840" cy="640" r="7"/>
+    <circle cx="1240" cy="420" r="10"/><circle cx="1560" cy="680" r="7"/>
+  </g>
+</svg>

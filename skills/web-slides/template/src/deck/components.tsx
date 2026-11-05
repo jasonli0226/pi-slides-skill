@@ -105,16 +105,56 @@ export function Background({ name = "grid" }: { name?: BackgroundName }) {
 
 /* ================================ slide frame ============================= */
 
+export type TitleBackdrop = {
+  src: string;
+  /** required unless decorative */
+  alt?: string;
+  /** ornamental full-bleed plate: empty alt, no cite */
+  decorative?: boolean;
+  fit?: "cover" | "contain";
+};
+
+/** Scrim over a title hero plate: light (white/soft) for photos; dark for aurora-only dark themes. */
+export type TitleScrim = "light" | "dark" | "auto";
+
+/** Full-bleed title recipe: left copy column, optional photo plate, soft left scrim (not centered). */
 export function SlideFrame({ kind = "content", kicker, title, subtitle, sources = [], background = "grid",
-  footer = true, center = false, children }: {
+  footer = true, center = false, hero = false, backdrop, scrim = "auto", heroLabel, children }: {
   kind?: SlideKind; kicker?: string; title: string; subtitle?: ReactNode; sources?: SourceRef[];
-  background?: BackgroundName; footer?: boolean; center?: boolean; children?: ReactNode;
+  background?: BackgroundName; footer?: boolean; center?: boolean;
+  /** Left-aligned title hero (auto for kind=title when not center). */
+  hero?: boolean;
+  /** Full-bleed image behind the title; implies hero layout + scrim. Prefer real photos in public/media. */
+  backdrop?: TitleBackdrop;
+  /** Left gradient for readability. auto = light when backdrop set, else dark. */
+  scrim?: TitleScrim;
+  /** Small uppercase label pinned bottom-left on title heroes (e.g. "PROPOSAL FOR DISCUSSION"). */
+  heroLabel?: string;
+  children?: ReactNode;
 }) {
   const { index, total } = useSlide();
+  const isHero = Boolean(hero || backdrop || (kind === "title" && !center));
+  const fit = backdrop?.fit ?? "cover";
+  const scrimMode: "light" | "dark" =
+    scrim === "auto" ? (backdrop ? "light" : "dark") : scrim;
   return (
     <SourcesContext.Provider value={sources}>
-      <section className={`frame frame-${kind} ${center ? "frame-center" : ""}`} data-kind={kind} data-title={title}>
+      <section
+        className={`frame frame-${kind} ${center ? "frame-center" : ""} ${isHero ? "frame-title-hero" : ""}`}
+        data-kind={kind}
+        data-title={title}
+        data-hero={isHero ? "true" : undefined}
+        data-scrim={isHero ? scrimMode : undefined}
+      >
         <Background name={background} />
+        {backdrop && (
+          <div className="title-backdrop" aria-hidden={backdrop.decorative ? true : undefined}>
+            {backdrop.decorative
+              ? <img src={backdrop.src} alt="" data-decorative="true" className={`fit-${fit}`} loading="eager" decoding="async" />
+              : <img src={backdrop.src} alt={backdrop.alt ?? ""} className={`fit-${fit}`} loading="eager" decoding="async" />}
+          </div>
+        )}
+        {isHero && <div className={`title-scrim title-scrim-${scrimMode}`} aria-hidden />}
         <header className="frame-header">
           {kicker && <Appear variant="fade"><div className="kicker">{kicker}</div></Appear>}
           <Appear variant="up" delay={0.05}>
@@ -123,6 +163,11 @@ export function SlideFrame({ kind = "content", kicker, title, subtitle, sources 
           {subtitle && <Appear variant="up" delay={0.15}><p className="subtitle">{subtitle}</p></Appear>}
         </header>
         <div className="frame-body">{children}</div>
+        {heroLabel && (
+          <div className="title-hero-label" aria-hidden={false}>
+            <Appear variant="fade" delay={0.2}><span>{heroLabel}</span></Appear>
+          </div>
+        )}
         {footer && (
           <footer className="frame-footer">
             <div className="sources">

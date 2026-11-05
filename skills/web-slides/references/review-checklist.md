@@ -11,8 +11,9 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] `img-alt` / `img-broken`: every `<img>` / `<Figure>` has meaningful alt text and loads successfully.
 - [ ] `leftover`: no lorem, TODO, TBD, FIXME, placeholder, `{{ }}`, undefined or NaN.
 - [ ] `emoji-icon`: no emoji.
-- [ ] `off-stage`, `footer-overlap`, `clipped`: nothing spills off the stage, into the footer, or out of a container.
-- [ ] `uneven-gaps` / `absolute-spam` (warnings): sibling gutters and peer card heights stay even; body content is Grid/Flex, not a pile of absolutes (see `layout-guide.md`).
+- [ ] `off-stage`, `footer-overlap`, `clipped`, `box-overlap`, `safe-margin`: nothing spills off the stage, into the footer, out of a container, on top of peer content, or outside the padding band.
+- [ ] `uneven-gaps` (warn) / `absolute-spam` (warn >2, error >5): sibling gutters and peer card heights stay even; body content is Grid/Flex, not a pile of absolutes (see `layout-guide.md`).
+- [ ] Title openers use the left hero + scrim recipe (full-bleed `backdrop` when an image is available); avoid centered headlines over busy plates.
 - [ ] `tiny-text`: nothing under 18px, including chart and diagram text.
 - [ ] `contrast`: solid-background text meets 4.5:1 (3:1 if large).
 - [ ] `render` / console: no Mermaid or Shiki errors and no runtime errors.

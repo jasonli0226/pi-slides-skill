@@ -20,6 +20,31 @@ CSS Tricks’ own framing: **Grid for the page/stage structure, Flexbox for rows
 
 ## Recipes
 
+### Title hero (full-bleed photo + left light scrim)
+
+Prefer this for opening `kind="title"` slides. Match the airport-style pattern: **photo full-bleed**, **soft white scrim on the left (~45–55%)**, **dark type**, **not centered**. Do not use a heavy colored orb plate when a photo is available.
+
+```tsx
+<SlideFrame
+  kind="title"
+  hero
+  footer={false}
+  background="plain"
+  scrim="light"
+  backdrop={{ src: "/media/hero-photo.jpg", alt: "…" /* or decorative: true for plates */ }}
+  kicker="Data analytics team · 12-month work plan"
+  title="A 12-month plan to turn trusted data into sustainable business value."
+  subtitle={"AI & Innovation Department\nAirport Authority Hong Kong"}
+  heroLabel="Proposal for discussion"
+/>
+```
+
+- **`backdrop`**: full-bleed photographic background (`object-fit: cover`). Put **rights-cleared** user photos in `public/media/` — do not invent or hotlink stock. The template ships a synthetic placeholder (`title-hero-photo-placeholder.jpg`) only.
+- **`scrim`**: `light` (default when `backdrop` is set) = soft white left gradient, dark text; `dark` = ink from `--bg` for aurora-only dark openers; `auto` picks light if backdrop else dark.
+- **`kicker`**: small uppercase eyebrow. **`subtitle`**: org / dept (use `\n` for two lines). **`heroLabel`**: small uppercase footer label, bottom-left.
+- **Left column**: header stays ≤ ~52% / 920px; the right of the photo stays vivid past the scrim fade.
+- Kind `title` without `center` opts into the hero layout. Pass `center` only for rare centered openers or `kind="section"` / quote slides.
+
 ### Title + body (stack)
 
 ```tsx
@@ -127,8 +152,11 @@ Equal flex columns with a colored top edge. For the fuller dotted-line roadmap, 
 
 ## Anti-patterns
 
-- **Absolute spam.** `position: absolute` belongs to SlideFrame chrome, backgrounds (`.bg`) and rare diagram overlays — not everyday content. Prefer Grid/Flex. The lint warns when too many absolute boxes sit in the body.
+- **Absolute spam.** `position: absolute` belongs to SlideFrame chrome, backgrounds (`.bg`, `.title-backdrop`, `.title-scrim`) and rare diagram overlays — not everyday content. Prefer Grid/Flex. Lint **warns** above 2 absolute nodes in the body and **errors** above 5.
+- **Box overlap.** Content units (cards, stats, figures, pills, diagram roots) must not stack on top of each other. Use `gap` / named `.layout-*`. Lint rule `box-overlap` fails the review.
+- **Safe-margin breach.** Leaf copy must stay inside the SlideFrame padding band (~120×96). Lint rule `safe-margin` fails the review.
 - **Footer collision.** Body content must stop above the sources band. Never extend padding into the footer; lint rule `footer-overlap` fails the review.
+- **Centered title openers.** Prefer the left hero + scrim recipe over `center` for `kind="title"`.
 - **Uneven cards / gaps.** Sibling cards in one row should share height; gutters between peers should match. Prefer `.layout-compare` / `.layout-kpi` over hand-tuned margins. Lint warns on `uneven-gaps` when measured gutters in a row diverge.
 - **Fixed pixel columns** that ignore the 1920 stage padding. Use `fr`, `%` of the body, or the named layouts.
 
@@ -146,4 +174,4 @@ Equal flex columns with a colored top edge. For the fuller dotted-line roadmap, 
 - [ ] Body uses a `.layout-*` / `.grid-*` / `.row`, not a pile of absolutes.
 - [ ] Peer cards share height; KPI gutters look even.
 - [ ] No content in the footer band; contact sheet shows breathing room.
-- [ ] Review report has no `off-stage`, `footer-overlap`, `clipped`, or `uneven-gaps` hits for this slide.
+- [ ] Review report has no `off-stage`, `footer-overlap`, `box-overlap`, `safe-margin`, `clipped`, or `uneven-gaps` hits for this slide.

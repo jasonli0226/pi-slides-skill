@@ -84,3 +84,28 @@ Never mix emoji or a second icon pack with Lucide.
 - Embedding base64 blobs in TSX for large photos (use `public/media/`).
 - Using a screenshot as a substitute for a redrawn architecture diagram when you could use `LayeredArchitecture` / `C4Container`.
 - Leaving the template `illustrative-mesh.svg` in a final customer deck.
+
+## Title hero backdrop
+
+Opening slides prefer a **full-bleed photograph** on `SlideFrame`, not a framed `<Figure>` in the body:
+
+```tsx
+<SlideFrame
+  kind="title"
+  hero
+  footer={false}
+  background="plain"
+  scrim="light"
+  backdrop={{ src: "/media/hero-photo.jpg", alt: "Aerial campus at dusk" }}
+  kicker="…"
+  title="…"
+  subtitle={"Org line\nDepartment"}
+  heroLabel="Proposal for discussion"
+/>
+```
+
+- Soft **left light scrim** (~45–55% width) keeps dark type readable; the right of the photo stays vivid.
+- Put **rights-cleared** user photos in `public/media/`. Do not commit third-party photos whose license is unclear.
+- Template placeholder: `title-hero-photo-placeholder.jpg` (synthetic, not a real photo). Swap it for the talk's real plate.
+- Ornamental SVG meshes (`title-hero-plate.svg`, `illustrative-mesh.svg`) are fallbacks when no photo exists — prefer a photo for the airport-style opener.
+
