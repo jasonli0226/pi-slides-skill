@@ -105,16 +105,45 @@ export function Background({ name = "grid" }: { name?: BackgroundName }) {
 
 /* ================================ slide frame ============================= */
 
+export type TitleBackdrop = {
+  src: string;
+  /** required unless decorative */
+  alt?: string;
+  /** ornamental full-bleed plate: empty alt, no cite */
+  decorative?: boolean;
+  fit?: "cover" | "contain";
+};
+
+/** Full-bleed title recipe: left copy column, optional image plate, scrim for contrast. */
 export function SlideFrame({ kind = "content", kicker, title, subtitle, sources = [], background = "grid",
-  footer = true, center = false, children }: {
+  footer = true, center = false, hero = false, backdrop, children }: {
   kind?: SlideKind; kicker?: string; title: string; subtitle?: ReactNode; sources?: SourceRef[];
-  background?: BackgroundName; footer?: boolean; center?: boolean; children?: ReactNode;
+  background?: BackgroundName; footer?: boolean; center?: boolean;
+  /** Left-aligned title hero (auto for kind=title when not center). */
+  hero?: boolean;
+  /** Full-bleed image behind the title; implies hero layout + scrim. */
+  backdrop?: TitleBackdrop; children?: ReactNode;
 }) {
   const { index, total } = useSlide();
+  const isHero = Boolean(hero || backdrop || (kind === "title" && !center));
+  const fit = backdrop?.fit ?? "cover";
   return (
     <SourcesContext.Provider value={sources}>
-      <section className={`frame frame-${kind} ${center ? "frame-center" : ""}`} data-kind={kind} data-title={title}>
+      <section
+        className={`frame frame-${kind} ${center ? "frame-center" : ""} ${isHero ? "frame-title-hero" : ""}`}
+        data-kind={kind}
+        data-title={title}
+        data-hero={isHero ? "true" : undefined}
+      >
         <Background name={background} />
+        {backdrop && (
+          <div className="title-backdrop" aria-hidden={backdrop.decorative ? true : undefined}>
+            {backdrop.decorative
+              ? <img src={backdrop.src} alt="" data-decorative="true" className={`fit-${fit}`} loading="eager" decoding="async" />
+              : <img src={backdrop.src} alt={backdrop.alt ?? ""} className={`fit-${fit}`} loading="eager" decoding="async" />}
+          </div>
+        )}
+        {isHero && <div className="title-scrim" aria-hidden />}
         <header className="frame-header">
           {kicker && <Appear variant="fade"><div className="kicker">{kicker}</div></Appear>}
           <Appear variant="up" delay={0.05}>

@@ -43,8 +43,9 @@ import { defineSlide } from "../deck/types";
 export default defineSlide({
   id: "title",
   transition: "blur",
+  // Prefer left hero + optional backdrop={{ src: "/media/hero.webp", decorative: true }}
   Component: () => (
-    <SlideFrame kind="title" background="aurora" footer={false} title={${lit(title)}} />
+    <SlideFrame kind="title" hero background="aurora" footer={false} title={${lit(title)}} />
   ),
 });
 `);

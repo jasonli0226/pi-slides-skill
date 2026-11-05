@@ -88,6 +88,6 @@ Do not treat stubs as final deck quality. Diagrams, motion and tight layout stay
 
 - Don't put more than about 40 words of body text on a slide; move detail to the `notes`.
 - Don't use text smaller than 18px on the stage (the lint enforces this, including diagram text). Don't use more than 6 cards or 5 bullets. Don't put more than 8 nodes in Mermaid; for denser architecture use `LayeredArchitecture` / `C4Container` / `Sequence` (see `diagram-guide.md`), and still split if a swimlane exceeds 6 layers or 5 cells.
-- Don't use `position: absolute` for everyday content (SlideFrame chrome and `.bg` only). Prefer Grid/Flex per `references/layout-guide.md`. Don't use raw hex colors, hotlinked images you don't have rights to, invented logos, or stock "AI brain" art. Put user media in `public/media/` via `<Figure>`.
+- Don't use `position: absolute` for everyday content (SlideFrame chrome, `.bg`, and title `.title-backdrop` / `.title-scrim` only). Title openers: left hero + optional full-bleed `backdrop` (not centered). Prefer Grid/Flex per `references/layout-guide.md`. Don't use raw hex colors, hotlinked images you don't have rights to, invented logos, or stock "AI brain" art. Put user media in `public/media/` via `<Figure>`.
 - Don't ship `style-import/captures/*` or any third-party screenshot, logo or font file. They are reference only.
 - Don't skip the design-spec approval gate (`content/deck.spec.yaml`) or the screenshot review. Don't regenerate over `status: locked` slides.

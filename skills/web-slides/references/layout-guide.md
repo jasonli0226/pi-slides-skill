@@ -20,6 +20,32 @@ CSS Tricks’ own framing: **Grid for the page/stage structure, Flexbox for rows
 
 ## Recipes
 
+### Title hero (full-bleed plate + left copy)
+
+Prefer this for opening `kind="title"` slides. **Do not center** the headline.
+
+```tsx
+<SlideFrame
+  kind="title"
+  hero
+  footer={false}
+  background="plain"
+  backdrop={{ src: "/media/hero-plate.webp", decorative: true }}
+  title="Ship technical talks that look designed, not generated."
+  subtitle="One-line promise under the headline."
+>
+  <div className="row" style={{ gap: 12 }}>
+    <Pill>…</Pill>
+  </div>
+</SlideFrame>
+```
+
+- **`backdrop`**: full-bleed image (cover) behind chrome. Mark ornamental plates `decorative`.
+- **`title-scrim`**: automatic left-to-right fade from `--bg` so type stays readable on photos.
+- **Left column**: `.frame-title-hero` keeps header/body ≤ ~900px on the left; pills and meta stay with the copy.
+- Kind `title` without `center` opts into the hero layout even without a backdrop (scrim over `background`).
+- Pass `center` only for rare centered openers or `kind="section"` / quote slides.
+
 ### Title + body (stack)
 
 ```tsx
@@ -127,8 +153,11 @@ Equal flex columns with a colored top edge. For the fuller dotted-line roadmap, 
 
 ## Anti-patterns
 
-- **Absolute spam.** `position: absolute` belongs to SlideFrame chrome, backgrounds (`.bg`) and rare diagram overlays — not everyday content. Prefer Grid/Flex. The lint warns when too many absolute boxes sit in the body.
+- **Absolute spam.** `position: absolute` belongs to SlideFrame chrome, backgrounds (`.bg`, `.title-backdrop`, `.title-scrim`) and rare diagram overlays — not everyday content. Prefer Grid/Flex. Lint **warns** above 2 absolute nodes in the body and **errors** above 5.
+- **Box overlap.** Content units (cards, stats, figures, pills, diagram roots) must not stack on top of each other. Use `gap` / named `.layout-*`. Lint rule `box-overlap` fails the review.
+- **Safe-margin breach.** Leaf copy must stay inside the SlideFrame padding band (~120×96). Lint rule `safe-margin` fails the review.
 - **Footer collision.** Body content must stop above the sources band. Never extend padding into the footer; lint rule `footer-overlap` fails the review.
+- **Centered title openers.** Prefer the left hero + scrim recipe over `center` for `kind="title"`.
 - **Uneven cards / gaps.** Sibling cards in one row should share height; gutters between peers should match. Prefer `.layout-compare` / `.layout-kpi` over hand-tuned margins. Lint warns on `uneven-gaps` when measured gutters in a row diverge.
 - **Fixed pixel columns** that ignore the 1920 stage padding. Use `fr`, `%` of the body, or the named layouts.
 
@@ -146,4 +175,4 @@ Equal flex columns with a colored top edge. For the fuller dotted-line roadmap, 
 - [ ] Body uses a `.layout-*` / `.grid-*` / `.row`, not a pile of absolutes.
 - [ ] Peer cards share height; KPI gutters look even.
 - [ ] No content in the footer band; contact sheet shows breathing room.
-- [ ] Review report has no `off-stage`, `footer-overlap`, `clipped`, or `uneven-gaps` hits for this slide.
+- [ ] Review report has no `off-stage`, `footer-overlap`, `box-overlap`, `safe-margin`, `clipped`, or `uneven-gaps` hits for this slide.

@@ -1,7 +1,7 @@
 // Runs inside the browser on one static slide. Returns a list of issues.
 // Rules: frame, title-sentence, source-missing, cite-unknown, leftover, emoji-icon,
-//        img-alt, img-broken, off-stage, footer-overlap, clipped, uneven-gaps, absolute-spam,
-//        tiny-text, contrast.
+//        img-alt, img-broken, off-stage, footer-overlap, clipped, box-overlap, safe-margin,
+//        uneven-gaps, absolute-spam, tiny-text, contrast.
 (() => {
   const issues = [];
   const add = (level, rule, msg, el) =>
@@ -44,7 +44,7 @@
   if (emoji.length) add("error", "emoji-icon", `Emoji found (${emoji.join(" ")}). Use <Icon icon={...}> from lucide-react instead.`);
 
   /* ---- geometry ---- */
-  const isBg = (el) => !!el.closest(".bg");
+  const isBg = (el) => !!el.closest(".bg, .title-backdrop, .title-scrim");
   const visible = (el) => {
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none") return false;
@@ -118,15 +118,87 @@
   }
   let absCount = 0;
   for (const el of stage.querySelectorAll(".frame-body *")) {
-    if (isBg(el) || el.closest(".bg") || el.closest("svg")) continue;
+    if (isBg(el) || el.closest("svg")) continue;
     if (getComputedStyle(el).position === "absolute") {
       if (el.closest(".timeline, .dg-c4, .dg-seq, .dg-layered, .dg-flow, .deck-figure, .mermaid-box, .code-window, [data-figure]")) continue;
       absCount++;
     }
   }
-  if (absCount > 3) {
+  if (absCount > 5) {
+    add("error", "absolute-spam",
+      `${absCount} position:absolute nodes in the frame body. Prefer Grid/Flex layouts (see layout-guide.md).`);
+  } else if (absCount > 2) {
     add("warn", "absolute-spam",
       `${absCount} position:absolute nodes in the frame body. Prefer Grid/Flex layouts (see layout-guide.md).`);
+  }
+
+  /* ---- box overlap + safe margins ---- */
+  const unitSel = [
+    ".card", ".stat", ".deck-figure", ".pill", ".quote", ".mermaid-box", ".code-window",
+    ".timeline-item", ".icon-list > *", "table.compare", ".dg-layered", ".dg-c4", ".dg-seq", ".dg-flow",
+    ".layout-bento > *", ".layout-bento-4 > *", ".layout-compare > *", ".layout-kpi > *",
+  ].join(", ");
+  const units = [];
+  for (const el of stage.querySelectorAll(unitSel)) {
+    if (isBg(el) || !visible(el)) continue;
+    if (el.closest(".frame-footer")) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 8 || r.height < 8) continue;
+    // Prefer outermost unit: skip if an ancestor is already queued as a unit
+    if (units.some((u) => u.el.contains(el))) continue;
+    // Drop any previously queued descendants of this el
+    for (let i = units.length - 1; i >= 0; i--) {
+      if (el.contains(units[i].el)) units.splice(i, 1);
+    }
+    units.push({ el, r });
+  }
+  const area = (r) => Math.max(0, r.width) * Math.max(0, r.height);
+  const intersect = (a, b) => {
+    const left = Math.max(a.left, b.left), right = Math.min(a.right, b.right);
+    const top = Math.max(a.top, b.top), bottom = Math.min(a.bottom, b.bottom);
+    if (right - left <= 1 || bottom - top <= 1) return 0;
+    return (right - left) * (bottom - top);
+  };
+  const overlapSeen = new Set();
+  for (let i = 0; i < units.length; i++) {
+    for (let j = i + 1; j < units.length; j++) {
+      const a = units[i], b = units[j];
+      if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+      const ov = intersect(a.r, b.r);
+      if (ov < 64) continue; // ignore 1px hairline touches
+      const smaller = Math.min(area(a.r), area(b.r)) || 1;
+      if (ov / smaller < 0.08) continue; // ignore tiny corner clips
+      const key = [a.el.className, b.el.className].map(String).sort().join("|");
+      if (overlapSeen.has(key)) continue;
+      overlapSeen.add(key);
+      add("error", "box-overlap",
+        `Content boxes overlap by ~${Math.round(ov)}px². Use Grid/Flex gap or a named .layout-* — do not stack with absolute offsets.`,
+        a.el);
+    }
+  }
+
+  // Safe stage margins: body/header leaf content must stay inside SlideFrame padding band.
+  const safe = { left: 96, right: 96, top: 72, bottom: 64 };
+  const safeBox = {
+    left: sr.left + safe.left, right: sr.right - safe.right,
+    top: sr.top + safe.top, bottom: sr.bottom - safe.bottom,
+  };
+  const marginRoots = [stage.querySelector(".frame-header"), stage.querySelector(".frame-body")].filter(Boolean);
+  for (const root of marginRoots) {
+    for (const el of root.querySelectorAll("*")) {
+      if (isBg(el) || el.closest("svg") && el.tagName !== "svg") continue;
+      if (el.children.length > 0) continue; // leaf only
+      if (!(el.textContent || "").trim() && el.tagName !== "IMG" && !el.classList?.contains("icon")) continue;
+      if (!visible(el)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4) continue;
+      if (r.left < safeBox.left - 2 || r.right > safeBox.right + 2 ||
+          r.top < safeBox.top - 2 || r.bottom > safeBox.bottom + 2) {
+        add("error", "safe-margin",
+          `Content sits outside the safe padding band (~120×96). Keep copy inside SlideFrame padding.`,
+          el);
+      }
+    }
   }
 
   /* ---- text: size + contrast ---- */

@@ -84,3 +84,24 @@ Never mix emoji or a second icon pack with Lucide.
 - Embedding base64 blobs in TSX for large photos (use `public/media/`).
 - Using a screenshot as a substitute for a redrawn architecture diagram when you could use `LayeredArchitecture` / `C4Container`.
 - Leaving the template `illustrative-mesh.svg` in a final customer deck.
+
+## Title hero backdrop
+
+For opening slides, prefer a **full-bleed** plate on `SlideFrame` instead of a framed `<Figure>` in the body:
+
+```tsx
+<SlideFrame
+  kind="title"
+  hero
+  footer={false}
+  background="plain"
+  backdrop={{ src: "/media/hero-plate.webp", decorative: true }}
+  title="…"
+/>
+```
+
+- The plate covers the 1920×1080 stage (`object-fit: cover`).
+- A left scrim (`title-scrim`) is painted automatically so headline contrast holds.
+- Keep copy on the **left**; do not use `center` over a busy photo.
+- Ornamental meshes/gradients: `decorative: true`. Photos with meaning: set `alt` and omit `decorative`.
+

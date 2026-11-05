@@ -33,11 +33,62 @@ html[data-mode="print"] * { animation-play-state: paused !important; }
 /* ================================ frame ================================ */
 .frame { position: absolute; inset: 0; display: flex; flex-direction: column;
   padding: var(--pad-top) var(--pad-x) var(--pad-bottom); }
-.frame > *:not(.bg) { position: relative; z-index: 1; }
+.frame > *:not(.bg):not(.title-backdrop):not(.title-scrim) { position: relative; z-index: 1; }
 .frame-header { margin-bottom: var(--space-6); max-width: 1560px; }
 .frame-center { justify-content: center; }
 .frame-center .frame-header { margin-bottom: var(--space-8); }
 .frame-body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; overflow: hidden; padding-bottom: 20px; }
+
+/* Title hero: full-bleed image plate + left scrim + left copy (not centered) */
+.title-backdrop {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.title-backdrop img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.title-backdrop img.fit-contain { object-fit: contain; }
+.title-scrim {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  /* Strong left band so headline contrast holds on busy full-bleed plates */
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--bg) 96%, transparent) 0%,
+      color-mix(in oklab, var(--bg) 90%, transparent) 24%,
+      color-mix(in oklab, var(--bg) 72%, transparent) 42%,
+      color-mix(in oklab, var(--bg) 38%, transparent) 58%,
+      color-mix(in oklab, var(--bg) 12%, transparent) 72%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--bg) 35%, transparent) 0%,
+      transparent 28%,
+      transparent 72%,
+      color-mix(in oklab, var(--bg) 45%, transparent) 100%
+    );
+}
+.frame-title-hero {
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+}
+.frame-title-hero .frame-header {
+  max-width: 900px;
+  margin-bottom: var(--space-5);
+  align-self: flex-start;
+}
+.frame-title-hero .hero-title { max-width: 880px; }
+.frame-title-hero .subtitle { max-width: 760px; }
+.frame-title-hero .frame-body {
+  flex: 0 0 auto;
+  max-width: 900px;
+  align-self: flex-start;
+  justify-content: flex-start;
+  overflow: visible;
+  padding-bottom: 0;
+}
+.frame-title-hero .frame-body .row { justify-content: flex-start; }
 .frame-architecture .slide-title { font-size: 48px; line-height: 1.15; }
 .frame-architecture .frame-header { margin-bottom: 12px; }
 .kicker { font: 600 var(--fs-small)/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase;
