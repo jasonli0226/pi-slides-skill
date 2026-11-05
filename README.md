@@ -26,6 +26,7 @@ Light theme, with images researched from the web and added motion:
 - **Design spec:** `skills/web-slides/references/deck-spec.md` — YAML middle layer (slide types, layouts, components, chart data, notes) with approval gate and promote/merge rules; `npm run spec` validates and generates stubs.
 - **Media guide:** `skills/web-slides/references/media-guide.md` teaches the **agent** to copy user-provided logos/screenshots into `public/media/` and render them with `<Figure>` (alt + cite/illustrative, lint for missing alt / broken src).
 - **Swappable theme tokens:** the built-in themes are `midnight`, `aurora` and `paper`. A brand palette goes in `brand.css` and is a single-file change.
+- **Template inspiration:** curated free tech Google Slides / PowerPoint packs (SlidesCarnival, Slidesgo, …) used as **style references** only — palettes + layout recipes via `style:images`, never vendored PPTX. See [docs/template-inspiration.md](docs/template-inspiration.md).
 - **Style import:** `npm run style:url -- <url>`, `style:images -- <dir>` and `style:svg -- <dir>` turn a website, a mood board or SVG artwork into `style-spec.json` plus a WCAG-checked `[data-theme="brand"]`. The importer extracts colors, swaps proprietary fonts for free ones, maps layout feel to tokens and normalizes SVGs. It borrows style, never assets.
 - **Presenting:** arrow keys or clicks with click-steps, **N** notes, **O** overview, **F** fullscreen, and `prefers-reduced-motion` respected.
 
