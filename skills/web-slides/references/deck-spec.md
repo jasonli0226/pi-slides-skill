@@ -12,7 +12,7 @@ Full details for layout recipes: `layout-guide.md`. Slide types and component pr
 2. Agent writes a rich **`content/deck.spec.yaml`** the user can edit: slide order/number, takeaway title, slide type, layout recipe, components, text blocks, media paths, chart data, sources, speaker notes.
 3. User edits the file to change design or add content.
 4. **Approval gate:** set `approved: true` (and optionally `approved_at`) **only after the user explicitly approves** that file. Do not generate production slides until then (stubs for preview are OK if the user asked for a live preview).
-5. If a **style-library** pack was applied, keep `content/style-pack.json` (written by `style-lib apply`). Running `npm run spec` overlays pack theme + pattern defaults onto matching slides (title-hero → left scrim + backdrop stubs; KPI / timeline layouts). Prefer those pack layouts over inventing new ones.
+5. If a **style-library** pack was applied, keep `content/style-pack.json` (written by `style-lib apply`). Running `npm run spec` overlays pack theme + pattern defaults onto matching slides (title-hero → left scrim + backdrop stubs; KPI / timeline layouts). The overlay only fills fields the YAML leaves blank: an explicit `theme` or per-slide `layout` in `deck.spec.yaml` always wins. Prefer those pack layouts over inventing new ones.
 6. Agent runs `npm run spec` then builds React from the approved spec. Use **`npm run live`** / **`npm run dev`** for polish. Spec stays editable; regenerating must follow the **promote / merge** rules below.
 
 ## Schema

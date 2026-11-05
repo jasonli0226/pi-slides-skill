@@ -42,7 +42,7 @@ Effects:
 
 1. Writes `new-deck/src/theme/brand.css` (unless `--patterns-only`)
 2. If `src/slides/index.ts` has `theme: "…"`, sets `theme: "brand"` (unless `--patterns-only`)
-3. Writes `content/style-pack.json` and patches `content/deck.spec.yaml` (`style_pack`, theme, per-slide `pattern` / `layout` / title-hero fields)
+3. Writes `content/style-pack.json` and patches `content/deck.spec.yaml` (`style_pack`, theme, per-slide `pattern` / `layout` / title-hero fields). With `--patterns-only`, the deck's existing `theme` is left unchanged.
 4. Wires matching `src/slides/*.tsx` (title-hero props, layout-* classNames) and `src/slides/generated/from-pack.ts`
 5. Copies pattern files + `WIRE.md` to `style-import/pack-<id>/` (unless `--theme-only`)
 6. Prints next steps: `npm run spec && npm run check:tokens && npm run review`
