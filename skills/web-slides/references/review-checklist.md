@@ -12,6 +12,7 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] `leftover`: no lorem, TODO, TBD, FIXME, placeholder, `{{ }}`, undefined or NaN.
 - [ ] `emoji-icon`: no emoji.
 - [ ] `off-stage`, `footer-overlap`, `clipped`: nothing spills off the stage, into the footer, or out of a container.
+- [ ] `uneven-gaps` / `absolute-spam` (warnings): sibling gutters and peer card heights stay even; body content is Grid/Flex, not a pile of absolutes (see `layout-guide.md`).
 - [ ] `tiny-text`: nothing under 18px, including chart and diagram text.
 - [ ] `contrast`: solid-background text meets 4.5:1 (3:1 if large).
 - [ ] `render` / console: no Mermaid or Shiki errors and no runtime errors.
@@ -28,7 +29,7 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 
 - [ ] Reading only the titles in order tells the whole story.
 - [ ] Each slide has one focal point, and the accent color is used on that point only.
-- [ ] Alignment: left edges line up across slides; cards in a row have equal heights; nothing looks accidentally off-center.
+- [ ] Alignment: left edges line up across slides; cards in a row have equal heights; gutters match; nothing looks accidentally off-center. Prefer `.layout-*` recipes from `layout-guide.md`.
 - [ ] There's enough whitespace: no slide feels crammed (over 40 words is a smell).
 - [ ] Gradient text and text over glows are clearly readable, since the lint can't measure these.
 - [ ] Icons are all lucide with the same stroke, and the same concept uses the same icon everywhere.
