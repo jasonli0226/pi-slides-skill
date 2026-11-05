@@ -53,7 +53,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 - Read `references/media-guide.md`. User assets live in `public/media/` and render through `<Figure>`.
 - Lucide for icons; Figure for anything the user supplied. Never invent logos or stock art.
 - Always set `alt` and `cite` or `illustrative`. Keep logos `fit="contain"`; check text-over-image by eye.
-- Title openers: prefer a full-bleed plate via `SlideFrame backdrop={{ src, decorative }}` with the built-in left scrim — do not center the headline over a busy photo without the scrim.
+- Title openers: full-bleed **photo** via `SlideFrame backdrop` + `scrim="light"` (soft white left band, dark type, vivid image on the right). Use `heroLabel` for the bottom-left uppercase tag. Do not center; do not rely on heavy colored orbs when a photo is available. Real photos live in `public/media/` (rights-cleared only).
 
 ## Diagrams
 

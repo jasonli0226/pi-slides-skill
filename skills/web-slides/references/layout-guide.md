@@ -20,9 +20,9 @@ CSS Tricks’ own framing: **Grid for the page/stage structure, Flexbox for rows
 
 ## Recipes
 
-### Title hero (full-bleed plate + left copy)
+### Title hero (full-bleed photo + left light scrim)
 
-Prefer this for opening `kind="title"` slides. **Do not center** the headline.
+Prefer this for opening `kind="title"` slides. Match the airport-style pattern: **photo full-bleed**, **soft white scrim on the left (~45–55%)**, **dark type**, **not centered**. Do not use a heavy colored orb plate when a photo is available.
 
 ```tsx
 <SlideFrame
@@ -30,21 +30,20 @@ Prefer this for opening `kind="title"` slides. **Do not center** the headline.
   hero
   footer={false}
   background="plain"
-  backdrop={{ src: "/media/hero-plate.webp", decorative: true }}
-  title="Ship technical talks that look designed, not generated."
-  subtitle="One-line promise under the headline."
->
-  <div className="row" style={{ gap: 12 }}>
-    <Pill>…</Pill>
-  </div>
-</SlideFrame>
+  scrim="light"
+  backdrop={{ src: "/media/hero-photo.jpg", alt: "…" /* or decorative: true for plates */ }}
+  kicker="Data analytics team · 12-month work plan"
+  title="A 12-month plan to turn trusted data into sustainable business value."
+  subtitle={"AI & Innovation Department\nAirport Authority Hong Kong"}
+  heroLabel="Proposal for discussion"
+/>
 ```
 
-- **`backdrop`**: full-bleed image (cover) behind chrome. Mark ornamental plates `decorative`.
-- **`title-scrim`**: automatic left-to-right fade from `--bg` so type stays readable on photos.
-- **Left column**: `.frame-title-hero` keeps header/body ≤ ~900px on the left; pills and meta stay with the copy.
-- Kind `title` without `center` opts into the hero layout even without a backdrop (scrim over `background`).
-- Pass `center` only for rare centered openers or `kind="section"` / quote slides.
+- **`backdrop`**: full-bleed photographic background (`object-fit: cover`). Put **rights-cleared** user photos in `public/media/` — do not invent or hotlink stock. The template ships a synthetic placeholder (`title-hero-photo-placeholder.jpg`) only.
+- **`scrim`**: `light` (default when `backdrop` is set) = soft white left gradient, dark text; `dark` = ink from `--bg` for aurora-only dark openers; `auto` picks light if backdrop else dark.
+- **`kicker`**: small uppercase eyebrow. **`subtitle`**: org / dept (use `\n` for two lines). **`heroLabel`**: small uppercase footer label, bottom-left.
+- **Left column**: header stays ≤ ~52% / 920px; the right of the photo stays vivid past the scrim fade.
+- Kind `title` without `center` opts into the hero layout. Pass `center` only for rare centered openers or `kind="section"` / quote slides.
 
 ### Title + body (stack)
 

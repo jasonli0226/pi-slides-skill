@@ -87,7 +87,7 @@ Never mix emoji or a second icon pack with Lucide.
 
 ## Title hero backdrop
 
-For opening slides, prefer a **full-bleed** plate on `SlideFrame` instead of a framed `<Figure>` in the body:
+Opening slides prefer a **full-bleed photograph** on `SlideFrame`, not a framed `<Figure>` in the body:
 
 ```tsx
 <SlideFrame
@@ -95,13 +95,17 @@ For opening slides, prefer a **full-bleed** plate on `SlideFrame` instead of a f
   hero
   footer={false}
   background="plain"
-  backdrop={{ src: "/media/hero-plate.webp", decorative: true }}
+  scrim="light"
+  backdrop={{ src: "/media/hero-photo.jpg", alt: "Aerial campus at dusk" }}
+  kicker="…"
   title="…"
+  subtitle={"Org line\nDepartment"}
+  heroLabel="Proposal for discussion"
 />
 ```
 
-- The plate covers the 1920×1080 stage (`object-fit: cover`).
-- A left scrim (`title-scrim`) is painted automatically so headline contrast holds.
-- Keep copy on the **left**; do not use `center` over a busy photo.
-- Ornamental meshes/gradients: `decorative: true`. Photos with meaning: set `alt` and omit `decorative`.
+- Soft **left light scrim** (~45–55% width) keeps dark type readable; the right of the photo stays vivid.
+- Put **rights-cleared** user photos in `public/media/`. Do not commit third-party photos whose license is unclear.
+- Template placeholder: `title-hero-photo-placeholder.jpg` (synthetic, not a real photo). Swap it for the talk's real plate.
+- Ornamental SVG meshes (`title-hero-plate.svg`, `illustrative-mesh.svg`) are fallbacks when no photo exists — prefer a photo for the airport-style opener.
 

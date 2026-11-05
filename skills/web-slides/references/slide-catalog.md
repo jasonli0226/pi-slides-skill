@@ -4,7 +4,7 @@ Every type has a working example in `template/src/slides/` (in the skill dir). C
 
 | Type (`kind`) | Use it for | Example file | Core components |
 |---|---|---|---|
-| `title` | Opening promise of the talk | `01-title.tsx` | `SlideFrame hero backdrop` (full-bleed + left scrim), `subtitle`, `Pill`, `Icon` — **not** `center` |
+| `title` | Opening promise of the talk | `01-title.tsx` | `SlideFrame hero` + photo `backdrop` + `scrim="light"`, `kicker`, `subtitle`, `heroLabel` — **not** `center` |
 | `agenda` | 3 to 5 parts, revealed per click | `02-agenda.tsx` | `Stagger stepwise` + `Card icon` in `.grid-4` / `.grid-3` |
 | `big-number` | One headline metric (+ one supporting metric) | `03-big-number.tsx` | `Stat size="xl" cite`, second `Stat size="md"` |
 | `comparison` | Options side by side, recommended column highlighted | `04-comparison.tsx` | `table.compare`, `.col-hi`, `<Cite>` inside cells |
@@ -23,9 +23,9 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
 
 ## Component reference (`src/deck/components.tsx`)
 
-- **SlideFrame** `{ kind, title, kicker?, subtitle?, sources?: SourceRef[], background?: "grid"|"aurora"|"spotlight"|"plain", footer?: boolean, center?: boolean, hero?: boolean, backdrop?: { src, alt?, decorative?, fit? } }`
+- **SlideFrame** `{ kind, title, kicker?, subtitle?, sources?: SourceRef[], background?: "grid"|"aurora"|"spotlight"|"plain", footer?: boolean, center?: boolean, hero?: boolean, backdrop?: { src, alt?, decorative?, fit? }, scrim?: "light"|"dark"|"auto", heroLabel? }`
   - Renders the kicker and title, then a footer with numbered sources and the page number.
-  - **Title hero:** `hero` or `backdrop` (auto for `kind="title"` when not `center`) left-aligns copy, paints a left scrim, and optionally a full-bleed image plate. Prefer this over `center` for openers.
+  - **Title hero (photo pattern):** `backdrop` full-bleed photo + `scrim="light"` (soft white left ~45–55%, dark type) + `kicker` / takeaway title / org `subtitle` / `heroLabel` bottom-left. Auto `scrim` is light when backdrop is set. Prefer this over `center` or orb-only plates.
   - `<Cite id>` and figure `cite` props number themselves against `sources`.
 - **Appear** `{ at?: step, variant?: "up"|"fade"|"scale"|"blur"|"left"|"right", delay? }`
   - Without `at`, it animates on enter. With `at={k}`, it appears on click step k.

@@ -227,6 +227,10 @@
     }
     return bg;
   };
+  /* Light title-hero scrim is a sibling gradient (not background-color); treat copy as on white. */
+  const scrimLight = frame?.dataset.scrim === "light";
+  const underLightScrim = (el) =>
+    scrimLight && !!el.closest(".frame-header, .frame-body, .title-hero-label");
   const seen = new Set();
   const walker = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT);
   for (let t = walker.nextNode(); t; t = walker.nextNode()) {
@@ -238,7 +242,7 @@
     if (px < 18) add("error", "tiny-text", `Text is ${px}px; minimum on the 1920 stage is 18px.`, el);
     const fg = parse(cs.color);
     if (!fg || fg.a === 0) continue; // gradient-clipped text: verified visually + via tokens
-    const bg = bgOf(el);
+    const bg = underLightScrim(el) ? { r: 255, g: 255, b: 255, a: 1 } : bgOf(el);
     const cr = ratio(over(fg, bg), bg);
     const large = px >= 24 || (px >= 18.66 && parseInt(cs.fontWeight, 10) >= 700);
     const need = large ? 3 : 4.5;
