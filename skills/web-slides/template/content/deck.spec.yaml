@@ -1,0 +1,174 @@
+# Editable design spec — approval artifact between raw notes and React slides.
+# Schema: skills/web-slides/references/deck-spec.md
+# This file mirrors part of the template example deck (status: locked). Set approved: true
+# only after the user explicitly approves the design. Stubs regenerate via `npm run spec`.
+title: Agent-authored web decks
+theme: midnight
+audience: Engineering leads evaluating agent-built decks
+goal: Show that research-backed web slides can look keynote-grade and pass automated review
+minutes: 12
+approved: false
+version: 1
+notes: |
+  Schema sample for the template. Polished slides live in src/slides/*.tsx (locked).
+  For a new talk: replace slides with stubs, keep approved false until the user says yes.
+
+slides:
+  - n: 1
+    id: title
+    type: title
+    title: Research-backed decks that look like a design team built them.
+    layout: layout-stack
+    status: locked
+    background: aurora
+    kicker: Web Slides
+    subtitle: React · Vite · Motion · Playwright
+    notes: Open on the promise; do not bury the ask.
+    components:
+      - Pill:
+          text: React 19 + Motion
+          tone: accent
+
+  - n: 2
+    id: agenda
+    type: agenda
+    title: Four gates sit between a draft and a deck you can ship.
+    layout: grid-4
+    status: locked
+    kicker: Agenda
+    steps: 4
+    body:
+      - Research with sources
+      - Design spec you can edit
+      - Build and live polish
+      - Screenshot review and export
+    components:
+      - Card:
+          icon: Search
+          title: Research
+      - Card:
+          icon: FilePen
+          title: Spec
+      - Card:
+          icon: Sparkles
+          title: Build
+      - Card:
+          icon: ShieldCheck
+          title: Review
+
+  - n: 3
+    id: contrast-floor
+    type: big-number
+    title: Ticket triage time fell 48% after the pilot.
+    layout: layout-hero
+    status: locked
+    kicker: Results
+    sources: [pilotReport]
+    notes: Speak to the median; the bar chart is the receipt.
+    components:
+      - Stat:
+          value: 48
+          suffix: "%"
+          label: median triage drop
+          cite: pilotReport
+          size: xl
+      - BarChart:
+          cite: pilotReport
+          highlight: 1
+          unit: min
+          data:
+            - { label: Before, value: 42 }
+            - { label: After, value: 22 }
+
+  - n: 4
+    id: architecture
+    type: architecture
+    title: Agents write a design spec before they touch React.
+    layout: layout-media
+    status: locked
+    kicker: Architecture
+    sources: [skillRepo]
+    mermaid: |
+      flowchart LR
+        U[User notes] --> S[deck.spec.yaml]
+        S --> A{approved?}
+        A -->|yes| R[React slides]
+        R --> V[review + PDF]
+    components:
+      - Mermaid:
+          chart: |
+            flowchart LR
+              U[User notes] --> S[deck.spec.yaml]
+              S --> A{approved?}
+              A -->|yes| R[React slides]
+              R --> V[review + PDF]
+
+  - n: 5
+    id: layered-platform
+    type: architecture
+    title: Dense stacks use swimlanes instead of a Mermaid hairball.
+    layout: layout-stack
+    status: locked
+    kicker: Diagrams
+    sources: [skillRepo]
+    components:
+      - LayeredArchitecture:
+          caption: Illustrative agent → spec → slides stack
+          layers:
+            - id: present
+              label: Present
+              items:
+                - { label: Vite stage, sub: "1920×1080" }
+            - id: author
+              label: Author
+              items:
+                - { label: Design spec, highlight: true }
+                - { label: React slides }
+
+  - n: 6
+    id: workflow
+    type: timeline
+    title: Ship the deck in one working session, not a week of polish.
+    layout: layout-stack
+    status: locked
+    kicker: Timeline
+    steps: 4
+    timeline:
+      - { when: "0:15", title: Brief and research }
+      - { when: "0:30", title: Spec + user approval }
+      - { when: "1:30", title: Build stubs, lock polish }
+      - { when: "2:00", title: Review, PDF, hand-off }
+
+  - n: 7
+    id: results
+    type: results
+    title: Automated review catches the mistakes humans miss under deadline.
+    layout: layout-kpi
+    status: locked
+    kicker: Measured
+    sources: [skillRepo]
+    components:
+      - Stat:
+          value: 0
+          label: review errors to ship
+          cite: skillRepo
+          size: lg
+      - Stat:
+          value: 16
+          label: example slide types
+          cite: skillRepo
+          size: md
+
+  - n: 8
+    id: closing
+    type: closing
+    title: Approve the design spec, then let the agent build the stage.
+    layout: layout-stack
+    status: locked
+    background: aurora
+    kicker: Next
+    notes: Leave with the ask — edit the YAML, approve, regenerate stubs, polish locked slides.
+    body:
+      - Edit content/deck.spec.yaml
+      - Set approved true after you sign off
+      - npm run spec && npm run live

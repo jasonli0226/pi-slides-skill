@@ -16,6 +16,7 @@
     "export:png": "node scripts/review.mjs --out export/png --no-lint",
     "verify": "npm run check:tokens && npm run typecheck && npm run build && node scripts/review.mjs --no-build && node scripts/export-pdf.mjs --no-build",
     "outline": "node scripts/watch-outline.mjs",
+    "spec": "node scripts/spec.mjs",
     "live": "node scripts/live.mjs"
   },
   "dependencies": {
@@ -27,7 +28,8 @@
     "motion": "^14.9.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "shiki": "^4.6.0"
+    "shiki": "^4.6.0",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

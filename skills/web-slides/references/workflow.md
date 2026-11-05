@@ -14,21 +14,27 @@
 - Prefer primary sources. Write down the date you accessed each one.
 - If a needed number does not exist, say so in the outline. Do not estimate silently.
 
-## 3. Outline and approval gate
+## 3. Design spec and approval gate
 
-Write `outline.md` like this:
+From the user's raw notes (no layout required), write **`content/deck.spec.yaml`**. Schema and promote/merge rules: `deck-spec.md`. Example: `template/content/deck.spec.yaml`.
 
+Minimum per slide: `n`, `id`, `type`, `title` (full-sentence takeaway), `layout`, `status` (`stub` until polished), plus components / body / media / chart data / sources / notes as needed.
+
+```yaml
+title: "…"
+theme: midnight
+approved: false          # set true ONLY after the user approves this file
+slides:
+  - n: 1
+    id: title
+    type: title
+    title: "Research-backed decks that look like a design team built them."
+    layout: layout-stack
+    status: stub
+    background: aurora
 ```
-# <Deck title> · <audience> · <minutes>
-Theme: midnight (brand pending)
 
-01 title — "<takeaway sentence>." — visual: aurora bg — sources: —
-02 agenda — "<…>." — 4 cards
-03 big-number — "<…>." — Stat 48% — sources: pilotReport
-…
-```
-
-Then send it to the user with one question: approve, or what to change. Do not build until it is approved.
+Send the YAML (or a clear summary) to the user: approve, or what to change. They may edit the file directly. **Do not set `approved: true` or build production slides until they approve.** Optional: a one-line `outline.md` brainstorm first; optional light `content/deck.outline.md` for `npm run live` (`npm run spec -- --sync-outline`).
 
 ## 4. Scaffold
 
@@ -52,12 +58,13 @@ npm run style:svg -- ./art --apply
 
 Check `style-import/style-spec.json`, then preview with `npm run dev` → `/?theme=brand`. The rules are in `style-import.md`.
 
-## 5. Build
+## 5. Build from the approved spec
 
-- Make one file per slide, `src/slides/NN-id.tsx`, register each in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`.
-- Lay out the body with Grid/Flex recipes in `layout-guide.md` (`.layout-stack`, `.layout-kpi`, `.layout-compare`, `.layout-media`, `.layout-hero`) — not absolute positioning.
-- **Live preview (HMR):** `npm run dev` → http://127.0.0.1:5173. Edit a slide `.tsx` or `sources.ts` and the browser updates immediately (keys: arrows, N, O, F).
-- **Live + outline:** `npm run live` also watches `content/deck.outline.md` and regenerates `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import and spread in `index.ts` to preview stubs; refine into real slide files before review.
+- After approval, set `approved: true` and run `npm run spec` (validate + write `from-spec.tsx` for `status: stub` only).
+- Promote stubs → `src/slides/NN-id.tsx`, set `status: locked`, register in `index.ts`. **Never overwrite locked files** when regenerating (`deck-spec.md`).
+- Lay out with Grid/Flex recipes in `layout-guide.md` (`.layout-*`) — not absolute positioning.
+- **Live preview (HMR):** `npm run dev` → http://127.0.0.1:5173.
+- **Spec watch / light outline:** `npm run spec -- --watch` or `npm run live` (outline). Uncomment `specSlides` / `outlineSlides` in `index.ts` only while iterating.
 - Run `npm run typecheck` to catch prop mistakes early.
 
 ## 5b. User-provided media (agent does this)
