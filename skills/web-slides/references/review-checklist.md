@@ -1,6 +1,6 @@
 # Self-review checklist
 
-Run `npm run review`, then go through this list with the screenshots open. Every box must be true before export.
+Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go through this list with the screenshots open. Complete visual findings in the critique; do not auto-rewrite unless the user asks. Every box must be true before export.
 
 ## Automated (from review/report.md; must be 0 errors)
 

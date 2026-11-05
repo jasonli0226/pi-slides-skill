@@ -12,7 +12,8 @@ Full details for layout recipes: `layout-guide.md`. Slide types and component pr
 2. Agent writes a rich **`content/deck.spec.yaml`** the user can edit: slide order/number, takeaway title, slide type, layout recipe, components, text blocks, media paths, chart data, sources, speaker notes.
 3. User edits the file to change design or add content.
 4. **Approval gate:** set `approved: true` (and optionally `approved_at`) **only after the user explicitly approves** that file. Do not generate production slides until then (stubs for preview are OK if the user asked for a live preview).
-5. Agent runs `npm run spec` then builds React from the approved spec. Use **`npm run live`** / **`npm run dev`** for polish. Spec stays editable; regenerating must follow the **promote / merge** rules below.
+5. If a **style-library** pack was applied, keep `content/style-pack.json` (written by `style-lib apply`). Running `npm run spec` overlays pack theme + pattern defaults onto matching slides (title-hero → left scrim + backdrop stubs; KPI / timeline layouts). Prefer those pack layouts over inventing new ones.
+6. Agent runs `npm run spec` then builds React from the approved spec. Use **`npm run live`** / **`npm run dev`** for polish. Spec stays editable; regenerating must follow the **promote / merge** rules below.
 
 ## Schema
 
@@ -21,7 +22,8 @@ Full details for layout recipes: `layout-guide.md`. Slide types and component pr
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `title` | string | yes | Deck title (may match the title-slide takeaway or a short name) |
-| `theme` | `midnight` \| `aurora` \| `paper` \| `brand` | yes | |
+| `theme` | `midnight` \| `aurora` \| `paper` \| `tech-dark` \| `bento-minimal` \| `navy-pitch` \| `brand` | yes | |
+| `style_pack` | string | optional | Id of an applied `style-library` pack (`content/style-pack.json`). Set by `style-lib apply`. |
 | `audience` | string | recommended | Who watches |
 | `goal` | string | recommended | Decision or ask |
 | `minutes` | number | optional | Talk length |
@@ -39,7 +41,12 @@ Full details for layout recipes: `layout-guide.md`. Slide types and component pr
 | `id` | string | yes | kebab-case, unique; used as React slide `id` |
 | `type` | string | yes | One of the catalog kinds: `title`, `agenda`, `big-number`, `comparison`, `architecture`, `timeline`, `code`, `results`, `quote`, `governance`, `lessons`, `closing`, `section`, `content` |
 | `title` | string | yes | **Full-sentence takeaway** (5+ words, ends with punctuation) |
-| `layout` | string | recommended | Recipe from `layout-guide.md`: `layout-stack`, `layout-kpi`, `layout-compare`, `layout-media`, `layout-hero`, `layout-hero-flip`, `layout-bento`, `layout-bento-4`, `layout-section`, `layout-timeline-strip`, or `grid-2` / `grid-3` / `grid-4` / `row` |
+| `layout` | string | recommended | Recipe from `layout-guide.md`: `layout-stack`, `layout-kpi`, `layout-compare`, `layout-media`, `layout-hero`, `layout-hero-flip`, `layout-bento`, `layout-bento-4`, `layout-section`, `layout-timeline-strip`, or `grid-2` / `grid-3` / `grid-4` / `row`. Pack apply may set this (e.g. KPI → `layout-kpi`, timeline → `layout-timeline-strip`). |
+| `pattern` | string | optional | Style-library pattern id (`title-hero`, `kpi`, `timeline`, …). Stub generator honors `title-hero`. |
+| `scrim` | `light` \| `dark` \| `auto` | optional | Title-hero scrim; set by pack apply |
+| `hero` | boolean | optional | Title-hero left layout (`SlideFrame` `hero`) |
+| `heroLabel` | string | optional | Small bottom-left label on title hero |
+| `backdrop` | object | optional | `{ src, alt? }` or `{ src, decorative: true }` full-bleed title photo |
 | `status` | `stub` \| `locked` | yes | See promote / merge |
 | `kicker` | string | optional | Small label above the title |
 | `subtitle` | string | optional | Title slide / closing |

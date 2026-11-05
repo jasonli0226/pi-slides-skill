@@ -420,6 +420,288 @@ function cmdSave(args, { isUpdate = false } = {}) {
   console.log(`${isUpdate ? "updated" : "saved"} ${id} → ${packDir}`);
 }
 
+
+const PATTERN_WIRE = {
+  "title-hero": {
+    slideTypes: ["title"],
+    layout: "layout-stack",
+    background: "plain",
+    scrim: "light",
+    hero: true,
+    center: false,
+    backdrop: {
+      src: "/media/title-hero-photo-placeholder.jpg",
+      decorative: true,
+    },
+    heroLabel: "Proposal for discussion",
+  },
+  kpi: {
+    slideTypes: ["big-number", "results", "content"],
+    layout: "layout-kpi",
+  },
+  timeline: {
+    slideTypes: ["timeline"],
+    layout: "layout-timeline-strip",
+  },
+  compare: {
+    slideTypes: ["comparison"],
+    layout: "layout-compare",
+  },
+  bento: {
+    slideTypes: ["content", "agenda"],
+    layout: "layout-bento",
+  },
+};
+
+function writeStylePackManifest(deckDir, pack) {
+  const patterns = {};
+  for (const p of pack.json.patterns || []) {
+    const wire = PATTERN_WIRE[p.id];
+    if (wire) patterns[p.id] = { ...wire, packPatternId: p.id };
+  }
+  const manifest = {
+    id: pack.json.id,
+    name: pack.json.name || pack.json.id,
+    appliedAt: new Date().toISOString(),
+    themeFile: pack.json.theme?.file || null,
+    patterns,
+    sourcePackDir: (() => {
+      const cwd = process.cwd();
+      if (pack.dir.startsWith(cwd + path.sep)) return path.relative(cwd, pack.dir);
+      return pack.dir;
+    })(),
+  };
+  const out = path.join(deckDir, "content", "style-pack.json");
+  ensureDir(path.dirname(out));
+  writeFile(out, JSON.stringify(manifest, null, 2) + "\n");
+  console.log(`wrote ${out}`);
+  return manifest;
+}
+
+function patchDeckSpecYaml(deckDir, pack, manifest) {
+  const specPath = path.join(deckDir, "content", "deck.spec.yaml");
+  if (!fs.existsSync(specPath)) {
+    console.log("(no content/deck.spec.yaml — skipped YAML wire)");
+    return false;
+  }
+  let yaml = fs.readFileSync(specPath, "utf8");
+  const hasTheme = !!pack.json.theme?.file;
+  if (hasTheme) {
+    if (/^theme:\s*\S+/m.test(yaml)) yaml = yaml.replace(/^theme:\s*\S+/m, "theme: brand");
+    else yaml = `theme: brand\n` + yaml;
+  }
+  if (/^style_pack:\s*/m.test(yaml)) {
+    yaml = yaml.replace(/^style_pack:\s*.*$/m, `style_pack: ${pack.json.id}`);
+  } else if (/^theme:\s*\S+/m.test(yaml)) {
+    yaml = yaml.replace(/^(theme:\s*\S+)/m, `$1\nstyle_pack: ${pack.json.id}`);
+  } else {
+    yaml = `style_pack: ${pack.json.id}\n` + yaml;
+  }
+
+  // Split into deck preamble + slide chunks (each starting with "- n:")
+  const slideStart = yaml.search(/^\s*-\s*n:\s*\d+/m);
+  if (slideStart < 0) {
+    fs.writeFileSync(specPath, yaml);
+    console.log(`patched ${specPath} (deck fields only)`);
+    return true;
+  }
+  const head = yaml.slice(0, slideStart);
+  const rest = yaml.slice(slideStart);
+  const chunks = rest.split(/(?=^\s*-\s*n:\s*\d+)/m).filter(Boolean);
+  const wired = chunks.map((chunk) => {
+    const typeMatch = chunk.match(/^\s*type:\s*(\S+)\s*$/m);
+    if (!typeMatch) return chunk;
+    const type = typeMatch[1];
+    let wire = null;
+    for (const [pid, w] of Object.entries(manifest.patterns || {})) {
+      if ((w.slideTypes || []).includes(type)) {
+        wire = { ...w, packPatternId: pid };
+        break;
+      }
+    }
+    if (!wire) return chunk;
+    let body = chunk;
+    const setLine = (key, value, { object = false } = {}) => {
+      const re = new RegExp(`^(\\s*)${key}:\\s*[\\s\\S]*?(?=^\\s*[a-zA-Z_#-]|$)`, "m");
+      // simpler single-line keys
+      const lineRe = new RegExp(`^(\\s*)${key}:\\s*.*$`, "m");
+      if (object) return; // handled separately
+      if (lineRe.test(body)) body = body.replace(lineRe, `$1${key}: ${value}`);
+      else {
+        // insert after type:
+        body = body.replace(/^(\s*type:\s*\S+\s*)$/m, `$1\n$1`.replace(/type:\s*\S+/, `${key}: ${value}`));
+        // The above is wrong — do explicit indent from type line
+        body = chunk; // reset on first call mishap — use cleaner approach below
+      }
+    };
+    void setLine;
+    const typeLine = body.match(/^(\s*)type:\s*\S+\s*$/m);
+    const ind = typeLine ? typeLine[1] : "    ";
+    const upsert = (key, valueLines) => {
+      // remove existing key (single-line or block starting at key)
+      const blockRe = new RegExp(`^${ind}${key}:\\s*(?:\\|.*)?\\n(?:${ind}  .*\\n)*`, "m");
+      const lineRe = new RegExp(`^${ind}${key}:\\s*.*\\n?`, "m");
+      if (blockRe.test(body)) body = body.replace(blockRe, "");
+      else if (lineRe.test(body)) body = body.replace(lineRe, "");
+      // insert after type line
+      body = body.replace(
+        new RegExp(`^(${ind}type:\\s*\\S+\\s*)$`, "m"),
+        `$1\n${valueLines.map((l) => (l.startsWith(ind) ? l : ind + l)).join("\n")}`,
+      );
+    };
+    upsert("pattern", [`pattern: ${wire.packPatternId}`]);
+    if (wire.layout) upsert("layout", [`layout: ${wire.layout}`]);
+    if (wire.scrim) {
+      upsert("scrim", [`scrim: ${wire.scrim}`]);
+      if (wire.background) upsert("background", [`background: ${wire.background}`]);
+      if (wire.hero) upsert("hero", [`hero: true`]);
+      if (wire.heroLabel) upsert("heroLabel", [`heroLabel: ${JSON.stringify(wire.heroLabel)}`]);
+      if (wire.backdrop?.src) {
+        upsert("backdrop", [
+          "backdrop:",
+          `  src: ${wire.backdrop.src}`,
+          ...(wire.backdrop.decorative ? ["  decorative: true"] : []),
+        ]);
+      }
+    } else if (wire.layout) {
+      // kpi/timeline etc. — layout already upserted
+    }
+    return body;
+  });
+  fs.writeFileSync(specPath, head + wired.join(""));
+  console.log(`patched ${specPath}`);
+  return true;
+}
+
+function findSlideFiles(deckDir, idHint) {
+  const dir = path.join(deckDir, "src", "slides");
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".tsx"))
+    .map((f) => path.join(dir, f))
+    .filter((full) => {
+      const body = fs.readFileSync(full, "utf8");
+      if (idHint && (body.includes(`id: "${idHint}"`) || body.includes(`id: '${idHint}'`))) return true;
+      if (idHint && path.basename(full).includes(idHint)) return true;
+      return false;
+    });
+}
+
+function wireTitleHeroSlide(filePath, wire) {
+  let src = fs.readFileSync(filePath, "utf8");
+  if (/scrim=/.test(src) && /backdrop=/.test(src) && /hero(?:Label)?=/.test(src)) {
+    console.log(`title hero already wired: ${filePath}`);
+    return false;
+  }
+  // Ensure hero + scrim + backdrop on SlideFrame opening tag for kind="title"
+  if (!/kind=\{?"title"\}?/.test(src) && !/kind="title"/.test(src)) {
+    return false;
+  }
+  // Remove legacy center prop on title frames
+  src = src.replace(/(\s)center(\s|\/|>)/g, "$1$2");
+  if (!/hero(?:\s|=|\/|>)/.test(src)) {
+    src = src.replace(/<SlideFrame([^>]*)kind="title"/, '<SlideFrame$1kind="title"\n      hero');
+  }
+  if (!/scrim=/.test(src)) {
+    src = src.replace(
+      /<SlideFrame([\s\S]*?)(\s*\/?>)/,
+      (m, mid, end) => `<SlideFrame${mid}\n      scrim="${wire.scrim || "light"}"${end}`,
+    );
+  }
+  if (!/backdrop=/.test(src)) {
+    const bd = wire.backdrop || PATTERN_WIRE["title-hero"].backdrop;
+    const snippet = `backdrop={{\n        src: "${bd.src}",\n        decorative: ${bd.decorative ? "true" : "false"},\n      }}`;
+    src = src.replace(/scrim="[^"]*"/, (m) => `${m}\n      ${snippet}`);
+  }
+  if (!/background=/.test(src) && wire.background) {
+    src = src.replace(/scrim="/, `background="${wire.background}"\n      scrim="`);
+  }
+  if (!/heroLabel=/.test(src) && wire.heroLabel) {
+    src = src.replace(
+      /subtitle=\{?/,
+      (m) => `heroLabel="${wire.heroLabel}"\n      ${m}`,
+    );
+    if (!/heroLabel=/.test(src)) {
+      // subtitle might be string prop
+      src = src.replace(
+        /subtitle="[^"]*"/,
+        (m) => `${m}\n      heroLabel="${wire.heroLabel}"`,
+      );
+    }
+  }
+  // Prefer footer={false} on title heroes
+  if (!/footer=\{false\}/.test(src)) {
+    src = src.replace(/footer=\{true\}/, "footer={false}");
+  }
+  fs.writeFileSync(filePath, src);
+  console.log(`wired title-hero → ${filePath}`);
+  return true;
+}
+
+function wireLayoutClassInSlide(filePath, layoutClass) {
+  let src = fs.readFileSync(filePath, "utf8");
+  if (src.includes(`className="${layoutClass}"`) || src.includes(`className={'${layoutClass}'}`)) {
+    return false;
+  }
+  // Prefer replacing known layout-* classNames
+  if (/className="layout-[a-z0-9-]+"/.test(src)) {
+    src = src.replace(/className="layout-[a-z0-9-]+"/, `className="${layoutClass}"`);
+    fs.writeFileSync(filePath, src);
+    console.log(`wired layout ${layoutClass} → ${filePath}`);
+    return true;
+  }
+  if (/className="grid-\d+"/.test(src) && layoutClass.startsWith("layout-")) {
+    src = src.replace(/className="grid-\d+"/, `className="${layoutClass}"`);
+    fs.writeFileSync(filePath, src);
+    console.log(`wired layout ${layoutClass} → ${filePath}`);
+    return true;
+  }
+  return false;
+}
+
+function wirePatternSlides(deckDir, manifest) {
+  let changes = 0;
+  for (const [pid, wire] of Object.entries(manifest.patterns || {})) {
+    if (pid === "title-hero") {
+      const files = [
+        ...findSlideFiles(deckDir, "title"),
+        path.join(deckDir, "src", "slides", "01-title.tsx"),
+      ].filter((f, i, a) => f && fs.existsSync(f) && a.indexOf(f) === i);
+      for (const f of files) {
+        if (wireTitleHeroSlide(f, wire)) changes++;
+      }
+      continue;
+    }
+    for (const type of wire.slideTypes || []) {
+      // map type to common file names
+      const hints = [type, type.replace(/-/g, "")];
+      if (type === "big-number") hints.push("contrast-floor", "results");
+      if (type === "timeline") hints.push("workflow");
+      if (type === "comparison") hints.push("compare");
+      for (const h of hints) {
+        for (const f of findSlideFiles(deckDir, h)) {
+          if (wire.layout && wireLayoutClassInSlide(f, wire.layout)) changes++;
+        }
+      }
+    }
+  }
+  // Always write a generated pack wiring module agents can import
+  const genDir = path.join(deckDir, "src", "slides", "generated");
+  ensureDir(genDir);
+  const lines = [
+    "/* AUTO-GENERATED by style-lib apply — pattern wiring hints for the deck build.",
+    " * Prefer promoting these recipes into locked slides; do not treat as final content.",
+    " */",
+    `export const appliedStylePack = ${JSON.stringify({ id: manifest.id, patterns: Object.keys(manifest.patterns || {}) }, null, 2)} as const;`,
+    "",
+  ];
+  writeFile(path.join(genDir, "from-pack.ts"), lines.join("\n"));
+  console.log(`wrote ${path.join(genDir, "from-pack.ts")}`);
+  return changes;
+}
+
+
 function setThemeBrandInIndex(deckDir) {
   const indexPath = path.join(deckDir, "src", "slides", "index.ts");
   if (!fs.existsSync(indexPath)) return false;
@@ -445,6 +727,7 @@ function cmdApply(args) {
 
   const patternsOnly = !!args["patterns-only"];
   const themeOnly = !!args["theme-only"];
+  const noWire = !!args["no-wire"];
 
   if (!patternsOnly && pack.json.theme?.file) {
     const src = path.join(pack.dir, pack.json.theme.file);
@@ -460,6 +743,16 @@ function cmdApply(args) {
     console.log("(pack has no theme — skipped brand.css)");
   }
 
+  let manifest = null;
+  if (!themeOnly) {
+    manifest = writeStylePackManifest(deckDir, pack);
+    if (!noWire) {
+      patchDeckSpecYaml(deckDir, pack, manifest);
+      const n = wirePatternSlides(deckDir, manifest);
+      console.log(`wired ${n} slide file change(s)`);
+    }
+  }
+
   if (!themeOnly && (pack.json.patterns || []).length) {
     const out = path.join(deckDir, "style-import", `pack-${id}`);
     ensureDir(out);
@@ -471,13 +764,28 @@ function cmdApply(args) {
         fs.copyFileSync(from, to);
       }
     }
-    // also copy pack.json for traceability
     fs.copyFileSync(path.join(pack.dir, "pack.json"), path.join(out, "pack.json"));
+    const wireMd = [
+      `# Applied pack \`${id}\``,
+      "",
+      "Theme and pattern recipes were wired into the deck build:",
+      "",
+      "- `src/theme/brand.css` (if pack has a theme)",
+      "- `content/style-pack.json` (machine-readable apply manifest)",
+      "- `content/deck.spec.yaml` (`style_pack`, per-slide `pattern` / `layout` / title-hero fields)",
+      "- matching `src/slides/*.tsx` layout / title-hero props when files exist",
+      "- `src/slides/generated/from-pack.ts`",
+      "",
+      "Run `npm run spec` to regenerate stubs from the patched YAML, then polish.",
+      "Recipes also copied below for reference.",
+      "",
+    ].join("\n");
+    writeFile(path.join(out, "WIRE.md"), wireMd);
     console.log(`patterns → ${out}`);
   }
 
-  console.log("\nNext: cd", deckDir, "&& npm run check:tokens && npm run review");
-  console.log("Wire patterns from style-import/pack-" + id + "/ into your slides.");
+  console.log("\nNext: cd", deckDir, "&& npm run spec && npm run check:tokens && npm run review");
+  console.log("Then run the slide-reviewer critique before export:pdf.");
 }
 
 function main() {
@@ -489,7 +797,7 @@ function main() {
   style-lib.mjs show  --id <pack-id>
   style-lib.mjs save  --id <pack-id> --from <deck-dir> [--name "..."] [--theme <preset>] [--patterns a,b] [--dest repo|user]
   style-lib.mjs update --id <pack-id> --from <deck-dir> [--patterns a,b]
-  style-lib.mjs apply --id <pack-id> --deck <deck-dir> [--patterns-only] [--theme-only]`);
+  style-lib.mjs apply --id <pack-id> --deck <deck-dir> [--patterns-only] [--theme-only] [--no-wire]`);
     process.exit(0);
   }
   switch (cmd) {

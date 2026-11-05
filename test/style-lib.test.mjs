@@ -77,3 +77,85 @@ test("style-lib save + update round-trip in STYLE_LIBRARY_DIR", () => {
   const brand2 = fs.readFileSync(path.join(lib, "env-pack/brand.css"), "utf8");
   assert.match(brand2, /#445566/);
 });
+
+test("style-lib apply wires style-pack.json, deck.spec, and title slide", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "style-lib-wire-"));
+  fs.mkdirSync(path.join(tmp, "src/theme"), { recursive: true });
+  fs.mkdirSync(path.join(tmp, "src/slides"), { recursive: true });
+  fs.mkdirSync(path.join(tmp, "content"), { recursive: true });
+  fs.writeFileSync(
+    path.join(tmp, "src/slides/index.ts"),
+    'export const deck = { theme: "midnight", slides: [] };\n',
+  );
+  fs.writeFileSync(
+    path.join(tmp, "src/slides/01-title.tsx"),
+    `import { SlideFrame } from "../deck/components";
+import { defineSlide } from "../deck/types";
+export default defineSlide({
+  id: "title",
+  Component: () => (
+    <SlideFrame kind="title" center kicker="K" title="Ship research-backed decks that look designed." subtitle="Org" />
+  ),
+});
+`,
+  );
+  fs.writeFileSync(
+    path.join(tmp, "content/deck.spec.yaml"),
+    `title: Wire test
+theme: midnight
+approved: false
+slides:
+  - n: 1
+    id: title
+    type: title
+    title: Ship research-backed decks that look designed.
+    layout: layout-stack
+    status: stub
+    kicker: K
+    subtitle: Org
+`,
+  );
+  const r = run(["apply", "--id", "title-hero-light", "--deck", tmp]);
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.ok(fs.existsSync(path.join(tmp, "content/style-pack.json")));
+  const pack = JSON.parse(fs.readFileSync(path.join(tmp, "content/style-pack.json"), "utf8"));
+  assert.equal(pack.id, "title-hero-light");
+  assert.ok(pack.patterns["title-hero"]);
+  const yaml = fs.readFileSync(path.join(tmp, "content/deck.spec.yaml"), "utf8");
+  assert.match(yaml, /style_pack:\s*title-hero-light/);
+  assert.match(yaml, /pattern:\s*title-hero/);
+  assert.match(yaml, /scrim:\s*light/);
+  const title = fs.readFileSync(path.join(tmp, "src/slides/01-title.tsx"), "utf8");
+  assert.match(title, /scrim="light"/);
+  assert.match(title, /backdrop=/);
+  assert.ok(fs.existsSync(path.join(tmp, "src/slides/generated/from-pack.ts")));
+  assert.ok(fs.existsSync(path.join(tmp, "style-import/pack-title-hero-light/WIRE.md")));
+});
+
+test("style-lib apply navy pack sets brand theme in deck.spec", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "style-lib-navy-"));
+  fs.mkdirSync(path.join(tmp, "src/theme"), { recursive: true });
+  fs.mkdirSync(path.join(tmp, "src/slides"), { recursive: true });
+  fs.mkdirSync(path.join(tmp, "content"), { recursive: true });
+  fs.writeFileSync(path.join(tmp, "src/slides/index.ts"), 'export const deck = { theme: "midnight", slides: [] };\n');
+  fs.writeFileSync(
+    path.join(tmp, "content/deck.spec.yaml"),
+    `title: Navy
+theme: midnight
+approved: false
+slides:
+  - n: 1
+    id: metrics
+    type: big-number
+    title: Pipeline hit four million dollars this quarter.
+    layout: layout-hero
+    status: stub
+`,
+  );
+  const r = run(["apply", "--id", "navy-pitch-snapshot", "--deck", tmp]);
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  const yaml = fs.readFileSync(path.join(tmp, "content/deck.spec.yaml"), "utf8");
+  assert.match(yaml, /theme:\s*brand/);
+  assert.match(yaml, /layout:\s*layout-kpi/);
+  assert.match(yaml, /pattern:\s*kpi/);
+});
