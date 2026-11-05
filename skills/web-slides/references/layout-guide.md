@@ -13,8 +13,8 @@ CSS Tricks’ own framing: **Grid for the page/stage structure, Flexbox for rows
 
 | Use | When | Deck default |
 |---|---|---|
-| **CSS Grid** | Dividing the `.frame-body` into columns/rows with known tracks (`1fr 1fr`, `0.55fr 1.45fr`) | `.grid-2/3/4`, `.layout-compare`, `.layout-hero` |
-| **Flexbox** | One-dimensional rows or columns: KPI strip, title→body stack, media→caption, icon lists | `.row`, `.layout-stack`, `.layout-kpi`, `.layout-media`, `.card` |
+| **CSS Grid** | Dividing the `.frame-body` into columns/rows with known tracks (`1fr 1fr`, `0.55fr 1.45fr`) | `.grid-2/3/4`, `.layout-compare`, `.layout-hero`, `.layout-bento`, `.layout-bento-4` |
+| **Flexbox** | One-dimensional rows or columns: KPI strip, title→body stack, media→caption, icon lists | `.row`, `.layout-stack`, `.layout-kpi`, `.layout-media`, `.layout-section`, `.layout-timeline-strip`, `.card` |
 
 `SlideFrame` already owns the outer chrome (padding, title, footer). Your job is only the body.
 
@@ -72,6 +72,50 @@ Equal tracks, `align-items: stretch` so card heights match. For three/four peers
 ```
 
 `0.55fr 1.45fr` (or `.layout-hero-flip` for the reverse). Same idea as an inline `style={{ gridTemplateColumns: "0.55fr 1.45fr" }}` on `.grid-2`, but named so agents reuse one pattern.
+
+
+### Bento grid (asymmetric feature tiles)
+
+```tsx
+<div className="layout-bento">
+  <Card highlight title="Hero tile">…</Card>
+  <Card title="Tile">…</Card>
+  <Card title="Tile">…</Card>
+  <Card title="Tile">…</Card>
+  <Card title="Tile">…</Card>
+</div>
+```
+
+`layout-bento` is a 3×2 Grid with the first child spanning both rows (product / hardware decks). `layout-bento-4` is a 2×2 Grid with the first child spanning both rows (four tiles total). Prefer these over hand-tuned `gridTemplateAreas`.
+
+### Section divider (chapter break)
+
+```tsx
+<div className="layout-section">
+  <div className="section-kicker">02 — Roadmap</div>
+  <div className="section-rule" />
+  <h2 className="section-title">We ship the pilot in twelve weeks.</h2>
+  <p className="section-lede">Optional one-line bridge into the next arc.</p>
+</div>
+```
+
+Use for mid-deck chapter breaks (`type: section`). Big display type + accent hairline; keep body copy short.
+
+### Timeline strip (compact milestones)
+
+```tsx
+<div className="layout-timeline-strip">
+  {items.map((it) => (
+    <div key={it.when} className="timeline-strip-item">
+      <div className="timeline-strip-when">{it.when}</div>
+      <div className="timeline-strip-title">{it.title}</div>
+      <div className="timeline-strip-body">{it.body}</div>
+    </div>
+  ))}
+</div>
+```
+
+Equal flex columns with a colored top edge. For the fuller dotted-line roadmap, keep using the `<Timeline>` component (`.timeline`). Use the strip when you need 3–5 short milestones in one row without the tall marker stack.
 
 ## Safe patterns
 

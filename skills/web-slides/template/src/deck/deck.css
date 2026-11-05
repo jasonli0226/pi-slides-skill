@@ -88,6 +88,61 @@ html[data-mode="print"] * { animation-play-state: paused !important; }
 .layout-media { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; max-width: 100%; }
 .layout-hero { display: grid; grid-template-columns: 0.55fr 1.45fr; gap: var(--space-6); align-items: stretch; min-width: 0; min-height: 0; }
 .layout-hero-flip { display: grid; grid-template-columns: 1.45fr 0.55fr; gap: var(--space-6); align-items: stretch; min-width: 0; min-height: 0; }
+/* Bento: asymmetric product / feature grid (inspiration: consumer-electronics packs) */
+.layout-bento {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-rows: 1.15fr 1fr;
+  gap: var(--space-4);
+  min-width: 0; min-height: 0; height: 100%;
+}
+.layout-bento > *:first-child { grid-row: 1 / span 2; }
+.layout-bento > * { min-width: 0; min-height: 0; }
+.layout-bento-4 {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--space-4);
+  min-width: 0; min-height: 0; height: 100%;
+}
+.layout-bento-4 > *:first-child { grid-row: 1 / span 2; }
+.layout-bento-4 > * { min-width: 0; min-height: 0; }
+/* Section divider: chapter break between story arcs */
+.layout-section {
+  display: flex; flex-direction: column; justify-content: center; gap: var(--space-4);
+  min-width: 0; min-height: 0; height: 100%;
+}
+.layout-section .section-rule {
+  width: 120px; height: 4px; border-radius: 999px; background: var(--accent-gradient);
+}
+.layout-section .section-kicker {
+  font: 600 var(--fs-caption)/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+}
+.layout-section .section-title {
+  font: var(--hero-weight, 700) var(--fs-hero)/1.05 var(--font-display);
+  letter-spacing: var(--hero-tracking, -0.035em); max-width: 1400px; text-wrap: balance;
+}
+.layout-section .section-lede {
+  font: 400 var(--fs-body)/1.4 var(--font-body); color: var(--text-muted); max-width: 1100px;
+}
+/* Compact horizontal milestone strip (denser than full Timeline cards) */
+.layout-timeline-strip {
+  display: flex; gap: var(--space-3); align-items: stretch; min-width: 0; width: 100%;
+}
+.layout-timeline-strip > * { flex: 1 1 0; min-width: 0; }
+.timeline-strip-item {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: var(--space-4); border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border); border-top: 3px solid var(--accent);
+}
+.timeline-strip-item:nth-child(2) { border-top-color: var(--accent-2); }
+.timeline-strip-item:nth-child(3) { border-top-color: var(--accent-3); }
+.timeline-strip-item:nth-child(4) { border-top-color: var(--accent); }
+.timeline-strip-when { font: 600 var(--fs-caption)/1 var(--font-mono); color: var(--accent); letter-spacing: .04em; }
+.timeline-strip-title { font: 600 var(--fs-h3)/1.2 var(--font-display); }
+.timeline-strip-body { font: 400 var(--fs-small)/1.4 var(--font-body); color: var(--text-muted); }
+
 .u-min0 { min-width: 0; min-height: 0; }
 .u-grow { flex: 1 1 0; min-width: 0; }
 .card { background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px solid var(--border);

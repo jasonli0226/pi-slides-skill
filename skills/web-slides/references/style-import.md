@@ -1,6 +1,8 @@
 # Style import: build a theme from a URL, images or SVGs
 
-Use this when the user says "make it look like <site>", "use our brand", "match these images", or hands you SVG artwork. The result is always a **role-based theme** in `src/theme/brand.css` (`[data-theme="brand"]`), plus optional media under `public/media/`. Slides keep using tokens; never paste hex into TSX.
+**Prefer built-in presets first.** `tokens.css` already ships `midnight`, `aurora`, `paper`, `tech-dark`, `bento-minimal`, and `navy-pitch` (inspiration reconstructions — see `docs/template-inspiration.md`). Agents should **not** re-scrape SlidesCarnival / Slidesgo / similar free packs each run for those looks.
+
+Use this workflow when the user says "make it look like <*their* site>", "use our brand", "match these images", or hands you SVG artwork for a **new** brand. The result is always a **role-based theme** in `src/theme/brand.css` (`[data-theme="brand"]`), plus optional media under `public/media/`. Slides keep using tokens; never paste hex into TSX.
 
 **Borrow style, not assets.** Colors, a type scale, spacing, corner radius and how much things move are not copyrightable, so you can borrow them. Logos, product photos, illustrations, icon sets and font files can be, so you never take those from a third-party site.
 

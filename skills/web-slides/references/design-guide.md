@@ -21,7 +21,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 ## Color and theme
 
 - Every color comes from the tokens: `--bg`, `--surface`, `--text`, `--text-muted`, `--accent`, `--accent-2`, `--accent-3`, `--warning`, `--danger`, `--on-accent`.
-- The built-in themes are `midnight` (dark, the default), `aurora` (dark violet) and `paper` (light, for printing or bright rooms).
+- Built-in themes: `midnight` (dark, default), `aurora` (dark violet), `paper` (light, print / bright rooms), plus inspiration presets `tech-dark`, `bento-minimal`, `navy-pitch` (see `docs/template-inspiration.md`). Prefer these over `style:*` unless the user supplies a new brand.
 - Brand swap: copy a theme block into `src/theme/brand.css` as `[data-theme="brand"]`, set `theme: "brand"` in `src/slides/index.ts`, then run `npm run check:tokens`. Do not touch components.
 - **Matching a site, images or SVGs:** generate the brand theme with `npm run style:url|style:images|style:svg` (see `style-import.md`) instead of eyeballing hex. The importer keeps the brand hue and only shifts lightness to pass contrast. Say so if a brand color moved.
 - Layout feel tokens (`--hero-weight`, `--title-weight`, `--hero-tracking`, `--title-tracking`, `--shadow-card`, `--shadow-elev`, `--motion-scale`, `--radius*`, `--pad-*`) let a restrained brand look restrained: flatter cards, lighter weights, calmer motion. The type-scale minimums still apply.

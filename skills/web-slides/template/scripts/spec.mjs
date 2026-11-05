@@ -27,7 +27,7 @@ const checkOnly = process.argv.includes("--check");
 const watching = process.argv.includes("--watch");
 const syncOutline = process.argv.includes("--sync-outline");
 
-const THEMES = new Set(["midnight", "aurora", "paper", "brand"]);
+const THEMES = new Set(["midnight", "aurora", "paper", "tech-dark", "bento-minimal", "navy-pitch", "brand"]);
 const TYPES = new Set([
   "title", "agenda", "big-number", "comparison", "architecture", "timeline",
   "code", "results", "quote", "governance", "lessons", "closing", "section", "content",

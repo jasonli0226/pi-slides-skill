@@ -4,7 +4,7 @@ description: Build stunning, research-backed web slide decks (React + Vite + Mot
 license: MIT
 compatibility: Needs Node.js 20+ and npm, network access for npm install, and a Chromium for Playwright (npx playwright install chromium, or CHROME_PATH).
 metadata:
-  version: "0.7.0"
+  version: "0.8.0"
   stack: "react 19, vite 8, motion 14, playwright, mermaid, shiki, lucide-react"
 ---
 
@@ -22,18 +22,18 @@ Paths below are relative to this skill directory. Read files in `references/` wh
 4. **WCAG 2.2 AA contrast.** Normal text needs 4.5:1 and large text needs 3:1. `npm run check:tokens` and `npm run review` both enforce this.
 5. **Consistent icons.** Use only lucide-react through `<Icon>`, `<Card icon>` or `<IconList>`. Use one stroke weight and the fixed sizes. No emoji and no mixed icon sets. **User-provided logos/photos/screenshots** go through `<Figure>` — read `references/media-guide.md` and copy files into `public/media/`.
 6. **No template leftovers.** Delete every example slide you do not use. Do not leave lorem, TODO, TBD, `{{ }}`, example sources or "Illustrative" figures in a final deck unless the user agreed.
-7. **Theme by tokens only.** Every color, font and size lives in `src/theme/tokens.css`. A brand goes in `src/theme/brand.css` as `[data-theme="brand"]`. Never hard-code hex values in slides.
-8. **Borrow style, not assets.** When matching a website, images or SVGs, take colors, type scale, radius and motion feel through `npm run style:*`. Never copy third-party logos, photos or proprietary fonts. Swap fonts like SF Pro for Inter. Canva elements need the user's confirmation of rights. See `references/style-import.md`.
+7. **Theme by tokens only.** Every color, font and size lives in `src/theme/tokens.css`. Built-in themes: `midnight`, `aurora`, `paper`, plus inspiration presets `tech-dark`, `bento-minimal`, `navy-pitch` (see `docs/template-inspiration.md`). A user brand goes in `src/theme/brand.css` as `[data-theme="brand"]`. Never hard-code hex values in slides.
+8. **Prefer built-in presets; borrow style, not assets.** Default to a built-in theme (or an inspiration preset) instead of re-scraping SlidesCarnival / Slidesgo each run. Use `npm run style:url` / `style:images` / `style:svg` **only when the user supplies a new brand** (their site, images or SVGs). Never copy third-party logos, photos, fonts, or vendor PPTX/GS packs into the repo. Swap fonts like SF Pro for Inter. Canva elements need the user's confirmation of rights. See `references/style-import.md` and `docs/template-inspiration.md`.
 
 ## Workflow
 
 Follow these steps in order, and stop at the approval gate. The full details are in `references/workflow.md`.
 
-1. **Brief.** Get the audience, goal, length (minutes or slide count), the decision or ask, and the deadline. Also ask whether a brand palette exists, or a website, images or SVGs to match (step 5). If there is none, use `midnight`, `aurora` or `paper`.
+1. **Brief.** Get the audience, goal, length (minutes or slide count), the decision or ask, and the deadline. Also ask whether a brand palette exists, or a website, images or SVGs to match (step 5). If there is none, use a built-in theme (`midnight`, `aurora`, `paper`) or an inspiration preset (`tech-dark`, `bento-minimal`, `navy-pitch`) — do **not** scrape free template sites by default.
 2. **Research.** Collect sources into a working notes file with URLs and the exact figures and quotes. Prefer primary sources such as official docs, papers, filings and the user's own data.
 3. **Design spec, then approval.** From the user's raw notes (no layout required), write `content/deck.spec.yaml` — slide order, takeaway titles, types from `references/slide-catalog.md`, layout recipes from `references/layout-guide.md`, components (Stat/BarChart/Mermaid/LayeredArchitecture/FlowSteps/Sequence/C4Container/Figure/Code/Timeline/…), text, media paths, chart data, sources, speaker notes. Schema: `references/deck-spec.md`. **Show that file to the user, let them edit it, and wait for approval** (`approved: true` only after they say yes) before generating production React slides, unless they explicitly said to skip approval. A thin `outline.md` brainstorm is optional; `content/deck.outline.md` remains an optional light stub for `npm run live`.
-4. **Scaffold.** Run `node scripts/new-deck.mjs <dir> --title "<takeaway title>" [--theme midnight|aurora|paper]`, then `cd <dir> && npm install && npx playwright install chromium`. Use `--keep-examples` only if you want the 16 example slides as a reference; delete them afterwards.
-5. **Style import (when the user gives a look to match).** If they give a website URL, brand images or SVG artwork, run one of these in the deck:
+4. **Scaffold.** Run `node scripts/new-deck.mjs <dir> --title "<takeaway title>" [--theme midnight|aurora|paper|tech-dark|bento-minimal|navy-pitch]`, then `cd <dir> && npm install && npx playwright install chromium`. Use `--keep-examples` only if you want the 16 example slides as a reference; delete them afterwards.
+5. **Style import (only when the user supplies a new brand).** Prefer built-in / inspiration presets from step 1. If they give their own website URL, brand images or SVG artwork, run one of these in the deck:
    - `npm run style:url -- <url>`
    - `npm run style:images -- <dir>`
    - `npm run style:svg -- <dir>`
@@ -47,7 +47,7 @@ Follow these steps in order, and stop at the approval gate. The full details are
 
 ## Engine at a glance
 
-- The stage is 1920×1080 and scaled to fit. Body layouts: `.layout-stack`, `.layout-kpi`, `.layout-compare`, `.layout-media`, `.layout-hero` (+ `.grid-2/3/4`, `.row`) — see `references/layout-guide.md`. Present mode keys: ←/→, Space, PgUp/PgDn, Home/End, **N** notes, **O** overview, **F** fullscreen (keys with Ctrl/Cmd/Alt are left to the browser). URLs look like `#/slide/step`; editing the hash jumps there, and a step past the slide's last is clamped.
+- The stage is 1920×1080 and scaled to fit. Body layouts: `.layout-stack`, `.layout-kpi`, `.layout-compare`, `.layout-media`, `.layout-hero`, `.layout-bento`, `.layout-section`, `.layout-timeline-strip` (+ `.grid-2/3/4`, `.row`) — see `references/layout-guide.md`. Present mode keys: ←/→, Space, PgUp/PgDn, Home/End, **N** notes, **O** overview, **F** fullscreen (keys with Ctrl/Cmd/Alt are left to the browser). URLs look like `#/slide/step`; editing the hash jumps there, and a step past the slide's last is clamped.
 - `?static&slide=N&step=final` renders one slide for screenshots, and `?print` renders all slides for PDF. In both, motion is off and every step is shown.
 - Click steps: set `steps: n` on the slide, then use `<Appear at={k}>`, `<Stagger stepwise>`, `<IconList stepwise>`, `<Timeline>`, or `<Code focus={[...]}>`.
 - Components (`src/deck/components.tsx`): `SlideFrame`, `Appear`, `Stagger`, `Card`, `Icon`, `Pill`, `Stat`, `BarChart`, `Figure`, `Mermaid`, `Code`, `Timeline`, `Quote`, `IconList`, `Gradient`, `Cite`.
@@ -66,7 +66,7 @@ Full rules: `references/media-guide.md`. Example: `template/src/slides/16-media-
 
 ## Style import (agent)
 
-When the user says "make it look like apple.com", "use our brand images" or hands you SVGs, **you** run the import. Don't hand-pick hex values:
+**Prefer built-in themes** (`midnight` / `aurora` / `paper` / `tech-dark` / `bento-minimal` / `navy-pitch`) before scraping. Only when the user says "make it look like *our* site", "use our brand images" or hands you SVGs, **you** run the import. Don't hand-pick hex values, and don't re-fetch SlidesCarnival/Slidesgo packs for a look we already baked in:
 
 | Input | Command | Output |
 |---|---|---|
