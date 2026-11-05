@@ -84,10 +84,12 @@ Details and sizing: `media-guide.md`.
 ```bash
 npm run review              # build + screenshot + lint → review/
 npm run review -- --steps   # also every click step
+npm run critique            # aggregate lint → review/critique.md (no auto-rewrite)
 ```
 
 - Read `review/report.md`, open `review/contact-sheet.png`, then open every `review/slide-*.png`. The lint can't judge taste, so look at each image.
-- Go through `review-checklist.md`, fix the problems, and run review again. Repeat until there are 0 errors.
+- Run **`npm run critique`** (slide-reviewer skill). Fill **Visual findings** in `review/critique.md` (overlap, density, weak titles, safe margins). Show the critique to the user; **do not auto-rewrite** unless they ask.
+- Go through `review-checklist.md`, fix the problems they approved, and run review + critique again. Repeat until there are 0 lint errors and the critique is accepted.
 
 ## 8. Export
 

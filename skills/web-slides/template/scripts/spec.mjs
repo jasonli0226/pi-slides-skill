@@ -34,6 +34,8 @@ const TYPES = new Set([
 ]);
 const LAYOUTS = new Set([
   "layout-stack", "layout-kpi", "layout-compare", "layout-media", "layout-hero",
+  "layout-hero-flip", "layout-bento", "layout-bento-4", "layout-section",
+  "layout-timeline-strip",
   "grid-2", "grid-3", "grid-4", "row",
 ]);
 const STATUSES = new Set(["stub", "locked"]);
@@ -47,6 +49,37 @@ function jsx(s) {
   return `{${JSON.stringify(s ?? "")}}`;
 }
 
+function applyStylePackOverlay(raw) {
+  const packPath = join(root, "content", "style-pack.json");
+  if (!existsSync(packPath)) return raw;
+  let pack;
+  try {
+    pack = JSON.parse(readFileSync(packPath, "utf8"));
+  } catch {
+    return raw;
+  }
+  if (!raw || typeof raw !== "object") return raw;
+  const out = { ...raw };
+  if (pack.id && !out.style_pack) out.style_pack = pack.id;
+  if (pack.themeFile) out.theme = "brand";
+  out.slides = (out.slides || []).map((s) => {
+    const slide = { ...s };
+    for (const [pid, wire] of Object.entries(pack.patterns || {})) {
+      if (!(wire.slideTypes || []).includes(slide.type)) continue;
+      if (!slide.pattern) slide.pattern = pid;
+      if (wire.layout) slide.layout = wire.layout;
+      if (wire.scrim && slide.scrim == null) slide.scrim = wire.scrim;
+      if (wire.background && slide.background == null) slide.background = wire.background;
+      if (wire.hero && slide.hero == null) slide.hero = true;
+      if (wire.heroLabel && slide.heroLabel == null) slide.heroLabel = wire.heroLabel;
+      if (wire.backdrop && slide.backdrop == null) slide.backdrop = wire.backdrop;
+      break;
+    }
+    return slide;
+  });
+  return out;
+}
+
 function loadSpec() {
   if (!existsSync(specPath)) {
     return { ok: false, errors: [`missing ${specPath}`], warnings: [], spec: null };
@@ -57,7 +90,7 @@ function loadSpec() {
   } catch (e) {
     return { ok: false, errors: [`YAML parse error: ${e.message}`], warnings: [], spec: null };
   }
-  return validate(raw);
+  return validate(applyStylePackOverlay(raw));
 }
 
 function validate(raw) {
@@ -122,6 +155,11 @@ function validate(raw) {
       kicker: s.kicker || "",
       subtitle: s.subtitle || "",
       background: s.background,
+      pattern: s.pattern || null,
+      scrim: s.scrim || null,
+      hero: !!s.hero,
+      heroLabel: s.heroLabel || "",
+      backdrop: s.backdrop || null,
       steps: s.steps ?? 0,
       sources: Array.isArray(s.sources) ? s.sources : [],
       notes: s.notes || "",
@@ -139,6 +177,7 @@ function validate(raw) {
   const spec = {
     title: raw.title,
     theme: raw.theme,
+    style_pack: raw.style_pack || null,
     audience: raw.audience || "",
     goal: raw.goal || "",
     minutes: raw.minutes,
@@ -155,9 +194,11 @@ function defaultLayout(type) {
   switch (type) {
     case "big-number":
     case "results":
-      return "layout-hero";
+      return "layout-kpi";
     case "comparison":
       return "layout-compare";
+    case "timeline":
+      return "layout-timeline-strip";
     case "agenda":
       return "grid-4";
     default:
@@ -242,10 +283,34 @@ ${s.body.map((b) => `          <li>${jsx(b)}</li>`).join("\n")}
   const bg = s.background ? ` background=${jsx(s.background)}` : "";
   const kicker = s.kicker ? ` kicker=${jsx(s.kicker)}` : "";
   const subtitle = s.subtitle ? ` subtitle=${jsx(s.subtitle)}` : "";
-  const center = kind === "title" || kind === "closing" || kind === "section" ? " center" : "";
+  const titleHero = kind === "title" && (s.pattern === "title-hero" || s.hero || s.scrim || s.backdrop);
+  const center = !titleHero && (kind === "title" || kind === "closing" || kind === "section") ? " center" : "";
+  const heroProp = titleHero ? " hero" : "";
+  const scrimProp = titleHero ? ` scrim=${jsx(s.scrim || "light")}` : "";
+  const heroLabelProp = titleHero && s.heroLabel ? ` heroLabel=${jsx(s.heroLabel)}` : "";
+  let backdropProp = "";
+  if (titleHero) {
+    const bd = s.backdrop || { src: "/media/title-hero-photo-placeholder.jpg", decorative: true };
+    const src = bd.src || bd.path || "/media/title-hero-photo-placeholder.jpg";
+    const decorative = bd.decorative !== false && !bd.alt;
+    backdropProp = ` backdrop={{ src: ${JSON.stringify(src)}, decorative: ${decorative ? "true" : "false"}${bd.alt ? `, alt: ${JSON.stringify(bd.alt)}` : ""} }}`;
+  }
   const notes = s.notes
     ? JSON.stringify(s.notes)
     : JSON.stringify(`Generated from content/deck.spec.yaml (${s.id}) — promote to locked after polish.`);
+
+  if (titleHero) {
+    return `const s${i} = defineSlide({
+  id: ${JSON.stringify(s.id)},
+  steps: ${Number(s.steps) || 0},
+  notes: ${notes},
+  Component: () => (
+    <SlideFrame kind="title"${heroProp}${kicker}
+      title=${jsx(s.title)}${subtitle}${bg || ' background="plain"'}${scrimProp}${backdropProp}${heroLabelProp}
+      footer={false} />
+  ),
+});`;
+  }
 
   return `const s${i} = defineSlide({
   id: ${JSON.stringify(s.id)},

@@ -43,7 +43,7 @@ Run from the **repo root** (or any cwd; the script resolves the skill dir):
 ```bash
 node skills/style-library/scripts/style-lib.mjs list
 node skills/style-library/scripts/style-lib.mjs save  --id <pack-id> --from <deck-dir> [--name "..."] [--theme brand|navy-pitch|…] [--patterns title-hero,kpi,timeline] [--dest repo|user]
-node skills/style-library/scripts/style-lib.mjs apply --id <pack-id> --deck <deck-dir> [--patterns-only] [--theme-only]
+node skills/style-library/scripts/style-lib.mjs apply --id <pack-id> --deck <deck-dir> [--patterns-only] [--theme-only] [--no-wire]
 node skills/style-library/scripts/style-lib.mjs update --id <pack-id> --from <deck-dir> [--patterns title-hero,kpi]
 node skills/style-library/scripts/style-lib.mjs show  --id <pack-id>
 ```
@@ -52,7 +52,7 @@ node skills/style-library/scripts/style-lib.mjs show  --id <pack-id>
 |---|---|
 | **list** | Print pack id, name, tags, path |
 | **save** | Snapshot `brand.css` / a theme block + selected pattern recipes into a new pack |
-| **apply** | Write theme into the deck’s `src/theme/brand.css`, set `theme: "brand"` in `src/slides/index.ts` when present, copy pattern notes/snippets into `style-import/pack-<id>/` |
+| **apply** | Write theme into `brand.css`, set `theme: "brand"`, write `content/style-pack.json`, patch `deck.spec.yaml` (style_pack + per-slide pattern/layout/title-hero fields), wire matching slide TSX, emit `src/slides/generated/from-pack.ts`, and copy recipes to `style-import/pack-<id>/`. Use `--no-wire` to only copy files. |
 | **update** | Refresh an existing pack from a deck (bumps `updated`, replaces files) |
 | **show** | Dump `pack.json` + file list |
 
@@ -61,7 +61,7 @@ node skills/style-library/scripts/style-lib.mjs show  --id <pack-id>
 1. **Study.** Open the deck (or template slide) the user liked. Note theme (`brand` / preset) and which patterns matter (title hero, KPI strip, timeline, compare, …).
 2. **Save.** Pick a kebab `pack-id`. Run `save` with `--from <deck>` and `--patterns …` as needed. Prefer `--dest user` for one-off client brands; `--dest repo` only for packs meant to ship with this skill.
 3. **Confirm.** `list` / `show` and tell the user the id and what was captured (theme tokens? which patterns?).
-4. **Apply later.** On a new deck, `apply --id <pack-id> --deck <dir>`, then `cd <dir> && npm run check:tokens && npm run review`. Adapt copy; do not paste third-party assets.
+4. **Apply later.** On a new deck, `apply --id <pack-id> --deck <dir>` (wires theme + patterns into the build: `brand.css`, `content/style-pack.json`, `deck.spec.yaml`, matching slide TSX, `src/slides/generated/from-pack.ts`). Then `cd <dir> && npm run spec && npm run check:tokens && npm run review`. Adapt copy; do not paste third-party assets.
 5. **Update.** If the user refined the look, `update --id <pack-id> --from <deck>`.
 
 ## Scope (what a pack holds)
