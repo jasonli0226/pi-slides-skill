@@ -107,3 +107,8 @@ Do this **outside** committing vendor files. Prefer the user’s own screenshots
 - Researched for pi-slides-skill (IT/AI React decks) on 2026-11-05 (Asia/Hong_Kong).
 - Primary sources: SlidesCarnival [Terms](https://www.slidescarnival.com/terms-of-use) + [technology tag](https://www.slidescarnival.com/tag/technology); Slidesgo [FAQs](https://slidesgo.com/faqs); PresentationGO template terms; Microsoft Create presentations gallery.
 - Prefer **documenting picks + `style:images` workflow** over vendoring copyrighted packs.
+
+## Reuse with style-library
+
+One-shot `style:images` / presets cover generic looks. When the user wants a **named, reusable** brand or component recipe (title hero, KPI strip, …), save an original CSS/TSX pack with the sibling skill [`skills/style-library/`](../skills/style-library/SKILL.md) — do not vendor third-party PPTX into that library.
+

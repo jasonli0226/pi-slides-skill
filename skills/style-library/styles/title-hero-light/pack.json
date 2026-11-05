@@ -1,0 +1,31 @@
+{
+  "id": "title-hero-light",
+  "name": "Title hero \u2014 light left scrim",
+  "version": "1.0.0",
+  "description": "Full-bleed photo/mesh title with light left scrim and dark left-aligned copy. Patterns only \u2014 pair with any brand.",
+  "created": "2026-11-05",
+  "updated": "2026-11-05",
+  "tags": [
+    "title",
+    "photo",
+    "light-scrim",
+    "hero"
+  ],
+  "source": {
+    "kind": "web-slides-template",
+    "path": "skills/web-slides/template",
+    "note": "Original CSS/TSX snapshot \u2014 no third-party PPTX vendored."
+  },
+  "theme": null,
+  "patterns": [
+    {
+      "id": "title-hero",
+      "kind": "layout",
+      "files": [
+        "patterns/title-hero.md",
+        "patterns/title-hero.css.snippet",
+        "patterns/title-hero.tsx.snippet"
+      ]
+    }
+  ]
+}

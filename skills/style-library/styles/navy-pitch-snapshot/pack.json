@@ -1,0 +1,34 @@
+{
+  "id": "navy-pitch-snapshot",
+  "name": "Navy pitch (brand snapshot)",
+  "version": "1.0.0",
+  "description": "navy-pitch tokens rewritten as data-theme=brand for reusable brand.css packs.",
+  "created": "2026-11-05",
+  "updated": "2026-11-05",
+  "tags": [
+    "navy",
+    "pitch",
+    "theme",
+    "kpi"
+  ],
+  "source": {
+    "kind": "web-slides-template",
+    "path": "skills/web-slides/template",
+    "note": "Original CSS/TSX snapshot \u2014 no third-party PPTX vendored."
+  },
+  "theme": {
+    "file": "brand.css",
+    "selector": "[data-theme=\"brand\"]"
+  },
+  "patterns": [
+    {
+      "id": "kpi",
+      "kind": "layout",
+      "files": [
+        "patterns/kpi.md",
+        "patterns/kpi.css.snippet",
+        "patterns/kpi.tsx.snippet"
+      ]
+    }
+  ]
+}
