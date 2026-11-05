@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Create a new deck project from the template.
-// Usage: node <skill>/scripts/new-deck.mjs <target-dir> --title "Deck title" [--theme midnight|aurora|paper] [--keep-examples]
+// Usage: node <skill>/scripts/new-deck.mjs <target-dir> --title "Deck title" [--theme midnight|aurora|paper|tech-dark|bento-minimal|navy-pitch] [--keep-examples]
 // Default: copies the engine + theme, and replaces the example slides with a single title slide.
 import { execFileSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";

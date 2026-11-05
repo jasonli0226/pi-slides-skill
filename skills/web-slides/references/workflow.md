@@ -39,7 +39,7 @@ Send the YAML (or a clear summary) to the user: approve, or what to change. They
 ## 4. Scaffold
 
 ```bash
-node <skill>/scripts/new-deck.mjs ./decks/<slug> --title "<title-slide takeaway>." --theme midnight
+node <skill>/scripts/new-deck.mjs ./decks/<slug> --title "<title-slide takeaway>." --theme midnight   # or aurora|paper|tech-dark|bento-minimal|navy-pitch
 cd ./decks/<slug> && npm install && npx playwright install chromium
 ```
 

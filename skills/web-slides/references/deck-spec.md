@@ -39,7 +39,7 @@ Full details for layout recipes: `layout-guide.md`. Slide types and component pr
 | `id` | string | yes | kebab-case, unique; used as React slide `id` |
 | `type` | string | yes | One of the catalog kinds: `title`, `agenda`, `big-number`, `comparison`, `architecture`, `timeline`, `code`, `results`, `quote`, `governance`, `lessons`, `closing`, `section`, `content` |
 | `title` | string | yes | **Full-sentence takeaway** (5+ words, ends with punctuation) |
-| `layout` | string | recommended | Recipe from `layout-guide.md`: `layout-stack`, `layout-kpi`, `layout-compare`, `layout-media`, `layout-hero`, or `grid-2` / `grid-3` / `grid-4` / `row` |
+| `layout` | string | recommended | Recipe from `layout-guide.md`: `layout-stack`, `layout-kpi`, `layout-compare`, `layout-media`, `layout-hero`, `layout-hero-flip`, `layout-bento`, `layout-bento-4`, `layout-section`, `layout-timeline-strip`, or `grid-2` / `grid-3` / `grid-4` / `row` |
 | `status` | `stub` \| `locked` | yes | See promote / merge |
 | `kicker` | string | optional | Small label above the title |
 | `subtitle` | string | optional | Title slide / closing |

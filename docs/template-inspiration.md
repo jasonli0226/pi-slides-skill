@@ -1,6 +1,6 @@
 # Template inspiration (free tech slide packs)
 
-Use free Google Slides / PowerPoint **tech** themes as **design references**, not as the deck engine. pi-slides-skill builds React 19 + Vite decks; we extract palettes and layout *ideas* into `brand.css`, named layout recipes, and `deck.spec.yaml` — we do **not** convert full PPTX/Slides files into React, and we do **not** commit third-party template files into this repo unless they are clearly CC0 / public domain.
+Use free Google Slides / PowerPoint **tech** themes as **design references**, not as the deck engine. pi-slides-skill builds React 19 + Vite decks; palettes and layout *ideas* from the shortlist below are **already baked** into built-in `[data-theme]` presets in `tokens.css` and named recipes in `deck.css`. Agents should **prefer those presets** and must **not** re-scrape the external pack pages on every deck run. Use `style:url` / `style:images` only when the user supplies a **new** brand. We do **not** convert full PPTX/Slides files into React, and we do **not** commit third-party template files into this repo unless they are clearly CC0 / public domain.
 
 Related skill docs: [style-import.md](../skills/web-slides/references/style-import.md), [layout-guide.md](../skills/web-slides/references/layout-guide.md), [deck-spec.md](../skills/web-slides/references/deck-spec.md).
 
@@ -8,8 +8,8 @@ Related skill docs: [style-import.md](../skills/web-slides/references/style-impo
 
 | What free packs give us | How we use it |
 |---|---|
-| Dark / clean IT aesthetic | Feed preview screenshots to `npm run style:images` → `[data-theme="brand"]` |
-| KPI strips, compare columns, section dividers, pitch sequences | Map to `.layout-kpi`, `.layout-compare`, `.layout-hero`, new named recipes in `deck.css` |
+| Dark / clean IT aesthetic | Built-in presets (`tech-dark`, `bento-minimal`, `navy-pitch`) — or `style:images` only for a *new* user brand |
+| KPI strips, compare columns, section dividers, pitch / bento / timeline | `.layout-kpi`, `.layout-compare`, `.layout-hero`, `.layout-bento`, `.layout-section`, `.layout-timeline-strip` |
 | Accent + surface relationships | Contrast-checked tokens (`check:tokens`), never paste hex into TSX |
 | Slide *count* and story beats | Inform `content/deck.spec.yaml` ordering — not one-to-one PPTX import |
 
@@ -41,6 +41,23 @@ Chosen for: dark or clean tech look, modern IT/AI audience fit, useful architect
 | 4 | **Tech Business Conference** | Slidesgo | https://slidesgo.com/theme/tech-business-conference | Free use; **keep credits slide** on free tier | Dark gradient conference kit: calendars, timelines, graphs — good for IT event / roadmap decks | Timeline → existing timeline slide type; planner/KPI strips → `.layout-kpi`; dark gradient accents (rebuild as CSS tokens, not imported gradient art) |
 | 5 | **Futuristic Background** | Slidesgo | https://slidesgo.com/theme/futuristic-background | Free use; **keep credits slide** on free tier | Dark navy + orange contrast; multi-color variants; multipurpose tech vibe without cartoon mascots | Hero title weight/tracking; accent contrast pairs; optional second brand mood (`brand-futura`-style preset via renamed `brand.css`) |
 
+
+## Built-in presets (prefer these)
+
+Original CSS reconstructions in `skills/web-slides/template/src/theme/tokens.css`. **No** PPTX/GS files, stock photos, icons, or vendor font files were vendored — palette and type *feel* only. Our CSS is original; attribute inspiration sources as noted.
+
+| Theme id | When to use | Inspiration (do not re-scrape) | License note |
+|---|---|---|---|
+| `tech-dark` | Startup / product keynotes; near-black + electric lime; bold condensed display | SlidesCarnival [Dark Modern Tech Startup Brand](https://www.slidescarnival.com/template/tech-startup-brand/154090) | CC BY 4.0 — credit SlidesCarnival for the *inspiration*; our tokens are a reconstruction |
+| `bento-minimal` | Hardware / product grids; black & white restraint; Inter; airy padding; calm motion | SlidesCarnival [Dark Minimal Consumer Electronics Brand](https://www.slidescarnival.com/template/consumer-electronics-brand/154101) | CC BY 4.0 — same attribution practice |
+| `navy-pitch` | Software pitches, IT roadmaps, conference kits; deep navy + blue / violet | SlidesCarnival [Minimalistic IT Software Pitch Deck](https://www.slidescarnival.com/template/it-software-pitch-deck/55642); layout energy also from Slidesgo [Tech Business Conference](https://slidesgo.com/theme/tech-business-conference) + [Futuristic Background](https://slidesgo.com/theme/futuristic-background) | SlidesCarnival CC BY 4.0; Slidesgo free tier requires keeping *their* credits slide **only if** you ship their content (these presets do not) |
+
+Also still available: `midnight`, `aurora`, `paper` (general-purpose defaults).
+
+Related layouts added for the same study pass: `.layout-bento` / `.layout-bento-4`, `.layout-section`, `.layout-timeline-strip` (see `layout-guide.md`).
+
+**Agent rule:** pick a row above with `npm run new-deck … --theme <id>` (or set `theme:` in `src/slides/index.ts`). Do **not** open the pack URLs to re-extract colors unless the user asks to refresh the presets or brings a different pack.
+
 ### Honorable mentions (use carefully)
 
 | Pack | URL | Note |
@@ -51,33 +68,31 @@ Chosen for: dark or clean tech look, modern IT/AI audience fit, useful architect
 
 Browse hubs: [SlidesCarnival technology](https://www.slidescarnival.com/tag/technology), [Slidesgo technology](https://slidesgo.com/technology), [PresentationGO](https://www.presentationgo.com/), [Microsoft Create presentations](https://create.microsoft.com/en-us/templates/presentations).
 
-## Agent workflow (how to fold a pick into a deck)
+## Agent workflow
 
-Do this **outside** committing vendor files. Prefer the user’s own screenshots of the template **preview** pages or slides they opened under the pack’s license.
+### Default (every deck)
 
-1. **Pick a shortlist row** with the user (or default to #1 dark startup + #2 minimal electronics for contrast).
-2. **Confirm rights.** Link the terms above. Say you will borrow **style** (colors, spacing, layout recipes), not logos, stock photos, icon packs, or font files.
-3. **Capture references (user-side or agent browser):**
-   - Open the template preview / a copy in Google Slides or PowerPoint.
-   - Screenshot 4–8 representative slides: title, KPI strip, two-column compare, timeline or roadmap, architecture-ish overview, closing.
-   - Save PNGs into a **local** folder the user owns, e.g. `~/refs/tech-startup-brand/` — **not** into `public/` and **not** into git unless they are the user’s own designs.
-4. **Import palette:**
+1. **Pick a built-in theme** with the user: `midnight` / `aurora` / `paper`, or an inspiration preset `tech-dark` / `bento-minimal` / `navy-pitch` (table above).
+2. Scaffold with `--theme <id>` and use the matching layout recipes (`.layout-bento`, `.layout-section`, `.layout-timeline-strip`, plus the older `.layout-kpi` / `.layout-compare` / `.layout-hero`).
+3. Do **not** open the shortlist URLs to re-extract colors unless refreshing presets.
+
+### Only when the user supplies a *new* brand
+
+Do this **outside** committing vendor files. Prefer the user’s own screenshots / brand assets.
+
+1. **Confirm rights.** Link the terms above if the look came from a free pack. Say you will borrow **style** (colors, spacing, layout recipes), not logos, stock photos, icon packs, or font files.
+2. **Capture references** the user owns into a local folder (not `public/`, not git unless their designs).
+3. **Import palette:**
    ```bash
    cd <deck>
-   npm run style:images -- ~/refs/tech-startup-brand --mood dark --apply
+   npm run style:images -- ~/refs/their-brand --mood dark --apply
    npm run check:tokens
    npm run review -- --theme brand
    ```
-   Or `npm run style:url -- <public marketing page>` when the pack page’s CSS is representative (preview heroes can skew — verify `style-import/style-spec.json`).
-5. **Translate layouts into recipes** (edit skill/deck CSS, don’t paste PPTX):
-   - KPI row of 3–4 metrics → `.layout-kpi`
-   - Before/after or A vs B → `.layout-compare`
-   - Big number + chart → `.layout-hero` / `.layout-hero-flip`
-   - Bento product grid → `.grid-3` / `.grid-4` with equal card height
-   - If a pattern repeats and isn’t covered, add a named class in `deck.css` and document it in `layout-guide.md` (Grid for stage, Flex for rows).
-6. **Update the design spec:** encode slide order, takeaway titles, `layout`, and components in `content/deck.spec.yaml`. User edits the YAML; agent builds React after approval.
-7. **Optional brand presets:** keep generated CSS as `src/theme/brand.css`, or copy to `brand-tech-startup.css` / `brand-it-pitch.css` and switch `theme` in `src/slides/index.ts`. Never commit SlidesCarnival/Slidesgo binary packs beside them.
-8. **Attribution hygiene:** if any third-party graphic ships in the **user’s** exported PDF, follow that pack’s credit rules. Inspiration-only React rebuilds that use Lucide + our tokens typically need no vendor credit slide — still link this doc in the PR/notes when you borrowed a palette from a pack.
+   Or `npm run style:url -- <their marketing page>`.
+4. **Translate layouts into recipes** (edit skill/deck CSS, don’t paste PPTX). If a pattern repeats and isn’t covered, add a named class in `deck.css` and document it in `layout-guide.md`.
+5. **Update the design spec** in `content/deck.spec.yaml`. Never commit SlidesCarnival/Slidesgo binary packs.
+6. **Attribution hygiene:** if any third-party graphic ships in the **user’s** exported PDF, follow that pack’s credit rules. Inspiration-only React rebuilds that use Lucide + our tokens typically need no vendor credit slide — still link this doc when a palette was borrowed.
 
 ## Anti-patterns
 

@@ -25,7 +25,7 @@
 
   /* layout feel (style import may override in brand.css) */
   --hero-weight: 700;
-  --title-weight: 650;
+  --title-weight: 600;
   --hero-tracking: -0.035em;
   --title-tracking: -0.02em;
   --shadow-card: 0 1px 0 rgba(255,255,255,.04) inset, 0 24px 60px rgba(0,0,0,.25);
@@ -101,3 +101,137 @@
   --glow-3: rgba(4, 120, 87, 0.10);
   --accent-gradient: linear-gradient(90deg, #0369a1, #6d28d9);
 }
+
+/* ==========================================================================
+   Inspiration presets (built-in)
+   Original CSS reconstructions inspired by free tech slide packs listed in
+   docs/template-inspiration.md. We borrow palette/layout *feel* only — no
+   PPTX/GS files, photos, icons, or fonts from those packs are vendored here.
+   Prefer these over style:url / style:images unless the user supplies a new brand.
+   Attribution for the inspiration sources: SlidesCarnival CC BY 4.0;
+   Slidesgo free tier requires keeping their credits slide if you ship their content
+   (these presets do not ship that content).
+   ========================================================================== */
+
+/* tech-dark: near-black + electric lime. Startup / product keynotes.
+   Inspired by SlidesCarnival "Dark Modern Tech Startup Brand"
+   https://www.slidescarnival.com/template/tech-startup-brand/154090 (CC BY 4.0).
+   Type feel: bold condensed display (Oswald-like → Space Grotesk), tight tracking. */
+[data-theme="tech-dark"] {
+  --bg: #0c0c0c;
+  --bg-elev: #141414;
+  --surface: #1a1a1a;
+  --surface-2: #242424;
+  --border: #333333;
+  --text: #f5f5f5;
+  --text-muted: #a3a3a3;
+  --accent: #b8e600;
+  --accent-2: #a3e635;
+  --accent-3: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --on-accent: #0c0c0c;
+  --code-bg: #0a0a0a;
+  --code-theme: github-dark-default;
+  --glow-1: rgba(184, 230, 0, 0.28);
+  --glow-2: rgba(163, 230, 53, 0.22);
+  --glow-3: rgba(74, 222, 128, 0.14);
+  --accent-gradient: linear-gradient(90deg, #b8e600, #4ade80);
+  --font-display: "Space Grotesk Variable", "Inter Variable", system-ui, sans-serif;
+  --font-body: "Inter Variable", system-ui, sans-serif;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --hero-weight: 700;
+  --title-weight: 700;
+  --hero-tracking: -0.04em;
+  --title-tracking: -0.025em;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.05) inset, 0 20px 50px rgba(0,0,0,.45);
+  --shadow-elev: 0 28px 70px rgba(0,0,0,.55);
+  --motion-scale: 1.1;
+  --pad-x: 112px;
+  --pad-top: 88px;
+}
+
+/* bento-minimal: black / white / quiet cyan. Product grids, hardware, restrained IT.
+   Inspired by SlidesCarnival "Dark Minimal Consumer Electronics Brand"
+   https://www.slidescarnival.com/template/consumer-electronics-brand/154101 (CC BY 4.0).
+   Type feel: Inter everywhere, weight 600, near-zero tracking, airy padding, flat cards. */
+[data-theme="bento-minimal"] {
+  --bg: #050505;
+  --bg-elev: #0f0f0f;
+  --surface: #141414;
+  --surface-2: #1c1c1c;
+  --border: #2a2a2a;
+  --text: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --accent: #e4e4e7;
+  --accent-2: #a1a1aa;
+  --accent-3: #7dd3fc;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --on-accent: #09090b;
+  --code-bg: #0a0a0a;
+  --code-theme: github-dark-default;
+  --glow-1: rgba(228, 228, 231, 0.12);
+  --glow-2: rgba(161, 161, 170, 0.10);
+  --glow-3: rgba(125, 211, 252, 0.14);
+  --accent-gradient: linear-gradient(90deg, #e4e4e7, #7dd3fc);
+  --font-display: "Inter Variable", system-ui, sans-serif;
+  --font-body: "Inter Variable", system-ui, sans-serif;
+  --radius: 24px;
+  --radius-sm: 14px;
+  --hero-weight: 600;
+  --title-weight: 600;
+  --hero-tracking: -0.02em;
+  --title-tracking: -0.015em;
+  --shadow-card: none;
+  --shadow-elev: 0 16px 40px rgba(0,0,0,.35);
+  --motion-scale: 0.7;
+  --pad-x: 144px;
+  --pad-top: 112px;
+  --fs-hero: 104px;
+  --fs-title: 56px;
+}
+
+/* navy-pitch: deep navy + blue / violet. Software pitches, conferences, IT roadmaps.
+   Inspired by SlidesCarnival "Minimalistic IT Software Pitch Deck"
+   https://www.slidescarnival.com/template/it-software-pitch-deck/55642 (CC BY 4.0)
+   and layout energy from Slidesgo Tech Business Conference + Futuristic Background
+   (https://slidesgo.com/theme/tech-business-conference ,
+    https://slidesgo.com/theme/futuristic-background — free; credits slide if shipping their art).
+   Type feel: readable geometric sans, medium drama glows. */
+[data-theme="navy-pitch"] {
+  --bg: #071225;
+  --bg-elev: #0c1a33;
+  --surface: #122440;
+  --surface-2: #183055;
+  --border: #2a4570;
+  --text: #eef3ff;
+  --text-muted: #9db0d0;
+  --accent: #5b8cff;
+  --accent-2: #a78bfa;
+  --accent-3: #22d3ee;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --on-accent: #06101f;
+  --code-bg: #081428;
+  --code-theme: github-dark-default;
+  --glow-1: rgba(91, 140, 255, 0.32);
+  --glow-2: rgba(167, 139, 250, 0.28);
+  --glow-3: rgba(34, 211, 238, 0.16);
+  --accent-gradient: linear-gradient(90deg, #5b8cff, #a78bfa);
+  --font-display: "Space Grotesk Variable", "Inter Variable", system-ui, sans-serif;
+  --font-body: "Inter Variable", system-ui, sans-serif;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --hero-weight: 700;
+  --title-weight: 600;
+  --hero-tracking: -0.03em;
+  --title-tracking: -0.02em;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.04) inset, 0 24px 60px rgba(0,0,0,.35);
+  --shadow-elev: 0 30px 80px rgba(0,0,0,.45);
+  --motion-scale: 1;
+  --pad-x: 120px;
+  --pad-top: 96px;
+}
+
