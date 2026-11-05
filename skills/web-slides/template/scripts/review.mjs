@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Screenshot every slide (final state) + run the lint rules + build a contact sheet.
 // Usage: node scripts/review.mjs [--no-build] [--steps] [--out review] [--no-lint] [--theme brand]
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { parse as parseYaml } from "yaml";
 import { args, argValue, buildAndServe, launch, waitReady, W, H } from "./lib.mjs";
 
 const out = argValue("--out", "review");
@@ -63,6 +64,50 @@ figure{margin:0}img{width:${tw}px;height:${th}px;display:block;border-radius:6px
 await page.screenshot({ path: join(out, "contact-sheet.png"), fullPage: true });
 await browser.close();
 await server.close();
+
+// Approved design spec must match built deck (count, ids, types) unless the user changed it after approval.
+const specFile = join(process.cwd(), "content", "deck.spec.yaml");
+if (existsSync(specFile)) {
+  try {
+    const spec = parseYaml(readFileSync(specFile, "utf8"));
+    if (spec && spec.approved === true && Array.isArray(spec.slides)) {
+      if (spec.slides.length !== deck.slides.length) {
+        deckIssues.push({
+          slide: 0, id: "spec", level: "error", rule: "spec-mismatch",
+          msg: `Approved spec has ${spec.slides.length} slides but the build has ${deck.slides.length}. Re-approve after edits, or update the deck to match.`,
+        });
+      }
+      const n = Math.min(spec.slides.length, deck.slides.length);
+      for (let i = 0; i < n; i++) {
+        const want = spec.slides[i];
+        const got = deck.slides[i];
+        const lint = results.find((r) => r.slide === i + 1);
+        if (want.id && got.id !== want.id) {
+          deckIssues.push({
+            slide: i + 1, id: got.id, level: "error", rule: "spec-mismatch",
+            msg: `Spec slide ${i + 1} id is "${want.id}" but build has "${got.id}".`,
+          });
+        }
+        if (want.type && lint?.kind && lint.kind !== want.type && !(want.type !== "section" && lint.kind === "content" && !["title", "closing", "section"].includes(want.type))) {
+          // SlideFrame kind is title|closing|section|content; catalog type is finer. Only error when frame kind clearly contradicts.
+          const frameOk =
+            (want.type === "title" && lint.kind === "title") ||
+            (want.type === "closing" && lint.kind === "closing") ||
+            (want.type === "section" && lint.kind === "section") ||
+            (!["title", "closing", "section"].includes(want.type) && lint.kind === "content");
+          if (!frameOk) {
+            deckIssues.push({
+              slide: i + 1, id: got.id, level: "error", rule: "spec-mismatch",
+              msg: `Spec type "${want.type}" does not match SlideFrame kind "${lint.kind}".`,
+            });
+          }
+        }
+      }
+    }
+  } catch (e) {
+    deckIssues.push({ slide: 0, id: "spec", level: "warn", rule: "spec-mismatch", msg: `Could not read deck.spec.yaml: ${e.message}` });
+  }
+}
 
 const all = [...deckIssues, ...results.flatMap((r) => r.issues.map((x) => ({ slide: r.slide, id: r.id, ...x })))];
 if (consoleErrors.length) all.push(...[...new Set(consoleErrors)].map((m) => ({ slide: 0, id: "console", level: "warn", rule: "console", msg: m })));

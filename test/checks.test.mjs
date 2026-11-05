@@ -38,6 +38,51 @@ test("scaffold keeps the outline wiring and starts from an empty outline", (t) =
   const idx = readFileSync(join(deck, "src/slides/index.ts"), "utf8");
   assert.match(idx, /\/\/ import \{ outlineSlides \} from "\.\/generated\/from-outline";/);
   assert.match(idx, /\/\/ \.\.\.outlineSlides,/);
+  assert.match(idx, /\/\/ import \{ specSlides \} from "\.\/generated\/from-spec";/);
+  assert.match(idx, /\/\/ \.\.\.specSlides,/);
   const out = run(process.execPath, ["scripts/watch-outline.mjs"], deck);
   assert.match(out, /\(0 slides, theme=midnight\)/);
+});
+
+test("scaffold seeds deck.spec.yaml and from-spec stub module", (t) => {
+  const deck = scaffold(t, ["--title", "Our pilot cut triage time in half."]);
+  const yaml = readFileSync(join(deck, "content/deck.spec.yaml"), "utf8");
+  assert.match(yaml, /approved:\s*false/);
+  assert.match(yaml, /id:\s*title/);
+  assert.match(yaml, /status:\s*locked/);
+  const gen = readFileSync(join(deck, "src/slides/generated/from-spec.tsx"), "utf8");
+  assert.match(gen, /specSlides/);
+  assert.match(gen, /lockedCount: 1/);
+  assert.ok(readFileSync(join(deck, "package.json"), "utf8").includes('"spec"'));
+});
+
+test("spec.mjs validates the template design spec", (t) => {
+  const out = run(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  assert.match(out, /spec: OK/);
+  const gen = run(process.execPath, ["scripts/spec.mjs"], template);
+  assert.match(gen, /locked/);
+  assert.ok(readFileSync(join(template, "src/slides/generated/from-spec.tsx"), "utf8").includes("specSlides"));
+});
+
+test("spec.mjs rejects missing approval flag and bad types", (t) => {
+  // Run against the template tree (has `yaml` installed). Use a temp copy of the YAML only.
+  const dir = tempDir(t);
+  // Minimal deck layout: reuse template scripts + node_modules via symlink would be heavy;
+  // write a bad spec into the template content, check, then restore.
+  const specPath = join(template, "content/deck.spec.yaml");
+  const backup = readFileSync(specPath, "utf8");
+  t.after(() => writeFileSync(specPath, backup));
+  writeFileSync(specPath, `title: X
+theme: midnight
+slides:
+  - n: 1
+    id: bad
+    type: not-a-type
+    title: Too short
+    status: stub
+`);
+  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  assert.equal(r.status, 1, r.out);
+  assert.match(r.out, /approved/);
+  assert.match(r.out, /type must be a catalog kind/);
 });

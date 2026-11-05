@@ -17,6 +17,7 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] `contrast`: solid-background text meets 4.5:1 (3:1 if large).
 - [ ] `render` / console: no Mermaid or Shiki errors and no runtime errors.
 - [ ] `npm run check:tokens` passes for the theme in use (including an imported `brand` theme). Every theme must define each checked token as 6-digit hex (`#rrggbb`); `#fff`, `rgb()` or a missing token fails.
+- [ ] `spec-mismatch` (when `content/deck.spec.yaml` has `approved: true`): build slide **count**, **ids in order**, and SlideFrame **kinds** match the approved spec. If the user changed the spec after approval, re-approve or justify; do not silently diverge.
 
 ## Style import (if a URL, images or SVGs set the look)
 
@@ -41,6 +42,12 @@ Run `npm run review`, then go through this list with the screenshots open. Every
 - [ ] Illustrative / generic rebuilds of vendor architectures are marked as such (Pill or caption), never copied proprietary.
 - [ ] The technical deck includes architecture, results, governance and lessons slides.
 - [ ] The final slide has a clear ask or next step and lists references.
+
+## Design spec
+
+- [ ] `content/deck.spec.yaml` was the approval artifact; `approved: true` only after the user signed off.
+- [ ] Locked slides were not clobbered by `npm run spec`; stubs were promoted per `deck-spec.md`.
+- [ ] Spec fields (title, type, components, sources) still match the polished TSX for locked slides, or manual merge was reported.
 
 ## Facts
 

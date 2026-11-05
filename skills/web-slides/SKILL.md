@@ -4,7 +4,7 @@ description: Build stunning, research-backed web slide decks (React + Vite + Mot
 license: MIT
 compatibility: Needs Node.js 20+ and npm, network access for npm install, and a Chromium for Playwright (npx playwright install chromium, or CHROME_PATH).
 metadata:
-  version: "0.6.0"
+  version: "0.7.0"
   stack: "react 19, vite 8, motion 14, playwright, mermaid, shiki, lucide-react"
 ---
 
@@ -31,7 +31,7 @@ Follow these steps in order, and stop at the approval gate. The full details are
 
 1. **Brief.** Get the audience, goal, length (minutes or slide count), the decision or ask, and the deadline. Also ask whether a brand palette exists, or a website, images or SVGs to match (step 5). If there is none, use `midnight`, `aurora` or `paper`.
 2. **Research.** Collect sources into a working notes file with URLs and the exact figures and quotes. Prefer primary sources such as official docs, papers, filings and the user's own data.
-3. **Outline, then approval.** Write `outline.md` with one line per slide. Each line gives the slide number, the slide type from `references/slide-catalog.md`, the takeaway title, the key visual, and the source ids. **Show it to the user and wait for approval** before writing any TSX, unless they explicitly said to skip approval.
+3. **Design spec, then approval.** From the user's raw notes (no layout required), write `content/deck.spec.yaml` — slide order, takeaway titles, types from `references/slide-catalog.md`, layout recipes from `references/layout-guide.md`, components (Stat/BarChart/Mermaid/LayeredArchitecture/FlowSteps/Sequence/C4Container/Figure/Code/Timeline/…), text, media paths, chart data, sources, speaker notes. Schema: `references/deck-spec.md`. **Show that file to the user, let them edit it, and wait for approval** (`approved: true` only after they say yes) before generating production React slides, unless they explicitly said to skip approval. A thin `outline.md` brainstorm is optional; `content/deck.outline.md` remains an optional light stub for `npm run live`.
 4. **Scaffold.** Run `node scripts/new-deck.mjs <dir> --title "<takeaway title>" [--theme midnight|aurora|paper]`, then `cd <dir> && npm install && npx playwright install chromium`. Use `--keep-examples` only if you want the 16 example slides as a reference; delete them afterwards.
 5. **Style import (when the user gives a look to match).** If they give a website URL, brand images or SVG artwork, run one of these in the deck:
    - `npm run style:url -- <url>`
@@ -39,7 +39,7 @@ Follow these steps in order, and stop at the approval gate. The full details are
    - `npm run style:svg -- <dir>`
 
    Add `--apply` to switch the deck to `theme: "brand"`. Each command writes `style-import/style-spec.json` and `src/theme/brand.css`, auto-fixes failing contrast while keeping hue, and runs `check:tokens`. Read the summary, sanity-check it against the captures, install any non-bundled font it names, and tell the user which brand colors were adjusted and which fonts were swapped. SVGs land classified in `public/media/svg/` (background, frame, decorative, icon). Full workflow, mapping rules, font table and licensing: `references/style-import.md`. Preview any theme with `?theme=brand` or `npm run review -- --theme brand`.
-6. **Build the slides.** Make one file per slide in `src/slides/NN-id.tsx`, register it in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`. Copy patterns from `template/src/slides/*` (one example per slide type) and follow `references/design-guide.md` and `references/layout-guide.md` (Grid for stage columns, Flex for rows; use `.layout-*` recipes). For any architecture or flow visual, open `references/diagram-guide.md` and pick Mermaid vs `LayeredArchitecture` / `FlowSteps` / `Sequence` / `C4Container`. **When the user provides images, logos, screenshots or says "use this asset", follow `references/media-guide.md` end-to-end:** copy into `public/media/`, render with `<Figure src="/media/…" alt="…" cite|illustrative>`, then re-screenshot. Never invent logos or stock photos. Use **`npm run dev`** (HMR present mode) or **`npm run live`** (HMR + outline watcher) while building — see Live mode below.
+6. **Build the slides from the approved spec.** Run `npm run spec` to validate and emit stubs for `status: stub` into `src/slides/generated/from-spec.tsx`. Promote each stub into `src/slides/NN-id.tsx`, set `status: locked` in the YAML, and register the polished module in `src/slides/index.ts` (see promote/merge in `references/deck-spec.md` — regenerating must not wipe locked slides). Add sources to `src/slides/sources.ts`. Copy patterns from `template/src/slides/*` and follow `references/design-guide.md` and `references/layout-guide.md`. For architecture or flow visuals, open `references/diagram-guide.md`. **When the user provides images, logos, screenshots or says "use this asset", follow `references/media-guide.md` end-to-end.** Use **`npm run dev`** or **`npm run live`** while polishing — see Live mode below.
 7. **Screenshots and review.** Run `npm run review`. It builds the deck, screenshots every slide in its final state into `review/`, writes `review/contact-sheet.png` and `review/report.md`, and exits non-zero on errors.
 8. **Self-review.** Open the contact sheet and every slide PNG and look at them; do not trust the lint alone. Go through `references/review-checklist.md`. Fix the issues and run review again until there are 0 errors and every warning is fixed or justified. Use `npm run review -- --steps` to check click-step states.
 9. **Export.** Run `npm run export:pdf`, which writes `export/deck.pdf` with vector, selectable text. If blur or glow effects print wrong, also run `npm run export:pdf -- --raster` for `export/deck-raster.pdf`. `npm run export:png` writes PNGs to `export/png/`. `npm run verify` runs the token check, typecheck, build, review and PDF export in one go.
@@ -76,14 +76,13 @@ When the user says "make it look like apple.com", "use our brand images" or hand
 
 Then run `npm run review`, look at the contact sheet, and report the palette, the contrast fixes and the font swaps. Use imported SVG backgrounds and decorations via `<Figure decorative frame={false}>`.
 
-## Live mode (real-time preview)
+## Design spec + live mode
 
-React slides are the source of truth for beauty. Two loops:
+1. **`content/deck.spec.yaml`** — editable middle layer and **approval gate** (`references/deck-spec.md`). User edits design; agent sets `approved: true` only after explicit approval, then `npm run spec` (validate + stub generate). `status: locked` slides are never overwritten.
+2. **`npm run dev`** — Vite present mode at http://127.0.0.1:5173 with HMR. Edit any `src/slides/*.tsx`, `sources.ts`, theme CSS, or diagram component; the browser updates immediately. Keys: ←/→, Space, **N** notes, **O** overview, **F** fullscreen.
+3. **`npm run live`** — same as dev, plus watches the optional light `content/deck.outline.md` → `from-outline.tsx`. Prefer the YAML spec; sync a light outline with `npm run spec -- --sync-outline`. Uncomment `specSlides` / `outlineSlides` in `index.ts` only while iterating.
 
-1. **`npm run dev`** — Vite present mode at http://127.0.0.1:5173 with HMR. Edit any `src/slides/*.tsx`, `sources.ts`, theme CSS, or diagram component; the browser updates immediately. Keys: ←/→, Space, **N** notes, **O** overview, **F** fullscreen.
-2. **`npm run live`** — same as dev, plus watches `content/deck.outline.md` and regenerates stub slides into `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import and the `...outlineSlides` spread in `src/slides/index.ts` to preview stubs, then replace each stub with a polished typed slide before ship. `npm run outline` regenerates once without Vite.
-
-Do not treat outline stubs as final deck quality. Diagrams, motion and tight layout stay in hand-written React.
+Do not treat stubs as final deck quality. Diagrams, motion and tight layout stay in hand-written (locked) React.
 
 ## Don'ts
 
@@ -91,4 +90,4 @@ Do not treat outline stubs as final deck quality. Diagrams, motion and tight lay
 - Don't use text smaller than 18px on the stage (the lint enforces this, including diagram text). Don't use more than 6 cards or 5 bullets. Don't put more than 8 nodes in Mermaid; for denser architecture use `LayeredArchitecture` / `C4Container` / `Sequence` (see `diagram-guide.md`), and still split if a swimlane exceeds 6 layers or 5 cells.
 - Don't use `position: absolute` for everyday content (SlideFrame chrome and `.bg` only). Prefer Grid/Flex per `references/layout-guide.md`. Don't use raw hex colors, hotlinked images you don't have rights to, invented logos, or stock "AI brain" art. Put user media in `public/media/` via `<Figure>`.
 - Don't ship `style-import/captures/*` or any third-party screenshot, logo or font file. They are reference only.
-- Don't skip the approval gate or the screenshot review.
+- Don't skip the design-spec approval gate (`content/deck.spec.yaml`) or the screenshot review. Don't regenerate over `status: locked` slides.

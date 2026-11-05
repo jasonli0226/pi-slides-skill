@@ -14,7 +14,7 @@ Light theme, with images researched from the web and added motion:
 
 ## What it does
 
-- **Workflow:** brief → research → outline → **your approval** → build → screenshots → self-review checklist → PDF export.
+- **Workflow:** brief → research → **editable design spec** (`content/deck.spec.yaml`) → **your approval** → build from spec → screenshots → self-review checklist → PDF export. Regenerating stubs does not wipe `status: locked` slides.
 - **A deck standard enforced by code**, not just by instructions:
   - Every Stat, chart or quote must cite a source listed on its slide.
   - Titles must be full-sentence takeaways.
@@ -23,6 +23,7 @@ Light theme, with images researched from the web and added motion:
 - **13 slide types with working examples:** title, agenda, big number, architecture (Mermaid **or** React swimlanes / C4 / sequence), comparison, timeline, code walkthrough (Shiki with per-step focus), quote, results (count-up stat + animated bars), governance, lessons, closing and section.
 - **Diagram guide:** `skills/web-slides/references/diagram-guide.md` teaches when to use Mermaid (≤8 nodes) vs `LayeredArchitecture`, `FlowSteps`, `Sequence`, `C4Container` (React + CSS, no heavy graph library).
 - **Layout guide:** `skills/web-slides/references/layout-guide.md` — presentation Flexbox + Grid recipes (KPI strip, compare, hero+chart), overflow rules; cites CSS Tricks Flexbox/Grid.
+- **Design spec:** `skills/web-slides/references/deck-spec.md` — YAML middle layer (slide types, layouts, components, chart data, notes) with approval gate and promote/merge rules; `npm run spec` validates and generates stubs.
 - **Media guide:** `skills/web-slides/references/media-guide.md` teaches the **agent** to copy user-provided logos/screenshots into `public/media/` and render them with `<Figure>` (alt + cite/illustrative, lint for missing alt / broken src).
 - **Swappable theme tokens:** the built-in themes are `midnight`, `aurora` and `paper`. A brand palette goes in `brand.css` and is a single-file change.
 - **Style import:** `npm run style:url -- <url>`, `style:images -- <dir>` and `style:svg -- <dir>` turn a website, a mood board or SVG artwork into `style-spec.json` plus a WCAG-checked `[data-theme="brand"]`. The importer extracts colors, swaps proprietary fonts for free ones, maps layout feel to tokens and normalizes SVGs. It borrows style, never assets.
@@ -55,6 +56,7 @@ cd my-deck && npm install && npx playwright install chromium
 npm run dev          # present mode + HMR — edit slides, browser updates live
 npm run live         # HMR + watch content/deck.outline.md → generated stub slides
 npm run outline      # regenerate outline stubs once (no Vite)
+npm run spec         # validate content/deck.spec.yaml + generate stub slides (status:stub only)
 npm run review       # screenshots + lint → review/ (contact-sheet.png, report.md)
 npm run export:pdf   # export/deck.pdf   (add -- --raster for a pixel-exact PDF)
 npm run verify       # tokens + typecheck + build + review + pdf, exit code for CI
@@ -77,6 +79,7 @@ skills/web-slides/
   references/
     design-guide.md              story, layout, type scale, color, icons, motion, data
     layout-guide.md              Flexbox + Grid recipes for the 1920×1080 stage
+    deck-spec.md                 editable YAML design spec + approval / promote rules
     diagram-guide.md             scenario → diagram type, beauty rules, anti-patterns
     slide-catalog.md             slide types, component props, file skeleton
     workflow.md                  step-by-step commands and approval gate
@@ -90,8 +93,9 @@ skills/web-slides/
     src/theme/tokens.css         all design tokens + 3 themes
     src/theme/brand.css          where the brand theme goes
     src/slides/                  one file per slide, sources.ts bibliography
-    content/deck.outline.md      optional live outline (titles/bullets)
-    scripts/                     review, live, watch-outline, export-pdf, check-tokens
+    content/deck.spec.yaml       editable design spec (approval artifact)
+    content/deck.outline.md      optional light outline (titles/bullets)
+    scripts/                     review, live, spec, watch-outline, export-pdf, check-tokens
     scripts/style/               style:url, style:images, style:svg (+ shared color/k-means lib)
 test/                            scaffold smoke, check and present-mode tests (npm test)
 docs/research.md                 stack comparison, decision, sources

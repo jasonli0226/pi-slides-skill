@@ -1,0 +1,89 @@
+{
+  "title": "Agent-authored web decks",
+  "theme": "midnight",
+  "approved": false,
+  "approved_at": null,
+  "version": 1,
+  "slides": [
+    {
+      "n": 1,
+      "id": "title",
+      "type": "title",
+      "title": "Research-backed decks that look like a design team built them.",
+      "layout": "layout-stack",
+      "status": "locked",
+      "sources": []
+    },
+    {
+      "n": 2,
+      "id": "agenda",
+      "type": "agenda",
+      "title": "Four gates sit between a draft and a deck you can ship.",
+      "layout": "grid-4",
+      "status": "locked",
+      "sources": []
+    },
+    {
+      "n": 3,
+      "id": "contrast-floor",
+      "type": "big-number",
+      "title": "Ticket triage time fell 48% after the pilot.",
+      "layout": "layout-hero",
+      "status": "locked",
+      "sources": [
+        "pilotReport"
+      ]
+    },
+    {
+      "n": 4,
+      "id": "architecture",
+      "type": "architecture",
+      "title": "Agents write a design spec before they touch React.",
+      "layout": "layout-media",
+      "status": "locked",
+      "sources": [
+        "skillRepo"
+      ]
+    },
+    {
+      "n": 5,
+      "id": "layered-platform",
+      "type": "architecture",
+      "title": "Dense stacks use swimlanes instead of a Mermaid hairball.",
+      "layout": "layout-stack",
+      "status": "locked",
+      "sources": [
+        "skillRepo"
+      ]
+    },
+    {
+      "n": 6,
+      "id": "workflow",
+      "type": "timeline",
+      "title": "Ship the deck in one working session, not a week of polish.",
+      "layout": "layout-stack",
+      "status": "locked",
+      "sources": []
+    },
+    {
+      "n": 7,
+      "id": "results",
+      "type": "results",
+      "title": "Automated review catches the mistakes humans miss under deadline.",
+      "layout": "layout-kpi",
+      "status": "locked",
+      "sources": [
+        "skillRepo"
+      ]
+    },
+    {
+      "n": 8,
+      "id": "closing",
+      "type": "closing",
+      "title": "Approve the design spec, then let the agent build the stage.",
+      "layout": "layout-stack",
+      "status": "locked",
+      "sources": []
+    }
+  ]
+}
