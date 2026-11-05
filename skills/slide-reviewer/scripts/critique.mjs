@@ -57,13 +57,22 @@ const ruleHints = [
   [/source-missing|cite-unknown/i, "blocker", "Missing or unknown citation"],
 ];
 
+// Explicit level written by review.mjs (`- **error** [rule] msg`) or plain `ERROR ...`.
+// It always wins over the rule-name fallback table.
+function explicitSeverity(line) {
+  const m =
+    /^\s*[-*]?\s*\*\*(error|warn|warning)\*\*/i.exec(line) ||
+    /^\s*[-*]?\s*(ERROR|WARN|WARNING)\b/i.exec(line);
+  if (!m) return null;
+  return m[1].toLowerCase().startsWith("err") ? "blocker" : "warn";
+}
+
 for (const line of report.split("\n")) {
-  const err = /^\s*[-*]?\s*(ERROR|WARN|WARNING)\b[:\s-]*(.*)$/i.exec(line);
+  const err = /^\s*[-*]?\s*(?:\*\*)?(ERROR|WARN|WARNING)\b(?:\*\*)?[:\s-]*(.*)$/i.exec(line);
   const bullet = /^\s*[-*]\s+(.+)$/.exec(line);
   const raw = err ? err[2] : bullet ? bullet[1] : null;
   if (!raw) continue;
-  const severityWord = err ? err[1].toUpperCase() : "";
-  let severity = severityWord.startsWith("ERR") ? "blocker" : severityWord.startsWith("WARN") ? "warn" : null;
+  let severity = explicitSeverity(line);
   let label = null;
   for (const [re, sev, name] of ruleHints) {
     if (re.test(line) || re.test(raw)) {
@@ -89,7 +98,8 @@ for (const m of slideSections) {
   const body = m[2];
   for (const line of body.split("\n")) {
     if (!/\b(error|warn)/i.test(line)) continue;
-    if (autoFindings.some((f) => f.detail === line.trim())) continue;
+    // Bullets and explicit-level lines were already parsed by the loop above.
+    if (/^\s*[-*]\s+/.test(line) || explicitSeverity(line)) continue;
     let severity = /error/i.test(line) ? "blocker" : "warn";
     let label = "Lint";
     for (const [re, sev, name] of ruleHints) {

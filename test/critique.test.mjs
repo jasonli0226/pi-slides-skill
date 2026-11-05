@@ -34,3 +34,31 @@ test("critique.mjs fails without review/", () => {
   const r = spawnSync(process.execPath, [CLI, "--deck", deck], { encoding: "utf8" });
   assert.notEqual(r.status, 0);
 });
+
+test("critique.mjs uses the level review.mjs writes, not the rule table", () => {
+  const deck = fs.mkdtempSync(path.join(os.tmpdir(), "critique-levels-"));
+  const review = path.join(deck, "review");
+  fs.mkdirSync(review);
+  fs.writeFileSync(
+    path.join(review, "report.md"),
+    [
+      "# Review",
+      "",
+      "## Deck",
+      '- **error** [spec-mismatch] Slide 2 layout differs from deck.spec.yaml',
+      '- **error** [duplicate-id] Slide id "a" is already used by slide 1',
+      "",
+      "## Slide 1 — a",
+      '- **error** [emoji-icon] Emoji used as icon — "🚀"',
+      "- **warn** [title-sentence] Title is not a full sentence",
+      "",
+      "## Slide 2 — b",
+      "- **error** [absolute-spam] 6 absolutely positioned boxes",
+      "- ok",
+      "",
+    ].join("\n"),
+  );
+  const r = spawnSync(process.execPath, [CLI, "--deck", deck], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.match(r.stdout, /automated: 4 blocker\(s\), 1 warning\(s\)/);
+});

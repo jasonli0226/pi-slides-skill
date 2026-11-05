@@ -1,7 +1,7 @@
 // Fast checks that need no npm install or browser: token contrast check, scaffold output.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { run, scaffold, tempDir, template, tryRun } from "./helpers.mjs";
 
@@ -85,4 +85,35 @@ slides:
   assert.equal(r.status, 1, r.out);
   assert.match(r.out, /approved/);
   assert.match(r.out, /type must be a catalog kind/);
+});
+
+test("spec.mjs style-pack overlay fills blanks but keeps explicit theme and layout", (t) => {
+  const deck = scaffold(t, ["--title", "Our pilot cut triage time in half."]);
+  symlinkSync(join(template, "node_modules"), join(deck, "node_modules"), "dir");
+  writeFileSync(join(deck, "content/style-pack.json"), JSON.stringify({
+    id: "navy-pitch-snapshot",
+    themeFile: "brand.css",
+    patterns: { kpi: { slideTypes: ["big-number"], layout: "layout-kpi" } },
+  }));
+  writeFileSync(join(deck, "content/deck.spec.yaml"), `title: Overlay
+theme: paper
+approved: false
+slides:
+  - n: 1
+    id: hero-metric
+    type: big-number
+    title: Pipeline hit four million dollars this quarter.
+    layout: layout-hero
+    status: stub
+  - n: 2
+    id: plain-metric
+    type: big-number
+    title: Churn fell to two percent after the pilot.
+    status: stub
+`);
+  run(process.execPath, ["scripts/spec.mjs"], deck);
+  const manifest = JSON.parse(readFileSync(join(deck, "src/slides/generated/spec-manifest.json"), "utf8"));
+  assert.equal(manifest.theme, "paper");
+  assert.equal(manifest.slides[0].layout, "layout-hero");
+  assert.equal(manifest.slides[1].layout, "layout-kpi");
 });

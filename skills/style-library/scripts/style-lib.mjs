@@ -436,7 +436,7 @@ const PATTERN_WIRE = {
     heroLabel: "Proposal for discussion",
   },
   kpi: {
-    slideTypes: ["big-number", "results", "content"],
+    slideTypes: ["big-number", "results"],
     layout: "layout-kpi",
   },
   timeline: {
@@ -453,7 +453,7 @@ const PATTERN_WIRE = {
   },
 };
 
-function writeStylePackManifest(deckDir, pack) {
+function writeStylePackManifest(deckDir, pack, { patternsOnly = false } = {}) {
   const patterns = {};
   for (const p of pack.json.patterns || []) {
     const wire = PATTERN_WIRE[p.id];
@@ -463,7 +463,7 @@ function writeStylePackManifest(deckDir, pack) {
     id: pack.json.id,
     name: pack.json.name || pack.json.id,
     appliedAt: new Date().toISOString(),
-    themeFile: pack.json.theme?.file || null,
+    themeFile: patternsOnly ? null : pack.json.theme?.file || null,
     patterns,
     sourcePackDir: (() => {
       const cwd = process.cwd();
@@ -485,7 +485,7 @@ function patchDeckSpecYaml(deckDir, pack, manifest) {
     return false;
   }
   let yaml = fs.readFileSync(specPath, "utf8");
-  const hasTheme = !!pack.json.theme?.file;
+  const hasTheme = !!manifest.themeFile;
   if (hasTheme) {
     if (/^theme:\s*\S+/m.test(yaml)) yaml = yaml.replace(/^theme:\s*\S+/m, "theme: brand");
     else yaml = `theme: brand\n` + yaml;
@@ -598,8 +598,11 @@ function wireTitleHeroSlide(filePath, wire) {
   if (!/kind=\{?"title"\}?/.test(src) && !/kind="title"/.test(src)) {
     return false;
   }
-  // Remove legacy center prop on title frames
-  src = src.replace(/(\s)center(\s|\/|>)/g, "$1$2");
+  // Remove legacy center prop on the title SlideFrame tag only (not text content)
+  src = src.replace(/<SlideFrame\b[^>]*>/, (tag) =>
+    // Skip quoted / braced attribute values so only a bare `center` prop matches.
+    tag.replace(/("[^"]*"|'[^']*'|\{[^}]*\})|\s+center(?:=\{true\})?(?=[\s/>])/g, (m, value) => value ?? ""),
+  );
   if (!/hero(?:\s|=|\/|>)/.test(src)) {
     src = src.replace(/<SlideFrame([^>]*)kind="title"/, '<SlideFrame$1kind="title"\n      hero');
   }
@@ -745,7 +748,7 @@ function cmdApply(args) {
 
   let manifest = null;
   if (!themeOnly) {
-    manifest = writeStylePackManifest(deckDir, pack);
+    manifest = writeStylePackManifest(deckDir, pack, { patternsOnly });
     if (!noWire) {
       patchDeckSpecYaml(deckDir, pack, manifest);
       const n = wirePatternSlides(deckDir, manifest);

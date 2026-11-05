@@ -61,13 +61,13 @@ function applyStylePackOverlay(raw) {
   if (!raw || typeof raw !== "object") return raw;
   const out = { ...raw };
   if (pack.id && !out.style_pack) out.style_pack = pack.id;
-  if (pack.themeFile) out.theme = "brand";
+  if (pack.themeFile && !out.theme) out.theme = "brand";
   out.slides = (out.slides || []).map((s) => {
     const slide = { ...s };
     for (const [pid, wire] of Object.entries(pack.patterns || {})) {
       if (!(wire.slideTypes || []).includes(slide.type)) continue;
       if (!slide.pattern) slide.pattern = pid;
-      if (wire.layout) slide.layout = wire.layout;
+      if (wire.layout && slide.layout == null) slide.layout = wire.layout;
       if (wire.scrim && slide.scrim == null) slide.scrim = wire.scrim;
       if (wire.background && slide.background == null) slide.background = wire.background;
       if (wire.hero && slide.hero == null) slide.hero = true;
