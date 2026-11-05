@@ -22,6 +22,7 @@ Light theme, with images researched from the web and added motion:
   - The lint fails on emoji icons, template leftovers (lorem, TODO, `{{ }}`, NaN), overflow and text under 18px.
 - **13 slide types with working examples:** title, agenda, big number, architecture (Mermaid **or** React swimlanes / C4 / sequence), comparison, timeline, code walkthrough (Shiki with per-step focus), quote, results (count-up stat + animated bars), governance, lessons, closing and section.
 - **Diagram guide:** `skills/web-slides/references/diagram-guide.md` teaches when to use Mermaid (≤8 nodes) vs `LayeredArchitecture`, `FlowSteps`, `Sequence`, `C4Container` (React + CSS, no heavy graph library).
+- **Layout guide:** `skills/web-slides/references/layout-guide.md` — presentation Flexbox + Grid recipes (KPI strip, compare, hero+chart), overflow rules; cites CSS Tricks Flexbox/Grid.
 - **Media guide:** `skills/web-slides/references/media-guide.md` teaches the **agent** to copy user-provided logos/screenshots into `public/media/` and render them with `<Figure>` (alt + cite/illustrative, lint for missing alt / broken src).
 - **Swappable theme tokens:** the built-in themes are `midnight`, `aurora` and `paper`. A brand palette goes in `brand.css` and is a single-file change.
 - **Style import:** `npm run style:url -- <url>`, `style:images -- <dir>` and `style:svg -- <dir>` turn a website, a mood board or SVG artwork into `style-spec.json` plus a WCAG-checked `[data-theme="brand"]`. The importer extracts colors, swaps proprietary fonts for free ones, maps layout feel to tokens and normalizes SVGs. It borrows style, never assets.
@@ -75,6 +76,7 @@ skills/web-slides/
   SKILL.md                       entry point pi loads (frontmatter + workflow + standard)
   references/
     design-guide.md              story, layout, type scale, color, icons, motion, data
+    layout-guide.md              Flexbox + Grid recipes for the 1920×1080 stage
     diagram-guide.md             scenario → diagram type, beauty rules, anti-patterns
     slide-catalog.md             slide types, component props, file skeleton
     workflow.md                  step-by-step commands and approval gate

@@ -55,6 +55,7 @@ Check `style-import/style-spec.json`, then preview with `npm run dev` → `/?the
 ## 5. Build
 
 - Make one file per slide, `src/slides/NN-id.tsx`, register each in `src/slides/index.ts`, and add sources to `src/slides/sources.ts`.
+- Lay out the body with Grid/Flex recipes in `layout-guide.md` (`.layout-stack`, `.layout-kpi`, `.layout-compare`, `.layout-media`, `.layout-hero`) — not absolute positioning.
 - **Live preview (HMR):** `npm run dev` → http://127.0.0.1:5173. Edit a slide `.tsx` or `sources.ts` and the browser updates immediately (keys: arrows, N, O, F).
 - **Live + outline:** `npm run live` also watches `content/deck.outline.md` and regenerates `src/slides/generated/from-outline.tsx`. Uncomment the `outlineSlides` import and spread in `index.ts` to preview stubs; refine into real slide files before review.
 - Run `npm run typecheck` to catch prop mistakes early.

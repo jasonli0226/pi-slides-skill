@@ -1,6 +1,7 @@
 // Runs inside the browser on one static slide. Returns a list of issues.
 // Rules: frame, title-sentence, source-missing, cite-unknown, leftover, emoji-icon,
-//        img-alt, img-broken, off-stage, footer-overlap, clipped, tiny-text, contrast.
+//        img-alt, img-broken, off-stage, footer-overlap, clipped, uneven-gaps, absolute-spam,
+//        tiny-text, contrast.
 (() => {
   const issues = [];
   const add = (level, rule, msg, el) =>
@@ -68,6 +69,64 @@
     if (["hidden", "clip"].includes(cs.overflow) && el.scrollHeight > el.clientHeight + 2 && (el.textContent || "").trim() && !el.closest(".overview"))
       if (!el.classList.contains("stage") && !el.classList.contains("frame") && !el.classList.contains("print-page"))
         add("error", "clipped", "Text is clipped by an overflow:hidden container.", el);
+  }
+
+  /* ---- layout feel: uneven gutters + absolute spam in the body ---- */
+  const layoutRoots = stage.querySelectorAll(
+    ".grid-2, .grid-3, .grid-4, .row, .layout-kpi, .layout-compare, .layout-hero, .layout-hero-flip, .layout-stack"
+  );
+  for (const root of layoutRoots) {
+    const kids = [...root.children].filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0 && visible(el) && !isBg(el);
+    });
+    if (kids.length < 2) continue;
+    const cs = getComputedStyle(root);
+    const horizontal = cs.display.includes("flex")
+      ? (cs.flexDirection || "row").startsWith("row")
+      : true;
+    const gaps = [];
+    for (let i = 0; i < kids.length - 1; i++) {
+      const a = kids[i].getBoundingClientRect();
+      const b = kids[i + 1].getBoundingClientRect();
+      if (horizontal) {
+        if (Math.abs(a.top - b.top) > 8) continue;
+        gaps.push(b.left - a.right);
+      } else {
+        if (Math.abs(a.left - b.left) > 8) continue;
+        gaps.push(b.top - a.bottom);
+      }
+    }
+    if (gaps.length >= 2) {
+      const lo = Math.min(...gaps), hi = Math.max(...gaps);
+      if (hi - lo > 16) {
+        add("warn", "uneven-gaps",
+          `Sibling gutters in .${[...root.classList].join(".")} differ by ${(hi - lo).toFixed(0)}px (min ${lo.toFixed(0)}, max ${hi.toFixed(0)}). Prefer gap + equal flex/grid tracks.`,
+          root);
+      }
+    }
+    const cards = kids.filter((el) => el.classList?.contains("card"));
+    if (cards.length >= 2) {
+      const hs = cards.map((el) => el.getBoundingClientRect().height);
+      const lo = Math.min(...hs), hi = Math.max(...hs);
+      if (hi - lo > 24) {
+        add("warn", "uneven-gaps",
+          `Card heights in a row differ by ${(hi - lo).toFixed(0)}px. Use align-items: stretch (layout-compare / grid-*) so peers match.`,
+          cards[0]);
+      }
+    }
+  }
+  let absCount = 0;
+  for (const el of stage.querySelectorAll(".frame-body *")) {
+    if (isBg(el) || el.closest(".bg") || el.closest("svg")) continue;
+    if (getComputedStyle(el).position === "absolute") {
+      if (el.closest(".timeline, .dg-c4, .dg-seq, .dg-layered, .dg-flow, .deck-figure, .mermaid-box, .code-window, [data-figure]")) continue;
+      absCount++;
+    }
+  }
+  if (absCount > 3) {
+    add("warn", "absolute-spam",
+      `${absCount} position:absolute nodes in the frame body. Prefer Grid/Flex layouts (see layout-guide.md).`);
   }
 
   /* ---- text: size + contrast ---- */
