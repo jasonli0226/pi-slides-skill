@@ -38,7 +38,10 @@ Light theme, with images researched from the web and added motion:
 This repo is a pi package. `package.json` declares `"pi": { "skills": ["./skills"] }`.
 
 ```bash
-# from GitHub
+# from npm
+pi install npm:pi-slides-skill
+
+# or from GitHub
 pi install git:github.com/jasonli0226/pi-slides-skill
 
 # or from a local clone

@@ -20,6 +20,8 @@ const tpl = join(dirname(fileURLToPath(import.meta.url)), "..", "template");
 const skip = new Set(["node_modules", "dist", "review", "export", "style-import"]);
 mkdirSync(dest, { recursive: true });
 cpSync(tpl, dest, { recursive: true, filter: (src) => !skip.has(src.split(/[\\/]/).pop()) });
+// npm never packs .gitignore, so a template installed from npm has none; rebuild it from the skip list.
+if (!existsSync(join(dest, ".gitignore"))) writeFileSync(join(dest, ".gitignore"), `${[...skip].join("\n")}\n`);
 
 if (!argv.includes("--keep-examples")) {
   if (!title) { console.error("--title is required unless --keep-examples"); process.exit(2); }
