@@ -52,6 +52,7 @@ const ruleHints = [
   [/emoji-icon/i, "warn", "Emoji icon"],
   [/absolute-spam/i, "warn", "Absolute positioning spam"],
   [/uneven-gaps/i, "warn", "Uneven gaps"],
+  [/hero-effects/i, "warn", "Competing hero effects"],
   [/spec-mismatch/i, "warn", "Spec mismatch"],
   [/img-alt|img-broken/i, "blocker", "Image alt/src issue"],
   [/source-missing|cite-unknown/i, "blocker", "Missing or unknown citation"],

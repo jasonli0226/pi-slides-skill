@@ -1,7 +1,7 @@
 // Runs inside the browser on one static slide. Returns a list of issues.
 // Rules: frame, title-sentence, source-missing, cite-unknown, leftover, emoji-icon,
 //        img-alt, img-broken, off-stage, footer-overlap, clipped, box-overlap, safe-margin,
-//        uneven-gaps, absolute-spam, tiny-text, contrast.
+//        uneven-gaps, absolute-spam, tiny-text, contrast, hero-effects.
 (() => {
   const issues = [];
   const add = (level, rule, msg, el) =>
@@ -263,6 +263,15 @@
     if (px < minSvg) { minSvg = px; minEl = el; }
   }
   if (minSvg < 18) add("error", "tiny-text", `Diagram/chart text renders at ~${minSvg.toFixed(0)}px (< 18px). Use fewer nodes, a larger height, or a wider column.`, minEl);
+
+  /* ---- hero effects: at most one per slide. A Stat group counts once; slide transitions don't count. ---- */
+  const heroes = [
+    stage.querySelector('[data-figure="stat"]') && "count-up Stat",
+    stage.querySelector(".bg-aurora, .bg-spotlight") && "glow background",
+    [...stage.querySelectorAll(".text-gradient")].some((el) => !el.closest(".stat")) && "gradient text",
+  ].filter(Boolean);
+  if (heroes.length > 1)
+    add("warn", "hero-effects", `${heroes.length} hero effects compete (${heroes.join(", ")}). Keep the one on the focal point.`);
 
   const errs = window.__DECK_ERRORS__ || [];
   errs.forEach((e) => add("error", "render", e));

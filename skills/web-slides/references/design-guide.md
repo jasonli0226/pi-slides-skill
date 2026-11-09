@@ -39,7 +39,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 
 - Transitions between slides are `fade` by default. Use `blur` for the title or quote slides and `zoom` for the closing; avoid mixing more than 2 or 3 kinds.
 - Inside a slide, use `Appear` for entrance (0.5 to 0.7s with an ease-out curve) and stagger groups by about 80ms. Use click steps to reveal an argument piece by piece, not to show off.
-- Give each slide at most one hero effect: a counting `Stat`, a spotlight or glow background, gradient headline text, or a `blur`/`zoom` transition. Plain `Appear` fades and a stagger don't count. If two effects compete, keep the one on the focal point and drop the other.
+- Give each slide at most one hero effect: a count-up `Stat` group (any number of `Stat`s together counts once), an `aurora` or `spotlight` background, or `.text-gradient` text outside a `Stat`. Slide transitions, plain `Appear` fades and a stagger don't count. Lint warns on `hero-effects` when a slide has two or more. If two effects compete, keep the one on the focal point and drop the other.
 - Animate opacity and transform only. Don't loop animations on content; the background blobs are slow and subtle.
 - Reduced motion is respected automatically (`MotionConfig reducedMotion="user"`). Static, print and screenshot modes render the final state with no motion, so the slide must read well without animation.
 
