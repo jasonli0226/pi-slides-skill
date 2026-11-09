@@ -53,7 +53,8 @@ node skills/slide-reviewer/scripts/critique.mjs --deck <deck-dir>
 | Titles | Not a full-sentence takeaway; weak verbs; section labels as titles |
 | Safe margins | Content in padding band; edge-hugging type |
 | Title hero | Centered headline over busy photo; missing left scrim; low contrast on scrim |
-| Hierarchy | Competing focals; accent used everywhere |
+| Hierarchy | Competing focals; accent used everywhere; more than one hero effect per slide |
+| Default look | Untouched template theme and tokens the user never chose |
 | Spec drift | Approved `deck.spec.yaml` types/order vs what screenshots show |
 
 Automated lint already covers many of these as errors/warnings in `report.md` — the critique **aggregates** them and adds judgment the lint cannot make.

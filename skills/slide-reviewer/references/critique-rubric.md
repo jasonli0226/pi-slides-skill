@@ -16,6 +16,7 @@ Use with `review/contact-sheet.png` and each `review/slide-NN.png` open.
 - Uneven card gaps / heights in a row
 - Absolute-spam layout instead of `.layout-*`
 - Accent color used on more than one focal
+- More than one hero effect on a slide (counting `Stat`, spotlight or glow background, gradient text, `blur`/`zoom` transition)
 - Spec type/kind mismatch vs approved YAML
 
 ## Notes
@@ -23,6 +24,7 @@ Use with `review/contact-sheet.png` and each `review/slide-NN.png` open.
 - Motion / step order (check with `npm run review -- --steps`)
 - Illustrative figures not labelled
 - Theme feels off-brand vs `style-pack` / brand.css
+- Untouched template look: still `midnight` with stock tokens and an empty `brand.css`, and the user never chose it
 
 ## Finding template
 

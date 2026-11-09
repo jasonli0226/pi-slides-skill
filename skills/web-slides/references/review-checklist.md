@@ -31,6 +31,7 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 
 - [ ] Reading only the titles in order tells the whole story.
 - [ ] Each slide has one focal point, and the accent color is used on that point only.
+- [ ] The theme was chosen on purpose. The deck isn't still on the template default (`midnight`, stock tokens, empty `brand.css`) unless the user asked for that.
 - [ ] Alignment: left edges line up across slides; cards in a row have equal heights; gutters match; nothing looks accidentally off-center. Prefer `.layout-*` recipes from `layout-guide.md`.
 - [ ] There's enough whitespace: no slide feels crammed (over 40 words is a smell).
 - [ ] Gradient text and text over glows are clearly readable, since the lint can't measure these.
@@ -61,3 +62,4 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 
 - [ ] Click steps reveal in a logical order, and the step count matches `steps`.
 - [ ] No more than 2 or 3 transition kinds are used, and nothing animates in a loop over content.
+- [ ] Each slide has at most one hero effect (counting `Stat`, spotlight or glow background, gradient text, or a `blur`/`zoom` transition).
