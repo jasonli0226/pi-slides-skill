@@ -1,7 +1,6 @@
 {
   "name": "pi-slides-skill",
   "version": "0.10.0",
-  "private": true,
   "description": "pi coding-agent skill: research-backed, animated React web slide decks with automated review and PDF export.",
   "keywords": [
     "pi-package",
@@ -12,6 +11,16 @@
     "motion"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasonli0226/pi-slides-skill.git"
+  },
+  "homepage": "https://github.com/jasonli0226/pi-slides-skill#readme",
+  "files": [
+    "skills/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node --test test/checks.test.mjs test/smoke.test.mjs test/present.test.mjs test/style-lib.test.mjs test/critique.test.mjs",
     "style-lib": "node skills/style-library/scripts/style-lib.mjs",
@@ -20,6 +29,7 @@
   "pi": {
     "skills": [
       "./skills"
-    ]
+    ],
+    "image": "https://raw.githubusercontent.com/jasonli0226/pi-slides-skill/main/examples/screenshots/contact-sheet.png"
   }
 }

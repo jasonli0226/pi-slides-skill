@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { run, scaffold, tempDir, template, tryRun } from "./helpers.mjs";
+import { npm, repo, run, scaffold, tempDir, template, tryRun } from "./helpers.mjs";
 
 const checkTokens = join(template, "scripts/check-tokens.mjs");
 
@@ -116,4 +116,14 @@ slides:
   assert.equal(manifest.theme, "paper");
   assert.equal(manifest.slides[0].layout, "layout-hero");
   assert.equal(manifest.slides[1].layout, "layout-kpi");
+});
+
+test("a deck scaffolded from the npm tarball gets a .gitignore", (t) => {
+  // npm never packs .gitignore files, so the template's copy is missing after `pi install npm:`.
+  const dir = tempDir(t);
+  const tgz = run(npm, ["pack", "--silent", "--pack-destination", dir], repo).trim().split("\n").pop();
+  run("tar", ["-xzf", join(dir, tgz), "-C", dir], dir);
+  const deck = join(dir, "deck");
+  run(process.execPath, [join(dir, "package/skills/web-slides/scripts/new-deck.mjs"), deck, "--title", "Our pilot cut triage time in half."], dir);
+  assert.match(readFileSync(join(deck, ".gitignore"), "utf8"), /^node_modules$/m);
 });
