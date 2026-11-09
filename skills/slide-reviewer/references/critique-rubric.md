@@ -16,7 +16,7 @@ Use with `review/contact-sheet.png` and each `review/slide-NN.png` open.
 - Uneven card gaps / heights in a row
 - Absolute-spam layout instead of `.layout-*`
 - Accent color used on more than one focal
-- More than one hero effect on a slide (counting `Stat`, spotlight or glow background, gradient text, `blur`/`zoom` transition)
+- More than one hero effect on a slide (lint `hero-effects`: count-up `Stat` group, `aurora`/`spotlight` background, gradient text outside a `Stat`)
 - Spec type/kind mismatch vs approved YAML
 
 ## Notes

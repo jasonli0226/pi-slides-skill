@@ -62,4 +62,4 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 
 - [ ] Click steps reveal in a logical order, and the step count matches `steps`.
 - [ ] No more than 2 or 3 transition kinds are used, and nothing animates in a loop over content.
-- [ ] Each slide has at most one hero effect (counting `Stat`, spotlight or glow background, gradient text, or a `blur`/`zoom` transition).
+- [ ] `hero-effects` (warn): each slide has at most one hero effect: a count-up `Stat` group (any number of `Stat`s together counts once), an `aurora` or `spotlight` background, or `.text-gradient` text outside a `Stat`.

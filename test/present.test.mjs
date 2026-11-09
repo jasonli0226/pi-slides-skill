@@ -82,3 +82,41 @@ test("review fails a deck with duplicate slide ids", { timeout: 300_000 }, () =>
     writeFileSync(idx, orig);
   }
 });
+
+async function lintSlide(n, mutate) {
+  const page = await browser.newPage({ viewport: { width: lib.W, height: lib.H }, reducedMotion: "reduce" });
+  try {
+    await page.goto(`${url}?static&slide=${n}`);
+    await lib.waitReady(page);
+    if (mutate) await page.evaluate(mutate);
+    return await page.evaluate(readFileSync(join(deck, "scripts/lint-in-page.js"), "utf8"));
+  } finally {
+    await page.close();
+  }
+}
+const heroIssues = (r) => r.issues.filter((i) => i.rule === "hero-effects");
+async function slideList() {
+  const probe = await present();
+  try { return (await deckInfo(probe)).slides; } finally { await probe.close(); }
+}
+
+test("hero-effects passes every example slide", async () => {
+  const slides = await slideList();
+  for (let n = 1; n <= slides.length; n++) {
+    assert.deepEqual(heroIssues(await lintSlide(n)), [], `slide ${n} (${slides[n - 1].id})`);
+  }
+});
+
+test("hero-effects warns when a Stat slide also gets a glow background", async () => {
+  const slides = await slideList();
+  const n = slides.findIndex((s) => s.id === "contrast-floor") + 1;
+  const r = await lintSlide(n, () => {
+    const bg = document.createElement("div");
+    bg.className = "bg bg-aurora";
+    document.querySelector(".stage").prepend(bg);
+  });
+  const found = heroIssues(r);
+  assert.equal(found.length, 1, JSON.stringify(r.issues));
+  assert.equal(found[0].level, "warn");
+  assert.match(found[0].msg, /count-up Stat.*glow background/);
+});
