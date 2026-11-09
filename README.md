@@ -20,6 +20,7 @@ Light theme, with images researched from the web and added motion:
   - Titles must be full-sentence takeaways.
   - Contrast is checked against WCAG 2.2 AA, both at the token level and in the rendered DOM.
   - The lint fails on emoji icons, template leftovers (lorem, TODO, `{{ }}`, NaN), overflow and text under 18px.
+  - The lint warns when a slide stacks more than one hero effect (count-up Stat, glow background, gradient text).
 - **13 slide types with working examples:** title, agenda, big number, architecture (Mermaid **or** React swimlanes / C4 / sequence), comparison, timeline, code walkthrough (Shiki with per-step focus), quote, results (count-up stat + animated bars), governance, lessons, closing and section.
 - **Diagram guide:** `skills/web-slides/references/diagram-guide.md` teaches when to use Mermaid (≤8 nodes) vs `LayeredArchitecture`, `FlowSteps`, `Sequence`, `C4Container` (React + CSS, no heavy graph library).
 - **Layout guide:** `skills/web-slides/references/layout-guide.md` — presentation Flexbox + Grid recipes (KPI strip, compare, hero+chart), overflow rules; cites CSS Tricks Flexbox/Grid.
