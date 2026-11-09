@@ -24,6 +24,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 - Built-in themes: `midnight` (dark, default), `aurora` (dark violet), `paper` (light, print / bright rooms), plus inspiration presets `tech-dark`, `bento-minimal`, `navy-pitch` (see `docs/template-inspiration.md`). Prefer these over `style:*` unless the user supplies a new brand.
 - Brand swap: copy a theme block into `src/theme/brand.css` as `[data-theme="brand"]`, set `theme: "brand"` in `src/slides/index.ts`, then run `npm run check:tokens`. Do not touch components.
 - **Matching a site, images or SVGs:** generate the brand theme with `npm run style:url|style:images|style:svg` (see `style-import.md`) instead of eyeballing hex. The importer keeps the brand hue and only shifts lightness to pass contrast. Say so if a brand color moved.
+- Don't ship the untouched template look. Pick a theme on purpose for the audience and room, and set at least the layout feel tokens below or a `style-pack` so the deck doesn't read as generic output. Leaving `midnight` with stock tokens is fine only when the user chose it.
 - Layout feel tokens (`--hero-weight`, `--title-weight`, `--hero-tracking`, `--title-tracking`, `--shadow-card`, `--shadow-elev`, `--motion-scale`, `--radius*`, `--pad-*`) let a restrained brand look restrained: flatter cards, lighter weights, calmer motion. The type-scale minimums still apply.
 - Fonts: only free fonts (bundled Inter, Space Grotesk and JetBrains Mono, or another Fontsource family you install). Swap proprietary faces using the table in `style-import.md`.
 - Contrast follows WCAG 2.2 AA. Text needs 4.5:1, or 3:1 if it is 24px or larger (or 18.66px bold). UI and graphics need 3:1 (SC 1.4.11).
@@ -38,6 +39,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 
 - Transitions between slides are `fade` by default. Use `blur` for the title or quote slides and `zoom` for the closing; avoid mixing more than 2 or 3 kinds.
 - Inside a slide, use `Appear` for entrance (0.5 to 0.7s with an ease-out curve) and stagger groups by about 80ms. Use click steps to reveal an argument piece by piece, not to show off.
+- Give each slide at most one hero effect: a counting `Stat`, a spotlight or glow background, gradient headline text, or a `blur`/`zoom` transition. Plain `Appear` fades and a stagger don't count. If two effects compete, keep the one on the focal point and drop the other.
 - Animate opacity and transform only. Don't loop animations on content; the background blobs are slow and subtle.
 - Reduced motion is respected automatically (`MotionConfig reducedMotion="user"`). Static, print and screenshot modes render the final state with no motion, so the slide must read well without animation.
 
