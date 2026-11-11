@@ -73,7 +73,7 @@ export function Cite({ id }: { id: string }) {
 }
 
 /** Wrap any figure (number, chart, claim) that needs a source. Lint fails if `cite` is missing. */
-function FigureMark({ cite, illustrative }: { cite?: string; illustrative?: boolean }) {
+export function FigureMark({ cite, illustrative }: { cite?: string; illustrative?: boolean }) {
   if (illustrative) return <span className="illustrative">Illustrative</span>;
   if (!cite) return <span data-uncited="true" />;
   return <Cite id={cite} />;
@@ -475,3 +475,9 @@ export {
   type FlowStep, type SequenceActor, type SequenceMessage,
   type C4Node, type C4Relation, type C4Kind, type DiagramTone,
 } from "./diagrams";
+
+/* Charts beyond BarChart (lazy ECharts; see references/chart-guide.md). */
+export { EChart, chartFacts, type ChartFacts } from "./echart";
+
+/* Optional 3D hero from a user-authored Spline scene (iframe + local poster; see media-guide.md). */
+export { SplineScene } from "./spline";

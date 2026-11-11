@@ -42,8 +42,36 @@ const STATUSES = new Set(["stub", "locked"]);
 const KNOWN_COMPONENTS = new Set([
   "Stat", "BarChart", "Mermaid", "LayeredArchitecture", "FlowSteps", "Sequence",
   "C4Container", "Figure", "Code", "Timeline", "Pill", "Card", "IconList", "Quote",
-  "Icon", "Stagger", "Appear", "Gradient", "Cite", "DiagramLegend",
+  "Icon", "Stagger", "Appear", "Gradient", "Cite", "DiagramLegend", "EChart", "SplineScene",
 ]);
+const arr = (v) => (v == null ? [] : Array.isArray(v) ? v : [v]);
+
+/** Cheap chart-guide checks on an EChart spec entry (same thresholds as the review lint). */
+function echartWarnings(props) {
+  const out = [];
+  if (!props || typeof props !== "object") return ["EChart needs a mapping with option, label and cite|illustrative"];
+  const option = props.option;
+  if (!option || typeof option !== "object") return ["EChart needs an `option` mapping (ECharts option: xAxis, yAxis, series)"];
+  if (!props.cite && !props.illustrative) out.push("EChart needs `cite` (a source id) or `illustrative: true`");
+  if (!props.label) out.push("EChart needs a `label` describing the chart for screen readers");
+  const series = arr(option.series);
+  if (!series.length) out.push("EChart option has no series");
+  const types = [...new Set(series.map((x) => String(x?.type ?? "unknown")))];
+  const odd = types.filter((t) => t === "pie" || /3D$/.test(t) || t === "radar" || t === "gauge");
+  if (odd.length) out.push(`EChart type ${odd.join(", ")} is off the chart guide (use a stacked bar for part-to-whole; no 3D)`);
+  if (series.length > 5) out.push(`EChart has ${series.length} series; keep it to 5 or fewer`);
+  const names = series.map((x) => x?.name).filter(Boolean);
+  if (series.length > 1 && !props.highlight) out.push("EChart has several series but no `highlight` (the series the title talks about)");
+  if (props.highlight && !names.includes(props.highlight)) out.push(`EChart highlight "${props.highlight}" names no series`);
+  const points = Math.max(0, ...series.map((x) => (Array.isArray(x?.data) ? x.data.length : 0)));
+  if (types.includes("bar") && points > 12) out.push(`EChart has ${points} bars per series; keep it to 12 or fewer`);
+  const xs = arr(option.xAxis), ys = arr(option.yAxis);
+  const valueAxes = [...xs.filter((a) => a?.type === "value"), ...ys.filter((a) => (a?.type ?? "value") === "value")];
+  if (types.includes("bar") && valueAxes.some((a) => a?.scale === true || (a?.min !== undefined && a.min !== 0)))
+    out.push("EChart bar chart value axis must start at zero");
+  if (xs.length > 1 || ys.length > 1) out.push("EChart has two value axes; split it unless the notes justify the dual axis");
+  return out;
+}
 
 function jsx(s) {
   return `{${JSON.stringify(s ?? "")}}`;
@@ -139,6 +167,13 @@ function validate(raw) {
         const keys = Object.keys(c);
         if (keys.length !== 1) warnings.push(`${loc} (${s.id}): components entry should have exactly one key`);
         else if (!KNOWN_COMPONENTS.has(keys[0])) warnings.push(`${loc} (${s.id}): unknown component "${keys[0]}"`);
+        else if (keys[0] === "EChart") for (const w of echartWarnings(c.EChart)) warnings.push(`${loc} (${s.id}): ${w}`);
+        else if (keys[0] === "SplineScene") {
+          const sp = c.SplineScene || {};
+          if (!sp.poster) warnings.push(`${loc} (${s.id}): SplineScene needs a local \`poster\` image under /media/`);
+          if (!/^https:\/\/my\.spline\.design\//.test(String(sp.src || ""))) warnings.push(`${loc} (${s.id}): SplineScene src must be the scene's public https://my.spline.design/… URL from the user`);
+          if (!["title", "closing", "section"].includes(s.type)) warnings.push(`${loc} (${s.id}): keep SplineScene to title, closing or hero slides`);
+        }
       }
     }
     if (s.status === "locked") {
@@ -236,6 +271,8 @@ function renderComponentPlaceholder(entry, i) {
           <p className="muted" style={{ margin: 0 }}>{${JSON.stringify(props.label || "")}}</p>
         </div>`;
     case "BarChart":
+    case "EChart":
+    case "SplineScene":
     case "Mermaid":
     case "LayeredArchitecture":
     case "FlowSteps":

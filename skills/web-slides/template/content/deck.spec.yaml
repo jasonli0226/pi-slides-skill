@@ -172,3 +172,24 @@ slides:
       - Edit content/deck.spec.yaml
       - Set approved true after you sign off
       - npm run spec && npm run live
+
+  - n: 9
+    id: trend-chart
+    type: results
+    title: Trend charts accent the one series the title is about and mute the rest.
+    layout: grid-2
+    status: locked
+    kicker: Charts • EChart
+    notes: Illustrative data only. Swap in a sourced dataset and cite it, or delete the slide.
+    components:
+      - EChart:
+          illustrative: true
+          highlight: Team A
+          label: Lint errors per deck over eight weeks for three teams; Team A falls from 14 to 2.
+          option:
+            xAxis: { type: category, data: [W1, W2, W3, W4, W5, W6, W7, W8] }
+            yAxis: { type: value, min: 0 }
+            series:
+              - { name: Team A, type: line, data: [14, 12, 9, 7, 5, 4, 3, 2] }
+              - { name: Team B, type: line, data: [12, 13, 11, 12, 10, 11, 10, 9] }
+              - { name: Team C, type: line, data: [15, 14, 15, 13, 14, 12, 12, 11] }

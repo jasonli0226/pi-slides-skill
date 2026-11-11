@@ -15,6 +15,7 @@ import governance from "./10-governance";
 import lessons from "./11-lessons";
 import closing from "./12-closing";
 import mediaFigure from "./16-media-figure";
+import trendChart from "./17-trend-chart";
 // Design-spec / outline stubs (optional): uncomment while iterating on content/deck.spec.yaml
 // (`npm run spec`) or content/deck.outline.md (`npm run live`). Promote stubs to locked files before ship.
 // import { specSlides } from "./generated/from-spec";
@@ -27,7 +28,7 @@ export const deck = defineDeck({
   slides: [
     title, agenda, bigNumber, comparison, architecture,
     layeredPlatform, c4Context, chatSequence,
-    timeline, code, results, quote, governance, lessons, closing, mediaFigure,
+    timeline, code, results, quote, governance, lessons, closing, mediaFigure, trendChart,
     // ...specSlides,
     // ...outlineSlides,
   ],

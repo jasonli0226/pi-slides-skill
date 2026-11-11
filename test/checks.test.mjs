@@ -87,6 +87,55 @@ slides:
   assert.match(r.out, /type must be a catalog kind/);
 });
 
+test("spec.mjs accepts the template EChart entry without warnings", () => {
+  const out = run(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  assert.match(out, /0 warning\(s\)/);
+  assert.match(readFileSync(join(template, "content/deck.spec.yaml"), "utf8"), /- EChart:/);
+});
+
+test("spec.mjs warns on EChart and SplineScene entries that break the guides", (t) => {
+  const specPath = join(template, "content/deck.spec.yaml");
+  const backup = readFileSync(specPath, "utf8");
+  // restore the YAML, then regenerate the stub module from it
+  t.after(() => { writeFileSync(specPath, backup); run(process.execPath, ["scripts/spec.mjs"], template); });
+  writeFileSync(specPath, `title: Charts
+theme: midnight
+approved: false
+slides:
+  - n: 1
+    id: share
+    type: results
+    title: Self-serve now brings in most new signups.
+    status: stub
+    components:
+      - EChart:
+          option:
+            xAxis: { type: category, data: [Q1, Q2] }
+            yAxis: [{ type: value, min: 5 }, { type: value }]
+            series:
+              - { name: A, type: bar, data: [1, 2] }
+              - { name: B, type: pie, data: [3, 4] }
+      - SplineScene:
+          src: https://example.com/scene
+  - n: 2
+    id: legacy-bars
+    type: results
+    title: The legacy chart shortcut still validates cleanly.
+    status: stub
+    chart: { unit: min, highlight: 1, data: [{ label: Before, value: 42 }, { label: After, value: 22 }] }
+`);
+  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  assert.equal(r.status, 0, r.out); // guide problems are warnings, not errors
+  for (const re of [/needs `cite`/, /needs a `label`/, /off the chart guide/, /no `highlight`/, /start at zero/, /two value axes/,
+    /SplineScene needs a local `poster`/, /my\.spline\.design/, /keep SplineScene to title/]) assert.match(r.out, re);
+  assert.doesNotMatch(r.out, /legacy-bars/);
+  // stubs render a placeholder card for the new components
+  run(process.execPath, ["scripts/spec.mjs"], template);
+  const gen = readFileSync(join(template, "src/slides/generated/from-spec.tsx"), "utf8");
+  assert.match(gen, /"EChart"/);
+  assert.match(gen, /"SplineScene"/);
+});
+
 test("spec.mjs style-pack overlay fills blanks but keeps explicit theme and layout", (t) => {
   const deck = scaffold(t, ["--title", "Our pilot cut triage time in half."]);
   symlinkSync(join(template, "node_modules"), join(deck, "node_modules"), "dir");

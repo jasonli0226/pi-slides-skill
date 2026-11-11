@@ -84,6 +84,15 @@
       "layout": "layout-stack",
       "status": "locked",
       "sources": []
+    },
+    {
+      "n": 9,
+      "id": "trend-chart",
+      "type": "results",
+      "title": "Trend charts accent the one series the title is about and mute the rest.",
+      "layout": "grid-2",
+      "status": "locked",
+      "sources": []
     }
   ]
 }

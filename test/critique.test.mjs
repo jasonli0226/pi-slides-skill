@@ -62,3 +62,28 @@ test("critique.mjs uses the level review.mjs writes, not the rule table", () => 
   assert.equal(r.status, 0, r.stderr + r.stdout);
   assert.match(r.stdout, /automated: 4 blocker\(s\), 1 warning\(s\)/);
 });
+
+test("critique.mjs labels chart and Spline findings", () => {
+  const deck = fs.mkdtempSync(path.join(os.tmpdir(), "critique-charts-"));
+  const review = path.join(deck, "review");
+  fs.mkdirSync(review);
+  fs.writeFileSync(
+    path.join(review, "report.md"),
+    [
+      "# Review",
+      "",
+      "## Slide 4 — trend",
+      "- **warn** [chart-baseline] A bar chart's value axis does not start at zero",
+      "- **warn** [chart-legibility] 3 series and no `highlight`",
+      "- **error** [spline-fallback] Spline scene has no local poster image",
+      "- **warn** [spline-placement] Spline scene on a \"content\" slide",
+      "",
+    ].join("\n"),
+  );
+  const r = spawnSync(process.execPath, [CLI, "--deck", deck], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.match(r.stdout, /automated: 1 blocker\(s\), 3 warning\(s\)/);
+  const out = fs.readFileSync(path.join(review, "critique.md"), "utf8");
+  for (const label of ["Bar chart baseline not zero", "Chart off the chart guide", "Spline scene without poster fallback", "Spline scene off a hero slide"])
+    assert.ok(out.includes(label), `critique.md is missing "${label}"`);
+});

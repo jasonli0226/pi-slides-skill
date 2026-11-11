@@ -14,6 +14,6 @@ export const specMeta = {
   "approved": false,
   "version": 1,
   "stubCount": 0,
-  "lockedCount": 8,
-  "count": 8
+  "lockedCount": 9,
+  "count": 9
 } as const;
