@@ -39,15 +39,16 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 
 - Transitions between slides are `fade` by default. Use `blur` for the title or quote slides and `zoom` for the closing; avoid mixing more than 2 or 3 kinds.
 - Inside a slide, use `Appear` for entrance (0.5 to 0.7s with an ease-out curve) and stagger groups by about 80ms. Use click steps to reveal an argument piece by piece, not to show off.
-- Give each slide at most one hero effect: a count-up `Stat` group (any number of `Stat`s together counts once), an `aurora` or `spotlight` background, or `.text-gradient` text outside a `Stat`. Slide transitions, plain `Appear` fades and a stagger don't count. Lint warns on `hero-effects` when a slide has two or more. If two effects compete, keep the one on the focal point and drop the other.
+- Give each slide at most one hero effect: a count-up `Stat` group (any number of `Stat`s together counts once), an `aurora` or `spotlight` background, `.text-gradient` text outside a `Stat`, or a `SplineScene`. Slide transitions, plain `Appear` fades and a stagger don't count. Lint warns on `hero-effects` when a slide has two or more. If two effects compete, keep the one on the focal point and drop the other.
 - Animate opacity and transform only. Don't loop animations on content; the background blobs are slow and subtle.
 - Reduced motion is respected automatically (`MotionConfig reducedMotion="user"`). Static, print and screenshot modes render the final state with no motion, so the slide must read well without animation.
 
 ## Data and evidence
 
-- Every `Stat`, `BarChart` and `Quote` needs `cite="sourceId"`, and the id must be in the slide's `sources`. Text claims get `<Cite id>`.
+- Every `Stat`, `BarChart`, `EChart` and `Quote` needs `cite="sourceId"`, and the id must be in the slide's `sources`. Text claims get `<Cite id>`.
 - Label units and timeframes, for example "median minutes, Q3 2026, n=1,240 tickets", using only what the source says.
 - Charts should start at zero and use 3 to 7 bars. Highlight the bar that the title talks about.
+- Pick the chart type from the story (trend → line, part-to-whole → stacked bar, correlation → scatter, flow → sankey, matrix → heatmap) with `references/chart-guide.md`. Keep `BarChart` for simple comparisons; use `EChart` for the rest. No pie, 3D or dual axes.
 - If a figure is an example or a projection that you were asked to show, mark it `illustrative` and say so in the notes.
 
 ## Media (photos, logos, screenshots)
@@ -55,6 +56,7 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 - Read `references/media-guide.md`. User assets live in `public/media/` and render through `<Figure>`.
 - Lucide for icons; Figure for anything the user supplied. Never invent logos or stock art.
 - Always set `alt` and `cite` or `illustrative`. Keep logos `fit="contain"`; check text-over-image by eye.
+- 3D: only a scene the user built in Spline, via `<SplineScene>` with a local poster, on a title, closing or hero slide (see the media guide).
 - Title openers: full-bleed **photo** via `SlideFrame backdrop` + `scrim="light"` (soft white left band, dark type, vivid image on the right). Use `heroLabel` for the bottom-left uppercase tag. Do not center; do not rely on heavy colored orbs when a photo is available. Real photos live in `public/media/` (rights-cleared only).
 
 ## Diagrams

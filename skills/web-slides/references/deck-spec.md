@@ -4,7 +4,7 @@ The design spec is the **approval artifact** between raw content and React slide
 
 Canonical file in a deck project: **`content/deck.spec.yaml`** (YAML). Schema below. Optional light companion: `content/deck.outline.md` (titles/bullets only) for `npm run live` — keep or sync from the spec with `npm run spec -- --sync-outline`.
 
-Full details for layout recipes: `layout-guide.md`. Slide types and component props: `slide-catalog.md`. Diagrams: `diagram-guide.md`. Media: `media-guide.md`.
+Full details for layout recipes: `layout-guide.md`. Slide types and component props: `slide-catalog.md`. Diagrams: `diagram-guide.md`. Charts: `chart-guide.md`. Media and 3D scenes: `media-guide.md`.
 
 ## Flow the agent must follow
 
@@ -57,7 +57,7 @@ Full details for layout recipes: `layout-guide.md`. Slide types and component pr
 | `body` | string[] | optional | Short text blocks / bullets (≤5; ≤~40 words total on stage) |
 | `media` | array | optional | `{ path, alt, cite?, illustrative?, decorative?, maxHeight? }` — paths under `public/` as URL paths e.g. `/media/logo.png` |
 | `components` | array | optional | Declared visuals (see below) |
-| `chart` | object | optional | Shortcut for one BarChart: `{ unit?, highlight?, data: [{label, value}] }` |
+| `chart` | object | optional | Shortcut for one BarChart: `{ unit?, highlight?, data: [{label, value}] }`. For any other chart, add an `EChart` entry to `components`. |
 | `code` | object | optional | `{ lang, filename?, focus?: string[], source: string }` |
 | `mermaid` | string | optional | Mermaid chart text (≤8 nodes) |
 | `timeline` | array | optional | `{ when, title, body? }[]` |
@@ -82,6 +82,20 @@ components:
       data:
         - { label: Before, value: 42 }
         - { label: After, value: 22 }
+  - EChart:                 # lines, stacks, distributions, scatter, sankey, heatmap — see chart-guide.md
+      cite: pilotReport       # or illustrative: true
+      highlight: Pilot team   # series name the title talks about
+      label: Median triage minutes per week, pilot vs other teams
+      option:                 # plain ECharts option; no colors (theme tokens apply)
+        xAxis: { type: category, data: [W1, W2, W3, W4] }
+        yAxis: { type: value, min: 0 }
+        series:
+          - { name: Pilot team, type: line, data: [42, 35, 27, 22] }
+          - { name: Other teams, type: line, data: [41, 40, 42, 39] }
+  - SplineScene:              # title / closing / hero slides only; scene URL + poster come from the user
+      src: https://my.spline.design/orbit-hero-1a2b3c4d/
+      poster: /media/orbit-hero-poster.jpg
+      alt: Rotating glass orbit around the product logo
   - Mermaid:
       chart: |
         flowchart LR
@@ -128,6 +142,8 @@ components:
 ```
 
 Unknown component names are validation **warnings** (forward-compatible). Missing `type` / `id` / `title` / `status` / `n` are **errors**.
+
+`npm run spec` also warns when an `EChart` entry breaks `chart-guide.md` (no `cite` / `illustrative` or `label`, pie or 3D, more than 5 series, several series without `highlight`, more than 12 bars, a bar axis not starting at zero, two value axes) and when a `SplineScene` has no `poster`, a URL that isn't `https://my.spline.design/…`, or sits on a slide type other than title / closing / section. Stubs render both as placeholder cards; build the real component when you promote the slide.
 
 ## Promote / merge (do not wipe polish)
 

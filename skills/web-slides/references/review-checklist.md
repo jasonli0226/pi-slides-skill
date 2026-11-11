@@ -7,7 +7,7 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 - [ ] `frame`: every slide uses SlideFrame.
 - [ ] `duplicate-id`: every slide id in `index.ts` is unique.
 - [ ] `title-sentence`: titles have 5 or more words and end with punctuation.
-- [ ] `source-missing` / `cite-unknown`: every Stat, BarChart, Quote and Figure cites a source listed on that slide (or is `illustrative`).
+- [ ] `source-missing` / `cite-unknown`: every Stat, BarChart, EChart, Quote and Figure cites a source listed on that slide (or is `illustrative`).
 - [ ] `img-alt` / `img-broken`: every `<img>` / `<Figure>` has meaningful alt text and loads successfully.
 - [ ] `leftover`: no lorem, TODO, TBD, FIXME, placeholder, `{{ }}`, undefined or NaN.
 - [ ] `emoji-icon`: no emoji.
@@ -15,6 +15,8 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 - [ ] `uneven-gaps` (warn) / `absolute-spam` (warn >2, error >5): sibling gutters and peer card heights stay even; body content is Grid/Flex, not a pile of absolutes (see `layout-guide.md`).
 - [ ] Title openers use the left hero + scrim recipe (full-bleed `backdrop` when an image is available); avoid centered headlines over busy plates.
 - [ ] `tiny-text`: nothing under 18px, including chart and diagram text.
+- [ ] `chart-type` / `chart-legibility` / `chart-baseline` / `chart-dual-axis` (warn): EChart follows `chart-guide.md`: no pie or 3D, ≤5 series with the title's series named in `highlight`, ≤12 bars per series, bar axes from zero, one value axis unless the notes justify two.
+- [ ] `spline-fallback` (error) / `spline-placement` (warn): every Spline scene goes through `<SplineScene>` with a local poster, on a title, closing or hero slide, one per slide.
 - [ ] `contrast`: solid-background text meets 4.5:1 (3:1 if large).
 - [ ] `render` / console: no Mermaid or Shiki errors and no runtime errors.
 - [ ] `npm run check:tokens` passes for the theme in use (including an imported `brand` theme). Every theme must define each checked token as 6-digit hex (`#rrggbb`); `#fff`, `rgb()` or a missing token fails.
@@ -37,7 +39,8 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 - [ ] Gradient text and text over glows are clearly readable, since the lint can't measure these.
 - [ ] Icons are all lucide with the same stroke, and the same concept uses the same icon everywhere.
 - [ ] User-provided media sits under `public/media/`, uses `<Figure>`, and is cited or marked illustrative (see `media-guide.md`). No invented logos.
-- [ ] Charts are labelled with units and timeframes, start at zero, and highlight the bar the title mentions.
+- [ ] Charts are labelled with units and timeframes, start at zero, and highlight the bar or series the title mentions. The chart type fits the story (`chart-guide.md`).
+- [ ] Any Spline scene's poster reads well on its own (it is what the PDF and offline talk show), and the user knows the live scene needs network.
 - [ ] Diagram type matches the scenario (see `diagram-guide.md`): Mermaid only if ≤8 nodes; swimlanes / C4 / sequence use the React components.
 - [ ] Layered maps: ≤6 layers, ≤5 cells per layer; C4: one zoom level, ≤8 boxes; Sequence: ≤6 actors, ≤8 messages.
 - [ ] Diagram labels aren't cut off; arrows are unidirectional and specifically labelled; no emoji; text ≥18px.
@@ -62,4 +65,4 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 
 - [ ] Click steps reveal in a logical order, and the step count matches `steps`.
 - [ ] No more than 2 or 3 transition kinds are used, and nothing animates in a loop over content.
-- [ ] `hero-effects` (warn): each slide has at most one hero effect: a count-up `Stat` group (any number of `Stat`s together counts once), an `aurora` or `spotlight` background, or `.text-gradient` text outside a `Stat`.
+- [ ] `hero-effects` (warn): each slide has at most one hero effect: a count-up `Stat` group (any number of `Stat`s together counts once), an `aurora` or `spotlight` background, `.text-gradient` text outside a `Stat`, or a `SplineScene`.

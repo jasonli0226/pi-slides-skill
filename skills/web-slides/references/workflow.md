@@ -44,7 +44,7 @@ cd ./decks/<slug> && npm install && npx playwright install chromium
 ```
 
 - If Chromium download is blocked, set `CHROME_PATH=/path/to/chrome`; the scripts fall back to `/usr/bin/google-chrome` or `/usr/bin/chromium`.
-- `--keep-examples` copies the 16 example slides; delete the ones you don't use, and their sources.
+- `--keep-examples` copies the 17 example slides; delete the ones you don't use, and their sources.
 
 ## 4b. Style import (optional)
 
@@ -77,7 +77,11 @@ If the user attaches or pastes an image, logo, screenshot or says "use this asse
 4. Do **not** invent logos or download unlicensed stock. If the asset is missing, ask.
 5. Re-run `npm run review` so screenshots and `img-alt` / `img-broken` lint cover the new media.
 
-Details and sizing: `media-guide.md`.
+Details and sizing: `media-guide.md`. If the user hands you a Spline scene URL for a 3D opener or closer, follow the "3D scenes (Spline)" section there and ask for a poster still.
+
+## 5c. Charts
+
+Pick the chart from the story with `chart-guide.md`: `BarChart` for 3–7 bar comparisons, `EChart` for trends, stacked part-to-whole, distributions, scatter, sankey and heatmaps. Put the data in the spec's `EChart` entry, cite it, name the accented series in `highlight`, and let the theme tokens color it.
 
 ## 6 and 7. Review loop
 
