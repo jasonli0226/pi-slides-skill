@@ -2,7 +2,7 @@
 // Rules: frame, title-sentence, source-missing, cite-unknown, leftover, emoji-icon,
 //        img-alt, img-broken, off-stage, footer-overlap, clipped, box-overlap, safe-margin,
 //        uneven-gaps, absolute-spam, tiny-text, contrast, hero-effects, chart-type, chart-legibility,
-//        chart-baseline, chart-dual-axis, spline-fallback, spline-placement.
+//        chart-baseline, chart-dual-axis.
 (() => {
   const issues = [];
   const add = (level, rule, msg, el) =>
@@ -136,7 +136,7 @@
   /* ---- box overlap + safe margins ---- */
   const unitSel = [
     ".card", ".stat", ".deck-figure", ".pill", ".quote", ".mermaid-box", ".code-window",
-    ".timeline-item", ".icon-list > *", ".echart", ".spline-scene", "table.compare", ".dg-layered", ".dg-c4", ".dg-seq", ".dg-flow",
+    ".timeline-item", ".icon-list > *", ".echart", "table.compare", ".dg-layered", ".dg-c4", ".dg-seq", ".dg-flow",
     ".layout-bento > *", ".layout-bento-4 > *", ".layout-compare > *", ".layout-kpi > *",
   ].join(", ");
   const units = [];
@@ -270,7 +270,6 @@
     stage.querySelector('[data-figure="stat"]') && "count-up Stat",
     stage.querySelector(".bg-aurora, .bg-spotlight") && "glow background",
     [...stage.querySelectorAll(".text-gradient")].some((el) => !el.closest(".stat")) && "gradient text",
-    stage.querySelector('[data-figure="spline"]') && "Spline 3D scene",
   ].filter(Boolean);
   if (heroes.length > 1)
     add("warn", "hero-effects", `${heroes.length} hero effects compete (${heroes.join(", ")}). Keep the one on the focal point.`);
@@ -289,20 +288,6 @@
     if (d.chartBarBaseline === "nonzero") add("warn", "chart-baseline", "A bar chart's value axis does not start at zero; bar length must encode the value.", el);
     if (d.chartDualAxis) add("warn", "chart-dual-axis", "Two value axes on one chart. Split into two charts unless the notes justify the dual axis.", el);
   });
-
-  /* ---- Spline 3D hero: local poster fallback + hero placement ---- */
-  const scenes = [...stage.querySelectorAll('[data-figure="spline"]')];
-  scenes.forEach((el) => {
-    const poster = el.querySelector("img[data-spline-poster]");
-    if (!poster || !(poster.getAttribute("src") || "").trim())
-      add("error", "spline-fallback", "Spline scene has no local poster image. Use <SplineScene poster=\"/media/…\"> so print, PDF, offline and reduced motion still show it.", el);
-  });
-  stage.querySelectorAll('iframe[src*="spline.design"]').forEach((el) => {
-    if (!el.closest('[data-figure="spline"]')) add("error", "spline-fallback", "Raw Spline iframe. Embed it through <SplineScene src poster> so it has a fallback.", el);
-  });
-  if (scenes.length > 1) add("warn", "spline-placement", `${scenes.length} Spline scenes on one slide; use one at most.`);
-  if (scenes.length && !["title", "closing", "section"].includes(kind) && frame?.dataset.hero !== "true" && !stage.querySelector(".layout-hero, .layout-hero-flip"))
-    add("warn", "spline-placement", `Spline scene on a "${kind}" slide. Keep 3D scenes to title, closing or hero slides.`);
 
   const errs = window.__DECK_ERRORS__ || [];
   errs.forEach((e) => add("error", "render", e));

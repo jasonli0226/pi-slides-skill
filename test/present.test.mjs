@@ -2,13 +2,12 @@
 // (`npx playwright install chromium` in the template, or CHROME_PATH).
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
-import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { scaffold, tryRun } from "./helpers.mjs";
 
 let deck, lib, server, url, browser;
-const SCENE = "https://my.spline.design/test-scene-0a1b2c/"; // stubbed with page.route; never fetched for real
 
 // The deck outlives every test in this file, so cleanup lives in the file-level after().
 const cleanups = [];
@@ -28,20 +27,10 @@ after(async () => {
   for (const fn of cleanups) fn();
 });
 
-/** Test-only slides: a Spline closing scene (no real scene ships with the template) and an uncited EChart. */
+/** Test-only slide: an EChart without a source. */
 function addFixtureSlides(dir) {
-  copyFileSync(join(dir, "public/media/title-hero-photo-placeholder.jpg"), join(dir, "public/media/scene-poster.jpg"));
-  writeFileSync(join(dir, "src/slides/90-fixtures.tsx"), `import { EChart, SlideFrame, SplineScene } from "../deck/components";
+  writeFileSync(join(dir, "src/slides/90-fixtures.tsx"), `import { EChart, SlideFrame } from "../deck/components";
 import { defineSlide } from "../deck/types";
-
-export const splineScene = defineSlide({
-  id: "spline-scene",
-  Component: () => (
-    <SlideFrame kind="closing" background="plain" title="A 3D scene closes the talk with one memorable image.">
-      <SplineScene src="${SCENE}" poster="/media/scene-poster.jpg" alt="Abstract 3D shapes" height={600} />
-    </SlideFrame>
-  ),
-});
 
 export const uncitedChart = defineSlide({
   id: "uncited-chart",
@@ -55,8 +44,8 @@ export const uncitedChart = defineSlide({
 `);
   const idx = join(dir, "src/slides/index.ts");
   writeFileSync(idx, readFileSync(idx, "utf8")
-    .replace('import { defineDeck } from "../deck/types";', 'import { defineDeck } from "../deck/types";\nimport { splineScene, uncitedChart } from "./90-fixtures";')
-    .replace("mediaFigure, trendChart,", "mediaFigure, trendChart, splineScene, uncitedChart,"));
+    .replace('import { defineDeck } from "../deck/types";', 'import { defineDeck } from "../deck/types";\nimport { uncitedChart } from "./90-fixtures";')
+    .replace("mediaFigure, trendChart,", "mediaFigure, trendChart, uncitedChart,"));
 }
 
 async function present(hash = "") {
@@ -190,78 +179,5 @@ test("chart lint warns on charts that break the chart guide", async () => {
   for (const re of [/warn chart-type .*pie/, /warn chart-legibility 6 series/, /warn chart-legibility .*no `highlight`/,
     /warn chart-legibility 20 bars/, /warn chart-baseline/, /warn chart-dual-axis/]) {
     assert.ok(msgs.some((m) => re.test(m)), `missing ${re} in ${JSON.stringify(msgs)}`);
-  }
-});
-
-test("Spline scene shows only its poster in static mode and counts as the hero effect", async () => {
-  const n = await slideNo("spline-scene");
-  const clean = await lintSlide(n);
-  assert.deepEqual(clean.issues, [], JSON.stringify(clean.issues));
-  const page = await browser.newPage({ viewport: { width: lib.W, height: lib.H } });
-  let hits = 0;
-  await page.route("https://my.spline.design/**", (route) => { hits++; return route.abort(); });
-  try {
-    await page.goto(`${url}?static&slide=${n}`);
-    await lib.waitReady(page);
-    assert.equal(await page.locator(".spline-scene iframe").count(), 0);
-    assert.equal(await page.locator(".spline-scene").getAttribute("data-spline-state"), "poster");
-    assert.ok(await page.locator("img[data-spline-poster]").evaluate((img) => img.complete && img.naturalWidth > 0));
-    assert.equal(hits, 0, "static mode must not contact Spline");
-  } finally {
-    await page.close();
-  }
-  const glow = await lintSlide(n, () => {
-    const bg = document.createElement("div");
-    bg.className = "bg bg-aurora";
-    document.querySelector(".stage").prepend(bg);
-  });
-  assert.match(heroIssues(glow)[0]?.msg ?? "", /glow background.*Spline 3D scene/);
-});
-
-test("Spline lint requires a poster and a hero slide", async () => {
-  const n = await slideNo("spline-scene");
-  const r = await lintSlide(n, () => {
-    document.querySelector("img[data-spline-poster]").remove();
-    document.querySelector("[data-title]").dataset.kind = "content";
-  });
-  assert.equal(ruleIssues(r, "spline-fallback")[0]?.level, "error", JSON.stringify(r.issues));
-  assert.equal(ruleIssues(r, "spline-placement")[0]?.level, "warn", JSON.stringify(r.issues));
-});
-
-async function presentScene(route, opts = {}) {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, ...opts });
-  const hits = { n: 0 };
-  await page.route("https://my.spline.design/**", (r) => { hits.n++; return route(r); });
-  await page.goto(`${url}#/${await slideNo("spline-scene")}`);
-  return { page, hits };
-}
-
-test("Spline scene goes live in present mode and hides the poster", async () => {
-  const { page } = await presentScene((r) => r.fulfill({ status: 200, contentType: "text/html", body: "<body>scene</body>" }));
-  try {
-    await page.waitForSelector('[data-spline-state="live"]', { timeout: 15_000 });
-    assert.equal(await page.locator(".spline-scene iframe").getAttribute("src"), SCENE);
-    assert.equal(await page.locator(".spline-scene iframe").getAttribute("sandbox"), "allow-scripts allow-same-origin");
-  } finally {
-    await page.close();
-  }
-});
-
-test("Spline scene keeps the poster when the network fails or motion is reduced", async () => {
-  const blocked = await presentScene((r) => r.abort());
-  try {
-    await blocked.page.waitForSelector('[data-spline-state="failed"]', { timeout: 15_000 });
-    assert.equal(await blocked.page.locator(".spline-scene iframe").count(), 0);
-  } finally {
-    await blocked.page.close();
-  }
-  const reduced = await presentScene((r) => r.abort(), { reducedMotion: "reduce" });
-  try {
-    await reduced.page.waitForSelector(".spline-scene");
-    await reduced.page.waitForTimeout(500);
-    assert.equal(await reduced.page.locator(".spline-scene").getAttribute("data-spline-state"), "poster");
-    assert.equal(reduced.hits.n, 0, "reduced motion must not contact Spline");
-  } finally {
-    await reduced.page.close();
   }
 });

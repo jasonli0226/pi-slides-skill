@@ -42,7 +42,7 @@ const STATUSES = new Set(["stub", "locked"]);
 const KNOWN_COMPONENTS = new Set([
   "Stat", "BarChart", "Mermaid", "LayeredArchitecture", "FlowSteps", "Sequence",
   "C4Container", "Figure", "Code", "Timeline", "Pill", "Card", "IconList", "Quote",
-  "Icon", "Stagger", "Appear", "Gradient", "Cite", "DiagramLegend", "EChart", "SplineScene",
+  "Icon", "Stagger", "Appear", "Gradient", "Cite", "DiagramLegend", "EChart",
 ]);
 const arr = (v) => (v == null ? [] : Array.isArray(v) ? v : [v]);
 
@@ -168,12 +168,6 @@ function validate(raw) {
         if (keys.length !== 1) warnings.push(`${loc} (${s.id}): components entry should have exactly one key`);
         else if (!KNOWN_COMPONENTS.has(keys[0])) warnings.push(`${loc} (${s.id}): unknown component "${keys[0]}"`);
         else if (keys[0] === "EChart") for (const w of echartWarnings(c.EChart)) warnings.push(`${loc} (${s.id}): ${w}`);
-        else if (keys[0] === "SplineScene") {
-          const sp = c.SplineScene || {};
-          if (!sp.poster) warnings.push(`${loc} (${s.id}): SplineScene needs a local \`poster\` image under /media/`);
-          if (!/^https:\/\/my\.spline\.design\//.test(String(sp.src || ""))) warnings.push(`${loc} (${s.id}): SplineScene src must be the scene's public https://my.spline.design/… URL from the user`);
-          if (!["title", "closing", "section"].includes(s.type)) warnings.push(`${loc} (${s.id}): keep SplineScene to title, closing or hero slides`);
-        }
       }
     }
     if (s.status === "locked") {
@@ -272,7 +266,6 @@ function renderComponentPlaceholder(entry, i) {
         </div>`;
     case "BarChart":
     case "EChart":
-    case "SplineScene":
     case "Mermaid":
     case "LayeredArchitecture":
     case "FlowSteps":

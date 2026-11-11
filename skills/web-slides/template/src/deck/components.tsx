@@ -478,6 +478,3 @@ export {
 
 /* Charts beyond BarChart (lazy ECharts; see references/chart-guide.md). */
 export { EChart, chartFacts, type ChartFacts } from "./echart";
-
-/* Optional 3D hero from a user-authored Spline scene (iframe + local poster; see media-guide.md). */
-export { SplineScene } from "./spline";

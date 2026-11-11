@@ -4,7 +4,7 @@ The design spec is the **approval artifact** between raw content and React slide
 
 Canonical file in a deck project: **`content/deck.spec.yaml`** (YAML). Schema below. Optional light companion: `content/deck.outline.md` (titles/bullets only) for `npm run live` — keep or sync from the spec with `npm run spec -- --sync-outline`.
 
-Full details for layout recipes: `layout-guide.md`. Slide types and component props: `slide-catalog.md`. Diagrams: `diagram-guide.md`. Charts: `chart-guide.md`. Media and 3D scenes: `media-guide.md`.
+Full details for layout recipes: `layout-guide.md`. Slide types and component props: `slide-catalog.md`. Diagrams: `diagram-guide.md`. Charts: `chart-guide.md`. Media: `media-guide.md`.
 
 ## Flow the agent must follow
 
@@ -92,10 +92,6 @@ components:
         series:
           - { name: Pilot team, type: line, data: [42, 35, 27, 22] }
           - { name: Other teams, type: line, data: [41, 40, 42, 39] }
-  - SplineScene:              # title / closing / hero slides only; scene URL + poster come from the user
-      src: https://my.spline.design/orbit-hero-1a2b3c4d/
-      poster: /media/orbit-hero-poster.jpg
-      alt: Rotating glass orbit around the product logo
   - Mermaid:
       chart: |
         flowchart LR
@@ -143,7 +139,7 @@ components:
 
 Unknown component names are validation **warnings** (forward-compatible). Missing `type` / `id` / `title` / `status` / `n` are **errors**.
 
-`npm run spec` also warns when an `EChart` entry breaks `chart-guide.md` (no `cite` / `illustrative` or `label`, pie or 3D, more than 5 series, several series without `highlight`, more than 12 bars, a bar axis not starting at zero, two value axes) and when a `SplineScene` has no `poster`, a URL that isn't `https://my.spline.design/…`, or sits on a slide type other than title / closing / section. Stubs render both as placeholder cards; build the real component when you promote the slide.
+`npm run spec` also warns when an `EChart` entry breaks `chart-guide.md` (no `cite` / `illustrative` or `label`, pie or 3D, more than 5 series, several series without `highlight`, more than 12 bars, a bar axis not starting at zero, two value axes). Stubs render it as a placeholder card; build the real component when you promote the slide.
 
 ## Promote / merge (do not wipe polish)
 

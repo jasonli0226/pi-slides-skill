@@ -8,7 +8,6 @@ Use with `review/contact-sheet.png` and each `review/slide-NN.png` open.
 - Title not a takeaway sentence (or lint `title-sentence` error)
 - Unreadable type (contrast fail, tiny text, light text on light scrim without checking)
 - Missing sources on figure slides (including `EChart`); leftovers (lorem / TODO)
-- Spline scene without a local poster (lint `spline-fallback`)
 - Title opener centered on a busy photo without left scrim
 
 ## Warnings
@@ -17,9 +16,8 @@ Use with `review/contact-sheet.png` and each `review/slide-NN.png` open.
 - Uneven card gaps / heights in a row
 - Absolute-spam layout instead of `.layout-*`
 - Accent color used on more than one focal
-- More than one hero effect on a slide (lint `hero-effects`: count-up `Stat` group, `aurora`/`spotlight` background, gradient text outside a `Stat`, `SplineScene`)
+- More than one hero effect on a slide (lint `hero-effects`: count-up `Stat` group, `aurora`/`spotlight` background, gradient text outside a `Stat`)
 - Chart off `chart-guide.md` (lint `chart-type`, `chart-legibility`, `chart-baseline`, `chart-dual-axis`): pie/3D, too many series, no highlighted series, truncated bar axis, dual axes
-- Spline scene off a title/closing/hero slide (lint `spline-placement`)
 - Spec type/kind mismatch vs approved YAML
 
 ## Notes

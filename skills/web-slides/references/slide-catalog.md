@@ -41,8 +41,6 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
   - Keep it to 3 to 7 bars. Give it at least about 60% of the width or the lint will flag tiny text. For lines, stacks, distributions, scatter, flows or matrices use `EChart` (`chart-guide.md`).
 - **EChart** `{ option: EChartsOption, label, highlight?: seriesName, height?, caption?, cite | illustrative }`
   - Lazy-loaded ECharts (SVG) for lines, stacked bars, histograms/boxplots, scatter, heatmaps and sankey. Theme colors and fonts come from the tokens; never put colors in `option`. Read `chart-guide.md` first. Example `17-trend-chart.tsx`.
-- **SplineScene** `{ src: "https://my.spline.design/…/", poster: "/media/…", alt | decorative, height?, timeout? }`
-  - Optional 3D hero from a scene the user built in Spline. Local poster in static/print/offline/reduced motion. Title, closing or hero slides only; counts as the hero effect. See `media-guide.md`.
 - **Mermaid** `{ chart: string, height? }`
   - Colors come from the theme tokens. Keep it to 8 nodes or fewer, use `<br/>` for 2-line labels, and use `-.->` for feedback loops.
 - **Code** `{ code, lang, filename?, focus?: string[], at? }`

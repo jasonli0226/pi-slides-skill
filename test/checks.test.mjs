@@ -93,7 +93,7 @@ test("spec.mjs accepts the template EChart entry without warnings", () => {
   assert.match(readFileSync(join(template, "content/deck.spec.yaml"), "utf8"), /- EChart:/);
 });
 
-test("spec.mjs warns on EChart and SplineScene entries that break the guides", (t) => {
+test("spec.mjs warns on EChart entries that break the guides", (t) => {
   const specPath = join(template, "content/deck.spec.yaml");
   const backup = readFileSync(specPath, "utf8");
   // restore the YAML, then regenerate the stub module from it
@@ -115,8 +115,6 @@ slides:
             series:
               - { name: A, type: bar, data: [1, 2] }
               - { name: B, type: pie, data: [3, 4] }
-      - SplineScene:
-          src: https://example.com/scene
   - n: 2
     id: legacy-bars
     type: results
@@ -126,14 +124,12 @@ slides:
 `);
   const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], template);
   assert.equal(r.status, 0, r.out); // guide problems are warnings, not errors
-  for (const re of [/needs `cite`/, /needs a `label`/, /off the chart guide/, /no `highlight`/, /start at zero/, /two value axes/,
-    /SplineScene needs a local `poster`/, /my\.spline\.design/, /keep SplineScene to title/]) assert.match(r.out, re);
+  for (const re of [/needs `cite`/, /needs a `label`/, /off the chart guide/, /no `highlight`/, /start at zero/, /two value axes/]) assert.match(r.out, re);
   assert.doesNotMatch(r.out, /legacy-bars/);
-  // stubs render a placeholder card for the new components
+  // stubs render a placeholder card for EChart
   run(process.execPath, ["scripts/spec.mjs"], template);
   const gen = readFileSync(join(template, "src/slides/generated/from-spec.tsx"), "utf8");
   assert.match(gen, /"EChart"/);
-  assert.match(gen, /"SplineScene"/);
 });
 
 test("spec.mjs style-pack overlay fills blanks but keeps explicit theme and layout", (t) => {

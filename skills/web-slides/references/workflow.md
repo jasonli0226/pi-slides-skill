@@ -77,7 +77,7 @@ If the user attaches or pastes an image, logo, screenshot or says "use this asse
 4. Do **not** invent logos or download unlicensed stock. If the asset is missing, ask.
 5. Re-run `npm run review` so screenshots and `img-alt` / `img-broken` lint cover the new media.
 
-Details and sizing: `media-guide.md`. If the user hands you a Spline scene URL for a 3D opener or closer, follow the "3D scenes (Spline)" section there and ask for a poster still.
+Details and sizing: `media-guide.md`.
 
 ## 5c. Charts
 

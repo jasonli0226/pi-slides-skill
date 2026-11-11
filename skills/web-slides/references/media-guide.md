@@ -77,7 +77,6 @@ Never mix emoji or a second icon pack with Lucide.
 - [ ] Image is fully on-stage; caption does not hit the footer.
 - [ ] No invented logos or unlicensed stock.
 - [ ] Contact-sheet PNG shows the real asset (not a broken-image icon).
-- [ ] Any `<SplineScene>` came from the user, sits on a title / closing / hero slide, and has a local `poster` that reads well on its own.
 
 ## Anti-patterns
 
@@ -110,38 +109,3 @@ Opening slides prefer a **full-bleed photograph** on `SlideFrame`, not a framed 
 - Template placeholder: `title-hero-photo-placeholder.jpg` (synthetic, not a real photo). Swap it for the talk's real plate.
 - Ornamental SVG meshes (`title-hero-plate.svg`, `illustrative-mesh.svg`) are fallbacks when no photo exists — prefer a photo for the airport-style opener.
 
-## 3D scenes (Spline, optional)
-
-`<SplineScene>` embeds a 3D scene **the user built in the Spline editor**. You can't author or edit a scene; you can only embed one the user hands you. Never search for or reuse someone else's public scene.
-
-**Use it only when the user gives you a scene and asks for 3D**, and only on a title, closing or hero slide. It counts as that slide's one hero effect (lint `hero-effects`), so drop any `aurora` / `spotlight` background or gradient text on the same slide.
-
-What you need from the user:
-
-1. The scene's **Public URL**: in Spline, Export → Public URL → copy the `https://my.spline.design/<name>-<id>/` link [S1]. Only that form is accepted.
-2. A **poster**: a still image of the scene (a screenshot of the editor's play view is fine), saved as `public/media/<kebab-name>.png|jpg`. If they don't send one, ask; don't ship a scene without it.
-
-```tsx
-import { SlideFrame, SplineScene } from "../deck/components";
-
-<SlideFrame kind="closing" background="plain" title="…">
-  <SplineScene
-    src="https://my.spline.design/orbit-hero-1a2b3c4d/"
-    poster="/media/orbit-hero-poster.jpg"
-    alt="Rotating glass orbit around the product logo"   // or decorative
-    height={620}
-  />
-</SlideFrame>
-```
-
-How it behaves:
-
-- **Poster first, always.** The local poster renders immediately. The live scene loads in a sandboxed iframe and the poster fades out only once the scene page has loaded.
-- **Poster only** in `?static` screenshots, `?print` / PDF export, the overview grid, with `prefers-reduced-motion: reduce`, when the browser is offline, when the URL can't be reached, and after `timeout` (12 s by default). So review, PDF and an offline talk all show the poster.
-- **It fetches from Spline's servers** in present mode. Tell the user the talk needs network for the live scene, and that the scene's look comes from their Spline file (theme tokens don't reach inside it).
-- The iframe ignores pointer and keyboard input (`pointer-events: none`, `tabIndex=-1`), so clicks and arrow keys keep driving the deck. Interactive orbit or hover events in the scene won't fire; use Spline's turntable or autoplay animation for motion.
-- Why an iframe and not `@splinetool/react-spline`: the iframe needs no npm package (the runtime is tens of MB unpacked and would sit in every deck's install), works with any React version, and keeps Spline's code in its own origin. The cost is no scene API (no variables or events from React) [S2].
-
-Lint: `spline-fallback` (error) when a scene has no poster or a raw Spline iframe skips `<SplineScene>`; `spline-placement` (warn) for a scene off title / closing / hero slides, or more than one per slide; `img-broken` when the poster file is missing.
-
-Sources: [S1] Spline docs, Exporting as Public URLs — https://docs.spline.design/exporting-your-scene/web/exporting-as-public-ur-ls · [S2] Spline docs, Exporting as Spline Viewer (Public URL vs Viewer) — https://docs.spline.design/exporting-your-scene/web/exporting-as-spline-viewer

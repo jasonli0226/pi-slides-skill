@@ -55,8 +55,6 @@ const ruleHints = [
   [/hero-effects/i, "warn", "Competing hero effects"],
   [/chart-type|chart-legibility|chart-dual-axis/i, "warn", "Chart off the chart guide"],
   [/chart-baseline/i, "warn", "Bar chart baseline not zero"],
-  [/spline-fallback/i, "blocker", "Spline scene without poster fallback"],
-  [/spline-placement/i, "warn", "Spline scene off a hero slide"],
   [/spec-mismatch/i, "warn", "Spec mismatch"],
   [/img-alt|img-broken/i, "blocker", "Image alt/src issue"],
   [/source-missing|cite-unknown/i, "blocker", "Missing or unknown citation"],
