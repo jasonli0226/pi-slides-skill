@@ -13,6 +13,7 @@ let deck, lib, server, url, browser;
 const cleanups = [];
 before(async () => {
   deck = scaffold({ after: (fn) => cleanups.push(fn) }, ["--keep-examples"], { install: true });
+  addFixtureSlides(deck);
   process.chdir(deck); // lib.mjs builds and serves the deck in the cwd
   lib = await import(pathToFileURL(join(deck, "scripts/lib.mjs")));
   ({ server, url } = await lib.buildAndServe());
@@ -25,6 +26,27 @@ after(async () => {
   process.chdir("/");
   for (const fn of cleanups) fn();
 });
+
+/** Test-only slide: an EChart without a source. */
+function addFixtureSlides(dir) {
+  writeFileSync(join(dir, "src/slides/90-fixtures.tsx"), `import { EChart, SlideFrame } from "../deck/components";
+import { defineSlide } from "../deck/types";
+
+export const uncitedChart = defineSlide({
+  id: "uncited-chart",
+  Component: () => (
+    <SlideFrame kind="results" title="An EChart without a source fails the citation lint.">
+      <EChart label="Uncited line" height={500}
+        option={{ xAxis: { type: "category", data: ["A", "B", "C"] }, series: [{ name: "S", type: "line", data: [1, 2, 3] }] }} />
+    </SlideFrame>
+  ),
+});
+`);
+  const idx = join(dir, "src/slides/index.ts");
+  writeFileSync(idx, readFileSync(idx, "utf8")
+    .replace('import { defineDeck } from "../deck/types";', 'import { defineDeck } from "../deck/types";\nimport { uncitedChart } from "./90-fixtures";')
+    .replace("mediaFigure, trendChart,", "mediaFigure, trendChart, uncitedChart,"));
+}
 
 async function present(hash = "") {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -119,4 +141,43 @@ test("hero-effects warns when a Stat slide also gets a glow background", async (
   assert.equal(found.length, 1, JSON.stringify(r.issues));
   assert.equal(found[0].level, "warn");
   assert.match(found[0].msg, /count-up Stat.*glow background/);
+});
+
+const slideNo = async (id) => (await slideList()).findIndex((s) => s.id === id) + 1;
+const ruleIssues = (r, rule) => r.issues.filter((i) => i.rule.startsWith(rule));
+
+test("the EChart example renders real SVG text and passes the chart lint", async () => {
+  const n = await slideNo("trend-chart");
+  const page = await browser.newPage({ viewport: { width: lib.W, height: lib.H }, reducedMotion: "reduce" });
+  try {
+    await page.goto(`${url}?static&slide=${n}`);
+    await lib.waitReady(page);
+    assert.ok(await page.locator('[data-figure="echart"] svg text').count() > 10, "ECharts should draw SVG text");
+    assert.equal(await page.locator('[data-figure="echart"] .illustrative').count(), 1);
+    const r = await page.evaluate(readFileSync(join(deck, "scripts/lint-in-page.js"), "utf8"));
+    assert.deepEqual(r.issues, [], JSON.stringify(r.issues));
+  } finally {
+    await page.close();
+  }
+});
+
+test("an EChart without cite fails source-missing", async () => {
+  const r = await lintSlide(await slideNo("uncited-chart"));
+  const found = ruleIssues(r, "source-missing");
+  assert.equal(found.length, 1, JSON.stringify(r.issues));
+  assert.equal(found[0].level, "error");
+  assert.deepEqual(ruleIssues(r, "chart-"), [], "one series needs no highlight");
+});
+
+test("chart lint warns on charts that break the chart guide", async () => {
+  const r = await lintSlide(await slideNo("trend-chart"), () => {
+    const el = document.querySelector('[data-figure="echart"]');
+    Object.assign(el.dataset, { chartTypes: "bar,pie", chartSeries: "6", chartPoints: "20", chartHighlight: "none",
+      chartBarBaseline: "nonzero", chartDualAxis: "true" });
+  });
+  const msgs = r.issues.filter((i) => i.rule.startsWith("chart-")).map((i) => `${i.level} ${i.rule} ${i.msg}`);
+  for (const re of [/warn chart-type .*pie/, /warn chart-legibility 6 series/, /warn chart-legibility .*no `highlight`/,
+    /warn chart-legibility 20 bars/, /warn chart-baseline/, /warn chart-dual-axis/]) {
+    assert.ok(msgs.some((m) => re.test(m)), `missing ${re} in ${JSON.stringify(msgs)}`);
+  }
 });

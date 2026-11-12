@@ -21,7 +21,9 @@ Light theme, with images researched from the web and added motion:
   - Contrast is checked against WCAG 2.2 AA, both at the token level and in the rendered DOM.
   - The lint fails on emoji icons, template leftovers (lorem, TODO, `{{ }}`, NaN), overflow and text under 18px.
   - The lint warns when a slide stacks more than one hero effect (count-up Stat, glow background, gradient text).
-- **13 slide types with working examples:** title, agenda, big number, architecture (Mermaid **or** React swimlanes / C4 / sequence), comparison, timeline, code walkthrough (Shiki with per-step focus), quote, results (count-up stat + animated bars), governance, lessons, closing and section.
+  - Charts are checked against the chart guide: no pie or 3D, at most 5 series with the title's series highlighted, bar axes from zero, no unjustified dual axes.
+- **13 slide types with working examples:** title, agenda, big number, architecture (Mermaid **or** React swimlanes / C4 / sequence), comparison, timeline, code walkthrough (Shiki with per-step focus), quote, results (count-up stat + animated bars, or an EChart trend), governance, lessons, closing and section.
+- **Charts:** `BarChart` for simple comparisons, plus `<EChart>` for trends, stacked part-to-whole, distributions, scatter, sankey and heatmaps. ECharts is tree-shaken and loaded only on slides that use it, renders as SVG (selectable text in the PDF), and takes its colors and fonts from the theme tokens. `skills/web-slides/references/chart-guide.md` maps the story to the chart type.
 - **Diagram guide:** `skills/web-slides/references/diagram-guide.md` teaches when to use Mermaid (≤8 nodes) vs `LayeredArchitecture`, `FlowSteps`, `Sequence`, `C4Container` (React + CSS, no heavy graph library).
 - **Layout guide:** `skills/web-slides/references/layout-guide.md` — presentation Flexbox + Grid recipes (KPI strip, compare, hero+chart), overflow rules; cites CSS Tricks Flexbox/Grid.
 - **Design spec:** `skills/web-slides/references/deck-spec.md` — YAML middle layer (slide types, layouts, components, chart data, notes) with approval gate and promote/merge rules; `npm run spec` validates and generates stubs.
@@ -155,6 +157,7 @@ We compared Slidev, reveal.js, Spectacle and a custom React + Motion scaffold (d
 ## Known limits
 
 - The presenter view is an in-page notes overlay, not a separate presenter window.
+- Chart text inside `EChart` is SVG, so the contrast lint skips it like other diagram text; the colors come from theme tokens that `check:tokens` covers.
 - Automatic contrast checking covers text on solid or semi-transparent backgrounds. Gradient text and text over glows or images must be checked by eye (it's on the checklist).
 - There is no editable PPTX output; hand-off is PDF and PNG.
 - The vector PDF drops the grain overlay and renders gradient text in the solid accent color. Use `--raster` for a pixel-exact copy.

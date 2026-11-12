@@ -18,6 +18,7 @@ Every type has a working example in `template/src/slides/` (in the skill dir). C
 | `closing` | The ask or next step, plus references | `12-closing.tsx` | `background="aurora"`, references from `allSources` |
 | `section` | Divider between parts (title may be short) | (use `title` pattern) | `SlideFrame kind="section" center` |
 | `content` | Anything else; media showcase | `16-media-figure.tsx` | `.grid-2/3/4`, `Card`, `IconList`, `Figure` |
+| `results` (trend) | Change over time, part-to-whole, distribution, correlation, flow, matrix | `17-trend-chart.tsx` | `EChart highlight cite` — see `chart-guide.md` |
 
 A technical deck must include `architecture`, `results`, `governance` and `lessons`.
 
@@ -37,7 +38,9 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
 - **Stat** `{ value: number, decimals?, prefix?, suffix?, label, cite | illustrative, size?: "md"|"lg"|"xl" }`
   - Counts up live and shows its final value in static or print mode.
 - **BarChart** `{ data: {label, value}[], unit?, decimals?, max?, highlight?: index, cite | illustrative }`
-  - Keep it to 3 to 7 bars. Give it at least about 60% of the width or the lint will flag tiny text.
+  - Keep it to 3 to 7 bars. Give it at least about 60% of the width or the lint will flag tiny text. For lines, stacks, distributions, scatter, flows or matrices use `EChart` (`chart-guide.md`).
+- **EChart** `{ option: EChartsOption, label, highlight?: seriesName, height?, caption?, cite | illustrative }`
+  - Lazy-loaded ECharts (SVG) for lines, stacked bars, histograms/boxplots, scatter, heatmaps and sankey. Theme colors and fonts come from the tokens; never put colors in `option`. Read `chart-guide.md` first. Example `17-trend-chart.tsx`.
 - **Mermaid** `{ chart: string, height? }`
   - Colors come from the theme tokens. Keep it to 8 nodes or fewer, use `<br/>` for 2-line labels, and use `-.->` for feedback loops.
 - **Code** `{ code, lang, filename?, focus?: string[], at? }`

@@ -1,7 +1,8 @@
 // Runs inside the browser on one static slide. Returns a list of issues.
 // Rules: frame, title-sentence, source-missing, cite-unknown, leftover, emoji-icon,
 //        img-alt, img-broken, off-stage, footer-overlap, clipped, box-overlap, safe-margin,
-//        uneven-gaps, absolute-spam, tiny-text, contrast, hero-effects.
+//        uneven-gaps, absolute-spam, tiny-text, contrast, hero-effects, chart-type, chart-legibility,
+//        chart-baseline, chart-dual-axis.
 (() => {
   const issues = [];
   const add = (level, rule, msg, el) =>
@@ -23,7 +24,7 @@
 
   /* ---- sources ---- */
   stage.querySelectorAll("[data-uncited]").forEach((el) =>
-    add("error", "source-missing", "A Stat/BarChart/Quote/Figure has no `cite` (or `illustrative`).", el.parentElement));
+    add("error", "source-missing", "A Stat/BarChart/EChart/Quote/Figure has no `cite` (or `illustrative`).", el.parentElement));
   stage.querySelectorAll("[data-cite-missing]").forEach((el) =>
     add("error", "cite-unknown", `<Cite id="${el.dataset.cite}"> is not in this slide's sources.`, el.parentElement));
 
@@ -135,7 +136,7 @@
   /* ---- box overlap + safe margins ---- */
   const unitSel = [
     ".card", ".stat", ".deck-figure", ".pill", ".quote", ".mermaid-box", ".code-window",
-    ".timeline-item", ".icon-list > *", "table.compare", ".dg-layered", ".dg-c4", ".dg-seq", ".dg-flow",
+    ".timeline-item", ".icon-list > *", ".echart", "table.compare", ".dg-layered", ".dg-c4", ".dg-seq", ".dg-flow",
     ".layout-bento > *", ".layout-bento-4 > *", ".layout-compare > *", ".layout-kpi > *",
   ].join(", ");
   const units = [];
@@ -272,6 +273,21 @@
   ].filter(Boolean);
   if (heroes.length > 1)
     add("warn", "hero-effects", `${heroes.length} hero effects compete (${heroes.join(", ")}). Keep the one on the focal point.`);
+
+  /* ---- charts (EChart): cheap checks from references/chart-guide.md ---- */
+  stage.querySelectorAll('[data-figure="echart"]').forEach((el) => {
+    const d = el.dataset;
+    const types = (d.chartTypes || "").split(",").filter(Boolean);
+    const series = Number(d.chartSeries || 0), points = Number(d.chartPoints || 0);
+    const odd = types.filter((t) => t === "pie" || /3D$/.test(t) || t === "radar" || t === "gauge");
+    if (odd.length) add("warn", "chart-type", `Chart type ${odd.join(", ")} is off the chart guide. Use a stacked bar for part-to-whole and flat 2D charts.`, el);
+    if (series > 5) add("warn", "chart-legibility", `${series} series on one chart; keep it to 5 or fewer (one highlighted, the rest muted context).`, el);
+    if (d.chartHighlight === "none") add("warn", "chart-legibility", `${series} series and no \`highlight\`. Name the series the title talks about.`, el);
+    if (d.chartHighlight === "unknown") add("warn", "chart-legibility", "`highlight` names no series in the chart.", el);
+    if (types.includes("bar") && points > 12) add("warn", "chart-legibility", `${points} bars per series; keep bar charts to 12 or fewer categories (aggregate, or use a line).`, el);
+    if (d.chartBarBaseline === "nonzero") add("warn", "chart-baseline", "A bar chart's value axis does not start at zero; bar length must encode the value.", el);
+    if (d.chartDualAxis) add("warn", "chart-dual-axis", "Two value axes on one chart. Split into two charts unless the notes justify the dual axis.", el);
+  });
 
   const errs = window.__DECK_ERRORS__ || [];
   errs.forEach((e) => add("error", "render", e));

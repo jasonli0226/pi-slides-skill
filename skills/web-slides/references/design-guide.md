@@ -45,9 +45,10 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 
 ## Data and evidence
 
-- Every `Stat`, `BarChart` and `Quote` needs `cite="sourceId"`, and the id must be in the slide's `sources`. Text claims get `<Cite id>`.
+- Every `Stat`, `BarChart`, `EChart` and `Quote` needs `cite="sourceId"`, and the id must be in the slide's `sources`. Text claims get `<Cite id>`.
 - Label units and timeframes, for example "median minutes, Q3 2026, n=1,240 tickets", using only what the source says.
 - Charts should start at zero and use 3 to 7 bars. Highlight the bar that the title talks about.
+- Pick the chart type from the story (trend → line, part-to-whole → stacked bar, correlation → scatter, flow → sankey, matrix → heatmap) with `references/chart-guide.md`. Keep `BarChart` for simple comparisons; use `EChart` for the rest. No pie, 3D or dual axes.
 - If a figure is an example or a projection that you were asked to show, mark it `illustrative` and say so in the notes.
 
 ## Media (photos, logos, screenshots)

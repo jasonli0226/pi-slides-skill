@@ -53,6 +53,8 @@ const ruleHints = [
   [/absolute-spam/i, "warn", "Absolute positioning spam"],
   [/uneven-gaps/i, "warn", "Uneven gaps"],
   [/hero-effects/i, "warn", "Competing hero effects"],
+  [/chart-type|chart-legibility|chart-dual-axis/i, "warn", "Chart off the chart guide"],
+  [/chart-baseline/i, "warn", "Bar chart baseline not zero"],
   [/spec-mismatch/i, "warn", "Spec mismatch"],
   [/img-alt|img-broken/i, "blocker", "Image alt/src issue"],
   [/source-missing|cite-unknown/i, "blocker", "Missing or unknown citation"],

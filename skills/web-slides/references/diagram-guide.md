@@ -1,6 +1,6 @@
 # Diagram guide
 
-How to choose a diagram for a slide, and how to draw it with React + CSS (or Mermaid for small flows). Read this before you invent a free-form SVG.
+How to choose a diagram for a slide, and how to draw it with React + CSS (or Mermaid for small flows). Read this before you invent a free-form SVG. For data charts (trends, stacks, scatter, sankey, heatmaps) read `chart-guide.md` instead.
 
 ## Principles (with sources)
 

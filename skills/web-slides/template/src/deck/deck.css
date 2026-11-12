@@ -271,6 +271,9 @@ html[data-mode="print"] * { animation-play-state: paused !important; }
 .chart-bar { fill: var(--text-muted); }
 .chart-bar-hi { fill: var(--accent); }
 .chart-cite { text-align: right; }
+.echart { margin: 0; width: 100%; }
+.echart-canvas { width: 100%; }
+.echart-caption { font: 400 var(--fs-caption)/1.4 var(--font-body); color: var(--text-muted); margin-right: var(--space-2); }
 
 .mermaid-box { width: 100%; display: flex; align-items: center; justify-content: center; }
 .mermaid-box svg { width: 100%; height: 100%; max-width: 100% !important; }
