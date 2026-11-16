@@ -45,7 +45,7 @@ How to choose and draw a chart for a slide. Read this before you add a `BarChart
 ```tsx
 import { EChart, SlideFrame } from "../deck/components";
 
-<EChart cite="opsReport" highlight="EU region" height={520}
+<EChart cite="opsReport" highlight="EU region"
   label="Weekly incidents per region, Jan–Jun 2026; EU falls from 14 to 2."
   caption="Incidents per week"
   option={{
@@ -62,7 +62,7 @@ import { EChart, SlideFrame } from "../deck/components";
 - `highlight` = the `name` of the series the title talks about. It gets the accent and a thicker line; the others are muted. Multi-line charts get direct end labels instead of a legend; stacks and multi-series bars get a legend at the top.
 - Keep series names short (about 14 characters or fewer) so the end labels fit.
 - `label` describes the chart for screen readers (like `Figure alt`). `caption` names units and timeframe.
-- Size: give it about 60% of the stage width or more, and a `height` of 440–600. Lint fails chart text under 18px.
+- Size: place it in a stretching column (`.layout-hero` / `.layout-hero-flip`) so it fills the remaining body height. Omit `height` to fill the parent (minimum 280px); pass an explicit pixel `height` only when you need a fixed size. `BarChart` also sizes itself from the container and caps bar thickness. Lint fails chart text under 18px.
 - Motion: it animates on enter in present mode. Static, print, PDF, screenshots and reduced motion render the final state with animation off.
 - Rendering uses ECharts' SVG renderer, so the vector PDF keeps chart text selectable and the review lint can measure chart text [4].
 - **Bundle:** ECharts is imported on demand (`src/deck/echarts-lib.ts`, tree-shaken from `echarts/core`) the first time a slide with an `EChart` renders [5]. Decks without charts never download it. Registered: line, bar, scatter, boxplot, heatmap, sankey, plus grid, legend, visualMap, markLine, markArea and dataset. Add a module there only if the guide supports it.

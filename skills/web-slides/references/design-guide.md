@@ -12,10 +12,10 @@ The goal is a deck that looks designed rather than generated: one clear idea per
 
 ## Layout (1920×1080 stage)
 
-- The safe area is 120px left/right padding, 96px top and 88px bottom; SlideFrame applies it. Never place content in the footer band.
+- The safe area is 120px left/right padding, 72px top and 88px bottom; SlideFrame applies it. Never place content in the footer band.
 - Use the type scale only: hero 112, title 60, h3 36, body 30, small 24, caption 18. Nothing smaller than 18px.
 - Body text should be 40 words per slide or fewer, with at most 5 bullets or 6 cards, and lines no longer than about 60 characters.
-- **Grid for stage columns, Flex for rows.** Prefer named recipes over ad-hoc positioning: **title hero** (`SlideFrame hero` + optional `backdrop` + automatic left scrim — not centered), `.layout-stack` (title+body), `.layout-kpi` (equal Stat strip), `.layout-compare` (two cards), `.layout-media` (figure column), `.layout-hero` / `.layout-hero-flip` (asymmetric `0.55fr 1.45fr`). Also `.grid-2/3/4` and `.row`. Full recipes, safe patterns (`gap`, `min-width:0`, `flex:1 1 0`, stretch) and anti-patterns: **`references/layout-guide.md`** (cites [CSS Tricks Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) and [Grid](https://css-tricks.com/snippets/css/complete-guide-grid/)).
+- **Grid for stage columns, Flex for rows.** Prefer named recipes over ad-hoc positioning: **title hero** (`SlideFrame hero` + optional `backdrop` + automatic left scrim — not centered), `.layout-stack` (title+body), `.layout-kpi` (equal Stat strip), `.layout-compare` (two cards), `.layout-media` (figure column), `.layout-hero` / `.layout-hero-flip` (asymmetric `0.55fr 1.45fr`). Also `.grid-2/3/4` and `.row`. First-round builds must use these named layouts, hang content from the title, and stretch charts to the remaining body — do not vertically center a short stack or use absolute positioning for everyday content. Full recipes, safe patterns (`gap`, `min-width:0`, `flex:1 1 0`, stretch) and anti-patterns: **`references/layout-guide.md`** (cites [CSS Tricks Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) and [Grid](https://css-tricks.com/snippets/css/complete-guide-grid/)).
 - Give every slide one focal point: a big number, a highlighted column, a highlighted bar or a highlighted card. Make one thing the accent color, not everything.
 
 ## Color and theme

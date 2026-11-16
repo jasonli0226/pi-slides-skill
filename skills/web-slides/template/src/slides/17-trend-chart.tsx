@@ -11,9 +11,9 @@ export default defineSlide({
   Component: () => (
     <SlideFrame kind="results" kicker="Charts • EChart"
       title="Trend charts accent the one series the title is about and mute the rest.">
-      <div className="grid-2" style={{ gridTemplateColumns: "1.6fr 0.9fr", alignItems: "center", gap: 64 }}>
+      <div className="layout-hero-flip" style={{ gridTemplateColumns: "1.6fr 0.9fr" }}>
         <Appear variant="fade">
-          <EChart illustrative highlight="Team A" height={520}
+          <EChart illustrative highlight="Team A"
             label="Illustrative line chart: lint errors per deck over eight weeks for three teams. Team A falls from 14 to 2; teams B and C stay between 9 and 15."
             caption="Lint errors per deck, weekly review runs"
             option={{

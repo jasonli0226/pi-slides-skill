@@ -181,3 +181,56 @@ test("chart lint warns on charts that break the chart guide", async () => {
     assert.ok(msgs.some((m) => re.test(m)), `missing ${re} in ${JSON.stringify(msgs)}`);
   }
 });
+
+test("sparse-layout passes every example slide", async () => {
+  const slides = await slideList();
+  for (let n = 1; n <= slides.length; n++) {
+    const found = ruleIssues(await lintSlide(n), "sparse-layout");
+    assert.deepEqual(found, [], `slide ${n} (${slides[n - 1].id}): ${JSON.stringify(found)}`);
+  }
+});
+
+test("sparse-layout warns when a content slide leaves a large empty body", async () => {
+  const r = await lintSlide(await slideNo("results"), () => {
+    const body = document.querySelector(".frame-body");
+    body.innerHTML = "";
+    const stub = document.createElement("div");
+    stub.className = "card";
+    stub.textContent = "Tiny stub";
+    stub.style.cssText = "width:280px;height:120px;flex:0 0 auto;align-self:flex-start;min-height:0;";
+    body.appendChild(stub);
+  });
+  const found = ruleIssues(r, "sparse-layout");
+  assert.equal(found.length, 1, JSON.stringify(r.issues));
+  assert.equal(found[0].level, "warn");
+  assert.match(found[0].msg, /frame-body/);
+});
+
+test("BarChart fills the remaining body with a capped bar thickness", async () => {
+  const n = await slideNo("results");
+  const page = await browser.newPage({ viewport: { width: lib.W, height: lib.H }, reducedMotion: "reduce" });
+  try {
+    await page.goto(`${url}?static&slide=${n}`);
+    await lib.waitReady(page);
+    const metrics = await page.evaluate(() => {
+      const body = document.querySelector(".frame-body").getBoundingClientRect();
+      const chart = document.querySelector("[data-figure='chart']").getBoundingClientRect();
+      const bars = [...document.querySelectorAll(".chart-bar")].map((el) => el.getBoundingClientRect());
+      return {
+        bodyH: body.height,
+        chartH: chart.height,
+        barHeights: bars.map((b) => b.height),
+        topGap: chart.top - body.top,
+        botGap: body.bottom - chart.bottom,
+      };
+    });
+    assert.ok(metrics.barHeights.length === 3, JSON.stringify(metrics));
+    for (const h of metrics.barHeights) {
+      assert.ok(h >= 28 && h <= 72, `bar thickness ${h} should be capped (~28–72px): ${JSON.stringify(metrics)}`);
+    }
+    assert.ok(metrics.chartH / metrics.bodyH >= 0.7, `chart should fill leftover body: ${JSON.stringify(metrics)}`);
+    assert.ok(metrics.topGap < 48, `chart should hang from the title, not float: ${JSON.stringify(metrics)}`);
+  } finally {
+    await page.close();
+  }
+});

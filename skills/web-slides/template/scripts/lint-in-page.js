@@ -1,8 +1,8 @@
 // Runs inside the browser on one static slide. Returns a list of issues.
 // Rules: frame, title-sentence, source-missing, cite-unknown, leftover, emoji-icon,
 //        img-alt, img-broken, off-stage, footer-overlap, clipped, box-overlap, safe-margin,
-//        uneven-gaps, absolute-spam, tiny-text, contrast, hero-effects, chart-type, chart-legibility,
-//        chart-baseline, chart-dual-axis.
+//        uneven-gaps, sparse-layout, absolute-spam, tiny-text, contrast, hero-effects, chart-type,
+//        chart-legibility, chart-baseline, chart-dual-axis.
 (() => {
   const issues = [];
   const add = (level, rule, msg, el) =>
@@ -136,7 +136,7 @@
   /* ---- box overlap + safe margins ---- */
   const unitSel = [
     ".card", ".stat", ".deck-figure", ".pill", ".quote", ".mermaid-box", ".code-window",
-    ".timeline-item", ".icon-list > *", ".echart", "table.compare", ".dg-layered", ".dg-c4", ".dg-seq", ".dg-flow",
+    ".timeline-item", ".icon-list > *", ".echart", ".chart", "table.compare", ".dg-layered", ".dg-c4", ".dg-seq", ".dg-flow",
     ".layout-bento > *", ".layout-bento-4 > *", ".layout-compare > *", ".layout-kpi > *",
   ].join(", ");
   const units = [];
@@ -179,7 +179,7 @@
   }
 
   // Safe stage margins: body/header leaf content must stay inside SlideFrame padding band.
-  const safe = { left: 96, right: 96, top: 72, bottom: 64 };
+  const safe = { left: 96, right: 96, top: 56, bottom: 48 };
   const safeBox = {
     left: sr.left + safe.left, right: sr.right - safe.right,
     top: sr.top + safe.top, bottom: sr.bottom - safe.bottom,
@@ -196,9 +196,70 @@
       if (r.left < safeBox.left - 2 || r.right > safeBox.right + 2 ||
           r.top < safeBox.top - 2 || r.bottom > safeBox.bottom + 2) {
         add("error", "safe-margin",
-          `Content sits outside the safe padding band (~120×96). Keep copy inside SlideFrame padding.`,
+          `Content sits outside the safe padding band (~120×72). Keep copy inside SlideFrame padding.`,
           el);
       }
+    }
+  }
+
+
+  /* ---- sparse / underfilled body (content slides only) ---- */
+  const sparseExempt = new Set(["title", "closing", "section", "quote"]);
+  if (frame && body && !sparseExempt.has(kind)
+      && !frame.classList.contains("frame-center")
+      && !frame.classList.contains("frame-title-hero")) {
+    const br = body.getBoundingClientRect();
+    const bodyArea = Math.max(1, br.width * br.height);
+    const boxes = [];
+    const pushBox = (el) => {
+      if (isBg(el) || !visible(el) || el.closest(".frame-footer")) return;
+      if (!body.contains(el)) return;
+      const r = el.getBoundingClientRect();
+      if (r.width < 8 || r.height < 8) return;
+      const clipped = {
+        left: Math.max(r.left, br.left), right: Math.min(r.right, br.right),
+        top: Math.max(r.top, br.top), bottom: Math.min(r.bottom, br.bottom),
+      };
+      if (clipped.right - clipped.left < 8 || clipped.bottom - clipped.top < 8) return;
+      boxes.push(clipped);
+    };
+    for (const u of units) pushBox(u.el);
+    for (const el of body.querySelectorAll(".chart, [data-figure='chart'], .timeline, .code-window, .mermaid-box, .icon-list")) {
+      pushBox(el);
+    }
+    const unionArea = (rects) => {
+      if (!rects.length) return 0;
+      const xs = [...new Set(rects.flatMap((r) => [r.left, r.right]))].sort((a, b) => a - b);
+      let area = 0;
+      for (let i = 0; i < xs.length - 1; i++) {
+        const x1 = xs[i], x2 = xs[i + 1], dx = x2 - x1;
+        if (dx <= 0) continue;
+        const segs = rects.filter((r) => r.left <= x1 + 0.01 && r.right >= x2 - 0.01)
+          .map((r) => [r.top, r.bottom]).sort((a, b) => a[0] - b[0]);
+        let start = 0, end = -Infinity;
+        for (const [top, bot] of segs) {
+          if (top > end) {
+            if (end > start) area += dx * (end - start);
+            start = top; end = bot;
+          } else end = Math.max(end, bot);
+        }
+        if (end > start) area += dx * (end - start);
+      }
+      return area;
+    };
+    const fill = unionArea(boxes) / bodyArea;
+    const contentTop = boxes.length ? Math.min(...boxes.map((b) => b.top)) : br.bottom;
+    const contentBottom = boxes.length ? Math.max(...boxes.map((b) => b.bottom)) : br.top;
+    const topBand = contentTop - br.top;
+    const botBand = br.bottom - contentBottom;
+    const bandLimit = br.height * 0.22;
+    if (fill < 0.55 || topBand > bandLimit || botBand > bandLimit) {
+      const why = fill < 0.55
+        ? `fills only ${Math.round(fill * 100)}% of .frame-body (need about 55%)`
+        : `leaves a ${Math.round(Math.max(topBand, botBand))}px empty band in .frame-body`;
+      add("warn", "sparse-layout",
+        `Body content ${why}. Hang content from the title and stretch charts or cards to the remaining height (see layout-guide.md).`,
+        body);
     }
   }
 

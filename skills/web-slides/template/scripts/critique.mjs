@@ -52,6 +52,7 @@ const ruleHints = [
   [/emoji-icon/i, "warn", "Emoji icon"],
   [/absolute-spam/i, "warn", "Absolute positioning spam"],
   [/uneven-gaps/i, "warn", "Uneven gaps"],
+  [/sparse-layout/i, "warn", "Sparse underfilled body"],
   [/hero-effects/i, "warn", "Competing hero effects"],
   [/chart-type|chart-legibility|chart-dual-axis/i, "warn", "Chart off the chart guide"],
   [/chart-baseline/i, "warn", "Bar chart baseline not zero"],

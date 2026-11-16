@@ -322,8 +322,8 @@ export function layoutTokens(layout = {}) {
   if (layout.shadow === "none") { t["shadow-card"] = "none"; t["shadow-elev"] = "0 1px 2px rgba(0,0,0,.08)"; }
   else if (layout.shadow === "soft") { t["shadow-card"] = "0 2px 8px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.08)"; t["shadow-elev"] = "0 20px 50px rgba(0,0,0,.18)"; }
   if (layout.motion) t["motion-scale"] = { calm: "0.7", default: "1", expressive: "1.2" }[layout.motion] || "1";
-  if (layout.whitespace === "airy") { t["pad-x"] = "144px"; t["pad-top"] = "112px"; }
-  else if (layout.whitespace === "dense") { t["pad-x"] = "96px"; t["pad-top"] = "80px"; }
+  if (layout.whitespace === "airy") { t["pad-x"] = "144px"; t["pad-top"] = "88px"; t["pad-bottom"] = "88px"; }
+  else if (layout.whitespace === "dense") { t["pad-x"] = "96px"; t["pad-top"] = "64px"; t["pad-bottom"] = "64px"; }
   return t;
 }
 

@@ -16,7 +16,7 @@ export default defineSlide({
   Component: () => (
     <SlideFrame kind="architecture" kicker="Architecture" sources={[S.piSkills, S.playwright]}
       title="The skill is a thin loop around a React deck, a headless browser and a review gate.">
-      <Appear variant="scale" delay={0.2}><Mermaid chart={chart} height={560} /></Appear>
+      <Appear variant="scale" delay={0.2}><Mermaid chart={chart} /></Appear>
     </SlideFrame>
   ),
 });

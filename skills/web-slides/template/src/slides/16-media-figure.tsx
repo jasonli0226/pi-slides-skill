@@ -12,13 +12,13 @@ export default defineSlide({
       kicker="Media • Figure"
       title="User-provided media lands in public/media and renders through Figure."
     >
-      <div className="grid-2" style={{ alignItems: "center", gap: 40 }}>
+      <div className="layout-compare">
         <Appear variant="fade">
           <Figure
             src="/media/illustrative-mesh.svg"
             alt="Abstract blue mesh sample for a user-supplied image"
             fit="contain"
-            maxHeight={400}
+            maxHeight={680}
             illustrative
             caption="Illustrative sample. Swap for the user's file."
           />

@@ -18,6 +18,8 @@ CSS Tricks’ own framing: **Grid for the page/stage structure, Flexbox for rows
 
 `SlideFrame` already owns the outer chrome (padding, title, footer). Your job is only the body.
 
+Content slides **hang from the title**: `.frame-body` is top-aligned (`justify-content: flex-start`), and the main body child stretches to the leftover height. Use a named `.layout-*` so cards, tables and charts fill that column. Do not vertically center everyday body content — that leaves equal empty bands under the title and above the footer. Title, closing, section and quote heroes keep their own alignment (`center` / `.frame-title-hero`).
+
 ## Recipes
 
 ### Title hero (full-bleed photo + left light scrim)
@@ -96,7 +98,7 @@ Equal tracks, `align-items: stretch` so card heights match. For three/four peers
 </div>
 ```
 
-`0.55fr 1.45fr` (or `.layout-hero-flip` for the reverse). Same idea as an inline `style={{ gridTemplateColumns: "0.55fr 1.45fr" }}` on `.grid-2`, but named so agents reuse one pattern.
+`0.55fr 1.45fr` (or `.layout-hero-flip` for the reverse). Same idea as an inline `style={{ gridTemplateColumns: "0.55fr 1.45fr" }}` on `.grid-2`, but named so agents reuse one pattern. The recipe stretches both columns (`align-items: stretch`); `BarChart` and `EChart` then fill the remaining height, with bar thickness capped so two or three bars do not become comically thick.
 
 
 ### Bento grid (asymmetric feature tiles)
@@ -148,30 +150,32 @@ Equal flex columns with a colored top edge. For the fuller dotted-line roadmap, 
 - **`min-width: 0` / `min-height: 0`** on flex/grid children that hold text, charts or figures — otherwise the default `min-size: auto` refuses to shrink and overflows the stage. Utilities: `.u-min0`, and every `.layout-*` / `.grid-*` child should inherit this habit.
 - **`flex: 1 1 0`** (not bare `flex: 1` alone when you need equal columns) so basis is zero and free space splits evenly. `.u-grow` and `.layout-kpi > *` do this.
 - **`align-items: stretch`** (default for Grid; set explicitly on Flex rows of cards) so peer cards share a height.
-- **`justify-content`**: `flex-start` or rely on `gap` for strips; use `center` for sparse hero slides; avoid `space-between` when item count varies (last row looks ragged).
+- **`justify-content`**: `flex-start` on content slides (hang from the title) or rely on `gap` for strips; use `center` only for sparse hero / title / quote / section / closing slides; avoid `space-between` when item count varies (last row looks ragged).
+- **Stretch charts and cards** to the leftover body height. Prefer `.layout-hero` / `.layout-compare` / `.layout-kpi` over a short island of content. `BarChart` sizes itself from the container (not a width-only aspect ratio). Omit `EChart` `height` when the chart should fill the column; pass an explicit pixel height only when you need a fixed size.
 
 ## Anti-patterns
 
 - **Absolute spam.** `position: absolute` belongs to SlideFrame chrome, backgrounds (`.bg`, `.title-backdrop`, `.title-scrim`) and rare diagram overlays — not everyday content. Prefer Grid/Flex. Lint **warns** above 2 absolute nodes in the body and **errors** above 5.
 - **Box overlap.** Content units (cards, stats, figures, pills, diagram roots) must not stack on top of each other. Use `gap` / named `.layout-*`. Lint rule `box-overlap` fails the review.
-- **Safe-margin breach.** Leaf copy must stay inside the SlideFrame padding band (~120×96). Lint rule `safe-margin` fails the review.
+- **Safe-margin breach.** Leaf copy must stay inside the SlideFrame padding band (~120×72 / 88). Lint rule `safe-margin` fails the review.
 - **Footer collision.** Body content must stop above the sources band. Never extend padding into the footer; lint rule `footer-overlap` fails the review.
 - **Centered title openers.** Prefer the left hero + scrim recipe over `center` for `kind="title"`.
 - **Uneven cards / gaps.** Sibling cards in one row should share height; gutters between peers should match. Prefer `.layout-compare` / `.layout-kpi` over hand-tuned margins. Lint warns on `uneven-gaps` when measured gutters in a row diverge.
+- **Sparse / underfilled body.** A short chart, stub card or vertically centered stack floating in a large empty body fails first-round density. Hang content from the title and stretch it. Lint **warns** on `sparse-layout` when content boxes fill less than about 55% of `.frame-body` (title, closing, section, quote, and `.frame-center` / `.frame-title-hero` are exempt).
 - **Fixed pixel columns** that ignore the 1920 stage padding. Use `fr`, `%` of the body, or the named layouts.
 
 ## 1920×1080 overflow rules
 
 1. Stage is exactly **1920×1080** with `overflow: hidden`. Anything past the edge is an `off-stage` error.
-2. Safe padding is owned by SlideFrame (~120px x, 96px top, 88px bottom). Do not fight it with negative margins.
-3. `.frame-body` is `flex: 1; min-height: 0; overflow: hidden`. Children that need scroll never belong on a slide — shorten copy or split the slide.
+2. Safe padding is owned by SlideFrame (~120px x, 72px top, 88px bottom). Do not fight it with negative margins. The sources footer is `position: absolute; bottom: 32px` — body content must still clear that band (`footer-overlap`).
+3. `.frame-body` is `flex: 1; min-height: 0; overflow: hidden` and top-aligned. The main child stretches to the leftover height so charts can fill the column. Children that need scroll never belong on a slide — shorten copy or split the slide.
 4. Text clipped inside an `overflow: hidden` box is a `clipped` error. Shrink type, reduce nodes, or give the column more `fr`.
 5. Long words / URLs: keep them in `notes` or break with shorter labels; do not rely on tiny type.
 6. After layout changes, run `npm run review` and open the PNGs — automated geometry catches spills; you still judge balance.
 
 ## Checklist before leaving a slide
 
-- [ ] Body uses a `.layout-*` / `.grid-*` / `.row`, not a pile of absolutes.
-- [ ] Peer cards share height; KPI gutters look even.
+- [ ] Body uses a `.layout-*` / `.grid-*` / `.row`, not a pile of absolutes. Content hangs from the title; charts and cards stretch to the remaining body.
+- [ ] Peer cards share height; KPI gutters look even. No large empty band under the title or a short, chunky bar chart.
 - [ ] No content in the footer band; contact sheet shows breathing room.
-- [ ] Review report has no `off-stage`, `footer-overlap`, `box-overlap`, `safe-margin`, `clipped`, or `uneven-gaps` hits for this slide.
+- [ ] Review report has no `off-stage`, `footer-overlap`, `box-overlap`, `safe-margin`, `clipped`, `uneven-gaps`, or `sparse-layout` hits for this slide.

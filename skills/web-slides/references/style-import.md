@@ -147,7 +147,7 @@ The page's proportions are borrowed and clamped to the 1920×1080 slide scale:
 | Hero letter-spacing | `--hero-tracking`, `--title-tracking` | em, −0.05…0.02 |
 | Shadows none / soft / heavy | `--shadow-card`, `--shadow-elev` | flat, soft or default |
 | Transition durations ≤0.25s / ≥0.6s | `--motion-scale` | 0.7 calm / 1 / 1.2 expressive (Appear reads it) |
-| Section padding ≥80px / ≤32px | `--pad-x`, `--pad-top` | airy 144/112, dense 96/80 |
+| Section padding ≥80px / ≤32px | `--pad-x`, `--pad-top` | airy 144/88, dense 96/64 |
 
 The minimums still win: text never goes below 18px, and the 40-word and 5-bullet limits still apply. A restrained brand (Apple-like) comes out as weight 600, near-zero tracking, flat cards and lots of whitespace. Lean into that with fewer cards per slide.
 
