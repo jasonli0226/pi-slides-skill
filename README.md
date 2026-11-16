@@ -2,13 +2,13 @@
 
 An agent skill for the [pi coding agent](https://github.com/badlogic/pi-mono) that builds **stunning, research-backed web slide decks**. Decks are React 19 + Vite + Motion apps on a 1920×1080 stage. Every slide is screenshotted and linted automatically, and the deck exports to PDF and PNG.
 
-Dark theme, styled from the Apple website as a reference:
+Official example in the midnight theme, with motion:
 
-![Demo of a dark-theme deck styled from the Apple website](examples/demo-dark-theme.gif)
+![Demo of the official example deck in the midnight theme](examples/demo-dark-theme.gif)
 
-Light theme, with images researched from the web and added motion:
+The same official example in the paper (light) theme:
 
-![Demo of a light-theme deck with web-researched images and motion](examples/demo-light-theme.gif)
+![Demo of the official example deck in the paper light theme](examples/demo-light-theme.gif)
 
 ![Contact sheet of the example deck](examples/screenshots/contact-sheet.png)
 
