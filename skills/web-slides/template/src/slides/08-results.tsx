@@ -9,7 +9,7 @@ export default defineSlide({
   Component: () => (
     <SlideFrame kind="results" kicker="Results" sources={[S.verifyRun]}
       title="The scaffold builds, reviews and exports this 15-slide deck end to end on a headless box.">
-      <div className="grid-2" style={{ gridTemplateColumns: "0.55fr 1.45fr", alignItems: "center" }}>
+      <div className="layout-hero">
         <Stat value={measured.reviewErrors} size="xl" cite="verifyRun" label="Blocking lint errors in the final review run." />
         <Appear delay={0.2}>
           <BarChart unit=" s" decimals={1} cite="verifyRun" highlight={1} data={[

@@ -17,7 +17,7 @@
 
   --space-1: 8px; --space-2: 16px; --space-3: 24px; --space-4: 32px;
   --space-6: 48px; --space-8: 64px; --space-12: 96px;
-  --pad-x: 120px; --pad-top: 96px; --pad-bottom: 88px;
+  --pad-x: 120px; --pad-top: 72px; --pad-bottom: 88px;
 
   --radius: 20px;
   --radius-sm: 12px;
@@ -149,7 +149,8 @@
   --shadow-elev: 0 28px 70px rgba(0,0,0,.55);
   --motion-scale: 1.1;
   --pad-x: 112px;
-  --pad-top: 88px;
+  --pad-top: 64px;
+  --pad-bottom: 80px;
 }
 
 /* bento-minimal: black / white / quiet cyan. Product grids, hardware, restrained IT.
@@ -188,7 +189,8 @@
   --shadow-elev: 0 16px 40px rgba(0,0,0,.35);
   --motion-scale: 0.7;
   --pad-x: 144px;
-  --pad-top: 112px;
+  --pad-top: 88px;
+  --pad-bottom: 88px;
   --fs-hero: 104px;
   --fs-title: 56px;
 }
@@ -232,6 +234,7 @@
   --shadow-elev: 0 30px 80px rgba(0,0,0,.45);
   --motion-scale: 1;
   --pad-x: 120px;
-  --pad-top: 96px;
+  --pad-top: 72px;
+  --pad-bottom: 88px;
 }
 

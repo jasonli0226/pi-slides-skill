@@ -12,7 +12,7 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 - [ ] `leftover`: no lorem, TODO, TBD, FIXME, placeholder, `{{ }}`, undefined or NaN.
 - [ ] `emoji-icon`: no emoji.
 - [ ] `off-stage`, `footer-overlap`, `clipped`, `box-overlap`, `safe-margin`: nothing spills off the stage, into the footer, out of a container, on top of peer content, or outside the padding band.
-- [ ] `uneven-gaps` (warn) / `absolute-spam` (warn >2, error >5): sibling gutters and peer card heights stay even; body content is Grid/Flex, not a pile of absolutes (see `layout-guide.md`).
+- [ ] `uneven-gaps` (warn) / `sparse-layout` (warn) / `absolute-spam` (warn >2, error >5): sibling gutters and peer card heights stay even; content slides fill at least about 55% of `.frame-body` (title, closing, section, quote, and centered/hero frames are exempt); body content is Grid/Flex, not a pile of absolutes (see `layout-guide.md`).
 - [ ] Title openers use the left hero + scrim recipe (full-bleed `backdrop` when an image is available); avoid centered headlines over busy plates.
 - [ ] `tiny-text`: nothing under 18px, including chart and diagram text.
 - [ ] `chart-type` / `chart-legibility` / `chart-baseline` / `chart-dual-axis` (warn): EChart follows `chart-guide.md`: no pie or 3D, ≤5 series with the title's series named in `highlight`, ≤12 bars per series, bar axes from zero, one value axis unless the notes justify two.
@@ -34,7 +34,7 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 - [ ] Each slide has one focal point, and the accent color is used on that point only.
 - [ ] The theme was chosen on purpose. The deck isn't still on the template default (`midnight`, stock tokens, empty `brand.css`) unless the user asked for that.
 - [ ] Alignment: left edges line up across slides; cards in a row have equal heights; gutters match; nothing looks accidentally off-center. Prefer `.layout-*` recipes from `layout-guide.md`.
-- [ ] There's enough whitespace: no slide feels crammed (over 40 words is a smell).
+- [ ] There's enough whitespace: no slide feels crammed (over 40 words is a smell). Content slides also must not look sparse: no large empty band under the title or a short chart floating in the body.
 - [ ] Gradient text and text over glows are clearly readable, since the lint can't measure these.
 - [ ] Icons are all lucide with the same stroke, and the same concept uses the same icon everywhere.
 - [ ] User-provided media sits under `public/media/`, uses `<Figure>`, and is cited or marked illustrative (see `media-guide.md`). No invented logos.

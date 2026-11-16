@@ -1,6 +1,6 @@
 import { animate, motion, useInView, type Variants } from "motion/react";
 import type { LucideIcon } from "lucide-react";
-import { createContext, useContext, useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { reportError, useAsyncTask, useIsStatic, useSlide } from "./context";
 import type { SlideKind, SourceRef } from "./types";
 
@@ -244,35 +244,84 @@ export function Stat({ value, decimals = 0, prefix = "", suffix = "", label, cit
   );
 }
 
-/** Animated horizontal bar chart in plain SVG + motion, themed by tokens. */
+/** Cap bar thickness and spend leftover height on row gaps + modest outer padding. */
+export function barChartRowLayout(height: number, n: number) {
+  const count = Math.max(1, n);
+  const MAX_BAR = 64, MIN_BAR = 28, MIN_GAP = 20, MIN_PAD = 8;
+  if (height <= 0) {
+    return { barH: MAX_BAR, gap: 36, pad: 12 };
+  }
+  if (count === 1) {
+    const barH = Math.min(MAX_BAR, Math.max(MIN_BAR, height - 2 * MIN_PAD));
+    return { barH, gap: 0, pad: Math.max(MIN_PAD, (height - barH) / 2) };
+  }
+  const extra = height - count * MAX_BAR;
+  if (extra >= 2 * MIN_PAD + (count - 1) * MIN_GAP) {
+    const pad = Math.max(MIN_PAD, Math.min(extra * 0.2, 96) / 2);
+    return { barH: MAX_BAR, gap: (height - count * MAX_BAR - 2 * pad) / (count - 1), pad };
+  }
+  const pad = MIN_PAD, gap = MIN_GAP;
+  const barH = (height - 2 * pad - (count - 1) * gap) / count;
+  if (barH >= MIN_BAR) return { barH, gap, pad };
+  const tightPad = 4, tightGap = 8;
+  return { barH: Math.max(MIN_BAR, (height - 2 * tightPad - (count - 1) * tightGap) / count), gap: tightGap, pad: tightPad };
+}
+
+/** Animated horizontal bar chart in plain SVG + motion, themed by tokens.
+ *  Sized from the container box (not a width-only aspect ratio); bar thickness is capped. */
 export function BarChart({ data, unit = "", cite, illustrative, max, highlight, decimals = 0 }: {
   data: { label: string; value: number }[]; unit?: string; cite?: string; illustrative?: boolean;
   max?: number; highlight?: number; decimals?: number;
 }) {
   const isStatic = useIsStatic();
+  const plotRef = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  useLayoutEffect(() => {
+    const el = plotRef.current;
+    if (!el) return;
+    const measure = () => {
+      const w = el.clientWidth, h = el.clientHeight;
+      setBox((prev) => (prev.w === w && prev.h === h) ? prev : { w, h });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const top = max ?? (Math.max(0, ...data.map((d) => d.value)) || 1);
-  const rowH = 100, labelW = 440, barW = 900, h = data.length * rowH;
+  const n = data.length;
+  const { barH, gap, pad } = barChartRowLayout(box.h, n);
+  const fallbackH = pad * 2 + n * barH + Math.max(0, n - 1) * gap;
+  const w = box.w || 1540;
+  const h = box.h || fallbackH;
+  const labelW = Math.min(440, Math.max(200, w * 0.28));
+  const valueW = Math.min(200, Math.max(120, w * 0.13));
+  const barW = Math.max(120, w - labelW - valueW);
+  const rx = Math.min(10, Math.max(4, barH * 0.16));
   return (
     <div className="chart" data-figure="chart">
-      <svg width="100%" viewBox={`0 0 ${labelW + barW + 200} ${h}`} role="img">
-        {data.map((d, i) => {
-          const w = (d.value / top) * barW;
-          const hi = highlight === i;
-          return (
-            <g key={d.label} transform={`translate(0, ${i * rowH})`}>
-              <text x={labelW - 24} y={rowH / 2} dominantBaseline="middle" textAnchor="end" className="chart-label">{d.label}</text>
-              <rect x={labelW} y={18} width={barW} height={rowH - 36} rx={10} className="chart-track" />
-              <motion.rect x={labelW} y={18} height={rowH - 36} rx={10}
-                className={hi ? "chart-bar chart-bar-hi" : "chart-bar"}
-                initial={{ width: isStatic ? w : 0 }} animate={{ width: w }}
-                transition={{ duration: isStatic ? 0 : 1.1, delay: isStatic ? 0 : 0.2 + i * 0.08, ease: [0.22, 1, 0.36, 1] }} />
-              <text x={labelW + w + 18} y={rowH / 2} dominantBaseline="middle" className="chart-value">
-                {d.value.toFixed(decimals)}{unit}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+      <div className="chart-plot" ref={plotRef}>
+        <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" role="img">
+          {data.map((d, i) => {
+            const bw = (d.value / top) * barW;
+            const hi = highlight === i;
+            const y = pad + i * (barH + gap);
+            return (
+              <g key={d.label} transform={`translate(0, ${y})`}>
+                <text x={labelW - 24} y={barH / 2} dominantBaseline="middle" textAnchor="end" className="chart-label">{d.label}</text>
+                <rect x={labelW} y={0} width={barW} height={barH} rx={rx} className="chart-track" />
+                <motion.rect x={labelW} y={0} height={barH} rx={rx}
+                  className={hi ? "chart-bar chart-bar-hi" : "chart-bar"}
+                  initial={{ width: isStatic ? bw : 0 }} animate={{ width: bw }}
+                  transition={{ duration: isStatic ? 0 : 1.1, delay: isStatic ? 0 : 0.2 + i * 0.08, ease: [0.22, 1, 0.36, 1] }} />
+                <text x={labelW + bw + 18} y={barH / 2} dominantBaseline="middle" className="chart-value">
+                  {d.value.toFixed(decimals)}{unit}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
       <div className="chart-cite"><FigureMark cite={cite} illustrative={illustrative} /></div>
     </div>
   );
@@ -281,7 +330,7 @@ export function BarChart({ data, unit = "", cite, illustrative, max, highlight, 
 const cssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 /** Mermaid diagram rendered with theme tokens. Keep Mermaid diagrams to ≤8 nodes; use LayeredArchitecture / C4Container / Sequence for denser pictures. */
-export function Mermaid({ chart, height = 620 }: { chart: string; height?: number }) {
+export function Mermaid({ chart, height }: { chart: string; height?: number }) {
   const id = useId().replace(/[^a-zA-Z0-9]/g, "");
   const [svg, setSvg] = useState("");
   const done = useAsyncTask([chart]);
@@ -324,7 +373,7 @@ export function Mermaid({ chart, height = 620 }: { chart: string; height?: numbe
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chart]);
-  return <div className="mermaid-box" style={{ height }} dangerouslySetInnerHTML={{ __html: svg }} />;
+  return <div className={`mermaid-box${height == null ? " mermaid-fill" : ""}`} style={height != null ? { height } : undefined} dangerouslySetInnerHTML={{ __html: svg }} />;
 }
 
 /** Syntax-highlighted code with per-step line focus.

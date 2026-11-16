@@ -140,8 +140,10 @@ function motionScale() {
  * `highlight` = name of the series the slide title talks about (accented; others muted).
  * `label` = what the chart shows, for screen readers (like Figure alt). Needs `cite` or `illustrative`.
  */
-export function EChart({ option, highlight, label, height = 560, caption, cite, illustrative }: {
-  option: EChartsOption; highlight?: string; label: string; height?: number;
+export function EChart({ option, highlight, label, height, caption, cite, illustrative }: {
+  option: EChartsOption; highlight?: string; label: string;
+  /** Pixel height for the canvas. Omit to fill the parent column (min 280px). */
+  height?: number;
   caption?: ReactNode; cite?: string; illustrative?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -178,12 +180,13 @@ export function EChart({ option, highlight, label, height = 560, caption, cite, 
   }, [key]);
 
   return (
-    <figure className="echart" data-figure="echart"
+    <figure className={`echart${height == null ? " echart-fill" : ""}`} data-figure="echart"
       data-chart-types={facts.types.join(",")} data-chart-series={facts.series} data-chart-points={facts.points}
       data-chart-dual-axis={facts.dualAxis ? "true" : undefined}
       data-chart-bar-baseline={facts.barBaselineNonZero ? "nonzero" : undefined}
       data-chart-highlight={facts.highlight}>
-      <div className="echart-canvas" ref={ref} role="img" aria-label={label} style={{ height }} />
+      <div className="echart-canvas" ref={ref} role="img" aria-label={label}
+        style={height != null ? { height, flex: "0 0 auto" } : undefined} />
       <figcaption className="chart-cite">
         {caption && <span className="echart-caption">{caption}</span>}
         <FigureMark cite={cite} illustrative={illustrative} />
