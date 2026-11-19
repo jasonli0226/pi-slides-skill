@@ -1,8 +1,8 @@
 // Shared test helpers: run commands, scaffold a deck into a temp dir.
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { cpSync, mkdtempSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -23,6 +23,19 @@ export function tryRun(cmd, args, cwd) {
 export function tempDir(t, prefix = "web-slides-test-") {
   const dir = mkdtempSync(join(tmpdir(), prefix));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
+  return dir;
+}
+
+/** Copy the template so a test can mutate deck.spec.yaml without racing siblings. */
+export function isolatedTemplate(t) {
+  const dir = tempDir(t, "web-slides-template-");
+  const skip = (src) => {
+    const rel = relative(template, src);
+    if (!rel || rel === ".") return false;
+    return rel.split(sep).some((part) => part === "node_modules" || part === "dist" || part === ".vite");
+  };
+  cpSync(template, dir, { recursive: true, filter: (src) => !skip(src) });
+  symlinkSync(join(template, "node_modules"), join(dir, "node_modules"), "dir");
   return dir;
 }
 

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { run, template, tryRun } from "./helpers.mjs";
+import { isolatedTemplate, run, template, tryRun } from "./helpers.mjs";
 
 const { validate, diagramIssues } = await import(
   pathToFileURL(join(template, "scripts/spec.mjs")).href
@@ -110,13 +110,8 @@ test("diagramIssues accepts evidenced nodes on a non-illustrative C4", () => {
 });
 
 test("validate fails non-zero on unlabeled edges via --check", (t) => {
-  const specPath = join(template, "content/deck.spec.yaml");
-  const backup = readFileSync(specPath, "utf8");
-  t.after(() => {
-    writeFileSync(specPath, backup);
-    run(process.execPath, ["scripts/spec.mjs"], template);
-  });
-  writeFileSync(specPath, `title: Fail
+  const dir = isolatedTemplate(t);
+  writeFileSync(join(dir, "content/deck.spec.yaml"), `title: Fail
 theme: midnight
 approved: false
 slides:
@@ -136,19 +131,14 @@ slides:
           relations:
             - { from: a, to: b, label: "" }
 `);
-  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], dir);
   assert.equal(r.status, 1, r.out);
   assert.match(r.out, /specific verb label/);
 });
 
 test("validate fails on mixed C4 and missing evidence via --check", (t) => {
-  const specPath = join(template, "content/deck.spec.yaml");
-  const backup = readFileSync(specPath, "utf8");
-  t.after(() => {
-    writeFileSync(specPath, backup);
-    run(process.execPath, ["scripts/spec.mjs"], template);
-  });
-  writeFileSync(specPath, `title: Fail
+  const dir = isolatedTemplate(t);
+  writeFileSync(join(dir, "content/deck.spec.yaml"), `title: Fail
 theme: midnight
 approved: false
 slides:
@@ -182,20 +172,15 @@ slides:
           relations:
             - { from: user, to: platform, label: Asks / reviews }
 `);
-  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], dir);
   assert.equal(r.status, 1, r.out);
   assert.match(r.out, /mixes container/);
   assert.match(r.out, /lack evidence/);
 });
 
 test("spec.mjs emits a real C4Container stub from validated IR", (t) => {
-  const specPath = join(template, "content/deck.spec.yaml");
-  const backup = readFileSync(specPath, "utf8");
-  t.after(() => {
-    writeFileSync(specPath, backup);
-    run(process.execPath, ["scripts/spec.mjs"], template);
-  });
-  writeFileSync(specPath, `title: Stub emit
+  const dir = isolatedTemplate(t);
+  writeFileSync(join(dir, "content/deck.spec.yaml"), `title: Stub emit
 theme: midnight
 approved: false
 slides:
@@ -218,8 +203,8 @@ slides:
           relations:
             - { from: user, to: platform, label: Asks / reviews }
 `);
-  run(process.execPath, ["scripts/spec.mjs"], template);
-  const gen = readFileSync(join(template, "src/slides/generated/from-spec.tsx"), "utf8");
+  run(process.execPath, ["scripts/spec.mjs"], dir);
+  const gen = readFileSync(join(dir, "src/slides/generated/from-spec.tsx"), "utf8");
   assert.match(gen, /C4Container/);
   assert.match(gen, /stepwise="path"/);
   assert.match(gen, /primary_path/);
