@@ -303,7 +303,7 @@ export function Sequence({
             const hop = walk.mark(messageState(i));
             return (
               <Appear key={`${m.from}-${m.to}-${i}`} at={reveal ? i + 1 : 0} delay={reveal ? 0 : 0.06 * i}
-                className={cx("dg-seq-msg", hop)} style={{ gridColumn: `${left + 1} / span ${span + 1}` }}>
+                className={cx("dg-seq-msg", hop)} style={{ gridColumn: `${left + 1} / span ${span + 1}`, gridRow: i + 1, ["--dg-span" as string]: span + 1 }}>
                 {m.note && <div className="dg-seq-note">{m.note}</div>}
                 <div className={cx("dg-seq-line", m.dashed && "is-dashed", reverse && "is-rev", hop)}>
                   <span className="dg-seq-label">{m.label}</span>
