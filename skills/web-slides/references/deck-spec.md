@@ -97,16 +97,55 @@ components:
         flowchart LR
           A[Agent] --> B[Spec]
   - LayeredArchitecture:
-      # shape per slide-catalog; stub generator may render a placeholder Card
+      illustrative: true          # or cite: repoMain plus per-node evidence
+      stepwise: path              # false | reveal | path
+      primary_path: [spec, slides]
       caption: illustrative stack
+      layers:
+        - id: author
+          label: Author
+          items:
+            - { id: spec, label: Design spec, highlight: true }
+            - { id: slides, label: React slides }
   - FlowSteps:
+      illustrative: true
       steps:
-        - { title: Research, body: Sources first }
+        - { id: research, title: Research, body: Sources first }
   - Sequence:
+      illustrative: true
+      stepwise: path
+      primary_path: [0, 1]
       actors: [{ id: u, label: User }, { id: a, label: Agent }]
-      messages: [{ from: u, to: a, label: raw notes }]
+      messages:
+        - { from: u, to: a, label: raw notes }
+        - { from: a, to: u, label: draft spec, dashed: true }
   - C4Container:
-      nodes: []
+      level: context              # context | container — required
+      stepwise: path
+      primary_path: [user, platform, docs]
+      illustrative: true          # official examples stay illustrative; do not invent file:line
+      caption: Chat ask across the platform
+      nodes:
+        - id: user
+          label: Analyst
+          kind: person
+          description: Asks in natural language
+          row: 2
+          col: 1
+        - id: platform
+          label: AI Platform
+          kind: system
+          highlight: true
+          row: 2
+          col: 2
+        - id: docs
+          label: Corp docs
+          kind: external
+          row: 3
+          col: 1
+      relations:
+        - { from: user, to: platform, label: Asks / reviews }
+        - { from: platform, to: docs, label: Retrieves docs }
   - Figure:
       src: /media/pilot-dashboard.png
       alt: Pilot ops dashboard after rollout
@@ -139,7 +178,31 @@ components:
 
 Unknown component names are validation **warnings** (forward-compatible). Missing `type` / `id` / `title` / `status` / `n` are **errors**.
 
-`npm run spec` also warns when an `EChart` entry breaks `chart-guide.md` (no `cite` / `illustrative` or `label`, pie or 3D, more than 5 series, several series without `highlight`, more than 12 bars, a bar axis not starting at zero, two value axes). Stubs render it as a placeholder card; build the real component when you promote the slide.
+`npm run spec` also warns when an `EChart` entry breaks `chart-guide.md` (no `cite` / `illustrative` or `label`, pie or 3D, more than 5 series, several series without `highlight`, more than 12 bars, a bar axis not starting at zero, two value axes). EChart / BarChart / Figure / Code / Timeline stubs still render as placeholder cards; build the real component when you promote the slide.
+
+### Diagram IR (inside `components[]`)
+
+Do not invent a second spec file. Nodes, labeled unidirectional edges (or the component's existing equivalent), `primary_path`, and per-node `evidence` live on the existing single-key maps. A slide-level `mermaid:` string may remain as a shortcut for small illustrative flows; when a `Mermaid` component and `mermaid:` both exist, they must match.
+
+Evidence pins reference a bibliography id already listed in the slide `sources` plus a file range:
+
+```yaml
+evidence:
+  - { cite: repoMain, path: apps/web/src/chat.ts, start: 40, end: 88, commit: 3d8f38e }
+```
+
+A repo bibliography entry in `sources.ts` may also carry optional `repo` and `commit`. Per-node pins are not themselves `SourceRef`s. The stage does not show `file:line` labels.
+
+`npm run spec` treats diagram issues as **errors** when they break hard rules, and **warnings** at the soft caps in `diagram-guide.md`:
+
+| Severity | Checks |
+|---|---|
+| Error | Unlabeled edges (empty or a bare "uses"); a bidirectional pair used instead of two labeled directions (C4 / Mermaid / explicit layered edges; sequence request/return is allowed); C4 `level` missing or mixed (e.g. container boxes on a context figure); `primary_path` id that does not exist, or (for C4 / Sequence) does not follow declared relations / messages; a non-illustrative architecture diagram whose nodes lack `evidence` with `path` + `start`; evidence / `cite` ids missing from the slide `sources` list |
+| Warning | Size caps (Mermaid ≤8 nodes; FlowSteps ≤6; LayeredArchitecture 3–6 layers and ≤5 cells/layer; Sequence ≤6 actors and ≤8 messages; C4Container ≤8 boxes on a ≤3×4 grid); a Mermaid-only `chart` with no IR and not `illustrative` when it looks like a real-repo diagram; invented-looking placeholders (`foo.ts`, line 1 on every node); `steps` disagreeing with the path length or reveal count; `mermaid:` vs `Mermaid.chart` drift |
+
+On a real-repo brief, add nodes/edges IR next to a Mermaid `chart:` or mark the figure `illustrative`. Official template architecture slides stay illustrative — do not invent fake file:line evidence for them.
+
+Stubs for `Mermaid`, `LayeredArchitecture`, `FlowSteps`, `Sequence`, and `C4Container` emit the **real** component from the validated IR (lucide `icon` names come from a small allow-list, or are omitted). Stubs remain `status: stub` and are not ship quality, but the preview shows the actual topology, not a "replace this stub" card. `status: locked` files are still never overwritten.
 
 ## Promote / merge (do not wipe polish)
 

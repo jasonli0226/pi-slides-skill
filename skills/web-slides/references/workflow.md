@@ -13,6 +13,7 @@
 - Keep `research/notes.md` in the deck directory. For each source, record the id, title, publisher, date, URL, and the exact figures and quotes (copied verbatim) with page or section.
 - Prefer primary sources. Write down the date you accessed each one.
 - If a needed number does not exist, say so in the outline. Do not estimate silently.
+- When the brief is a **real repository**, record the commit (when practical) and the file:line excerpts you used for architecture diagrams, the same way you already record verbatim figures and quotes. Those pins go into the diagram IR; do not invent paths.
 
 ## 3. Design spec and approval gate
 
@@ -105,6 +106,12 @@ npm run verify                     # tokens + typecheck + build + review + pdf i
 ```
 
 - `npm run build` writes `dist/`, a static site (relative paths) that opens from any static host.
+
+## 8b. Optional Archify leave-behind (not a dependency)
+
+If the user wants a **leave-behind** the audience can explore after the talk, you *may* produce a standalone [Archify](https://github.com/tt-a1i/archify) HTML file (user-installed skill, Apache-2.0 terms, not vendored in this repo) and cite it. The meeting deck still rebuilds a **frozen** view as our React + CSS diagram, or a `<Figure>` screenshot of that view with `cite` / `illustrative`. Do not nest their viewer in the slide app.
+
+`npm run build`, `npm run review`, and `npm run export:pdf` must succeed **without** Archify installed. The companion is never required to author or ship a deck.
 
 ## 9. Hand-off message
 

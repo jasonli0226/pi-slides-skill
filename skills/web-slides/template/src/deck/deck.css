@@ -414,10 +414,10 @@ table.compare th.col-hi { color: var(--accent); }
   color: var(--text); background: var(--surface); border: 1px solid color-mix(in srgb, var(--dg-tone) 40%, var(--border)); }
 .dg-seq-body { position: relative; display: grid; grid-template-columns: repeat(var(--dg-actors), 1fr); flex: 1 1 auto; min-height: 360px; height: 100%; }
 .dg-seq-life { border-left: 2px dashed color-mix(in srgb, var(--text-muted) 50%, transparent); margin: 0 auto; width: 0; }
-.dg-seq-msgs { position: absolute; inset: 12px 0; display: flex; flex-direction: column; justify-content: space-evenly; gap: 12px; padding: 8px 0; }
-.dg-seq-msg { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dg-seq-msgs { position: absolute; inset: 12px 0; display: grid; grid-template-columns: repeat(var(--dg-actors), 1fr); grid-auto-rows: 1fr; row-gap: 8px; padding: 8px 0; }
+.dg-seq-msg { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; }
 .dg-seq-note { font: 500 18px/1.3 var(--font-mono); color: var(--text-muted); text-align: center; }
-.dg-seq-line { position: relative; height: 3px; margin: 18px 28px 8px; background: var(--accent);
+.dg-seq-line { position: relative; height: 3px; margin: 18px calc(100% / (2 * var(--dg-span, 2))) 8px; background: var(--accent);
   border-radius: 2px; }
 .dg-seq-line.is-dashed { background: transparent; border-top: 3px dashed var(--text-muted); height: 0; }
 .dg-seq-line::after { content: ""; position: absolute; right: -2px; top: 50%; transform: translateY(-50%);
@@ -483,6 +483,29 @@ table.compare th.col-hi { color: var(--accent); }
 .dg-c4-legend .kind-container::before { border-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 30%, transparent); }
 .dg-c4-legend .kind-external::before { border-style: dashed; border-color: var(--text-muted); background: transparent; }
 
+
+/* Path walk: tone/stroke accent on the current hop. Dim stays readable (≥18px, no hide).
+   Static/print do not apply is-dim — the complete primary path is softly accented. */
+.dg-cell.is-path, .dg-layer.is-path, .dg-flow-card.is-path, .dg-seq-actor.is-path, .dg-c4-node.is-path {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 70%, transparent), 0 16px 44px var(--glow-1);
+}
+.dg-c4-node.is-path { border-color: var(--accent); }
+.dg-cell.is-path { border-color: var(--dg-tone, var(--accent)); }
+.dg-c4-edge-label.is-path {
+  border-color: var(--accent);
+  color: var(--text);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.dg-flow-arrow.is-path { color: var(--accent); opacity: 1; }
+.dg-seq-line.is-path { background: var(--accent); }
+.dg-seq-line.is-path.is-dashed { border-top-color: var(--accent); }
+.dg-seq-line.is-path::after { border-left-color: var(--accent); }
+.dg-seq-line.is-path.is-rev::after { border-left-color: transparent; border-right-color: var(--accent); }
+.dg-cell.is-dim, .dg-layer.is-dim, .dg-flow-card.is-dim, .dg-flow-arrow.is-dim,
+.dg-seq-msg.is-dim, .dg-seq-actor.is-dim, .dg-c4-node.is-dim, .dg-c4-edge-label.is-dim {
+  opacity: 0.65;
+}
+.dg-c4-node.kind-external.is-dim { opacity: 0.65; }
 
 /* ---- media / Figure ---- */
 .deck-figure { display: flex; flex-direction: column; gap: 12px; margin: 0; min-width: 0; max-width: 100%; }

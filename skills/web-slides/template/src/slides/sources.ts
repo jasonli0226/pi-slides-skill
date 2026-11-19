@@ -1,7 +1,12 @@
 import type { SourceRef } from "../deck/types";
 
 /** Single bibliography for the deck. Every figure, quote or factual claim on a slide
- *  cites one of these. Add the URL you actually opened, not a guess. */
+ *  cites one of these. Add the URL you actually opened, not a guess.
+ *
+ *  A repo source may also set optional `repo` (owner/name or URL) and `commit`.
+ *  Architecture nodes and edges do not each become a new SourceRef: they point at
+ *  one of these ids plus a `path`, `start`, optional `end`, and optional `commit`
+ *  override (see SourcePin). Do not invent file paths or line ranges. */
 export const S = {
   wcag: { id: "wcag", label: "W3C, Understanding WCAG 2.2 SC 1.4.3 Contrast (Minimum)", url: "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html" },
   slidevExport: { id: "slidevExport", label: "Slidev docs, Exporting", url: "https://sli.dev/guide/exporting" },

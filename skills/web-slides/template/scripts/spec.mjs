@@ -73,6 +73,299 @@ function echartWarnings(props) {
   return out;
 }
 
+const DIAGRAM_COMPONENTS = new Set(["Mermaid", "LayeredArchitecture", "FlowSteps", "Sequence", "C4Container"]);
+const C4_LEVELS = new Set(["context", "container"]);
+const C4_KINDS = new Set(["person", "system", "container", "external"]);
+const BARE_EDGE_LABELS = new Set(["", "uses", "use", "using"]);
+const MERMAID_KEYWORDS = new Set([
+  "flowchart", "graph", "sequencediagram", "classdiagram", "statediagram", "statediagram-v2",
+  "erdiagram", "gantt", "pie", "gitgraph", "mindmap", "timeline", "quadrantchart",
+  "participant", "actor", "boundary", "control", "entity", "database", "collections",
+  "queue", "subgraph", "end", "classdef", "click", "style", "linkstyle", "direction",
+  "lr", "tb", "td", "rl", "bt",
+]);
+const LUCIDE_ALLOW = new Set([
+  "Bot", "Database", "Network", "Server", "Search", "FilePen", "Sparkles", "ShieldCheck",
+  "Shield", "Check", "Rocket", "Globe", "Cloud", "Lock", "Users", "User", "Workflow",
+  "Boxes", "Box", "Layers", "GitBranch", "MessageSquare", "FileText", "Settings", "Cpu",
+  "HardDrive", "Waypoints", "Share2",
+]);
+const STUB_STRIP = new Set(["evidence", "cite", "illustrative"]);
+
+function stepwiseKind(stepwise) {
+  if (stepwise === "path") return "path";
+  if (stepwise === true || stepwise === "reveal") return "reveal";
+  return "off";
+}
+
+function mermaidNodeCount(chart) {
+  const text = String(chart || "");
+  const ids = new Set();
+  for (const m of text.matchAll(/\b([A-Za-z][\w-]*)\s*(?:\[|\(\(|\(|\{|>)/g)) {
+    if (!MERMAID_KEYWORDS.has(m[1].toLowerCase())) ids.add(m[1]);
+  }
+  for (const m of text.matchAll(/^\s*participant\s+(\S+)/gim)) ids.add(m[1].replace(/["']/g, ""));
+  return ids.size;
+}
+
+function normalizeMermaid(s) {
+  return String(s || "").replace(/\r\n/g, "\n").split("\n").map((l) => l.trimEnd()).join("\n").trim();
+}
+
+function looksLikeRepoChart(chart) {
+  return /\.(ts|tsx|js|jsx|mjs|cjs|py|go|rs|java|kt|rb)\b/.test(chart || "") || /\bsrc\//.test(chart || "");
+}
+
+function hasPin(entry) {
+  return Boolean(entry && typeof entry.path === "string" && entry.path.trim() && entry.start != null && entry.start !== "");
+}
+
+function evidenceList(node) {
+  return arr(node?.evidence).filter((e) => e && typeof e === "object");
+}
+
+function nodeHasEvidence(node) {
+  return evidenceList(node).some(hasPin);
+}
+
+function collectPins(props) {
+  const pins = [];
+  const walk = (x) => {
+    if (!x || typeof x !== "object") return;
+    if (Array.isArray(x)) { x.forEach(walk); return; }
+    if (Array.isArray(x.evidence)) pins.push(...evidenceList(x));
+    for (const v of Object.values(x)) {
+      if (v && typeof v === "object") walk(v);
+    }
+  };
+  walk(props);
+  return pins;
+}
+
+function diagramNodes(name, props) {
+  if (!props || typeof props !== "object") return [];
+  if (name === "C4Container") return arr(props.nodes).filter((n) => n && n.id);
+  if (name === "Sequence") return arr(props.actors).filter((n) => n && n.id);
+  if (name === "FlowSteps") return arr(props.steps).map((s, i) => ({ ...s, id: s?.id || String(i) }));
+  if (name === "LayeredArchitecture") {
+    const nodes = [];
+    for (const layer of arr(props.layers)) {
+      if (layer?.id) nodes.push({ ...layer, _kind: "layer" });
+      arr(layer?.items).forEach((it, i) => nodes.push({ ...it, id: it?.id || (layer?.id ? `${layer.id}-${i}` : undefined), _kind: "cell", _layer: layer?.id }));
+    }
+    return nodes;
+  }
+  if (name === "Mermaid") return arr(props.nodes).filter((n) => n && (n.id || n.label));
+  return [];
+}
+
+function diagramEdges(name, props) {
+  if (!props || typeof props !== "object") return [];
+  if (name === "C4Container") return arr(props.relations);
+  if (name === "Sequence") return arr(props.messages);
+  if (name === "Mermaid") return arr(props.edges);
+  if (name === "LayeredArchitecture") return arr(props.edges || props.relations);
+  if (name === "FlowSteps") {
+    const steps = arr(props.steps);
+    return steps.slice(0, -1).map((s, i) => {
+      const next = steps[i + 1];
+      return { from: s?.id || String(i), to: next?.id || String(i + 1), label: s?.title || "then" };
+    });
+  }
+  return [];
+}
+
+function nodeIdSet(name, props) {
+  const ids = new Set();
+  if (name === "C4Container") for (const n of arr(props.nodes)) if (n?.id) ids.add(String(n.id));
+  if (name === "Sequence") {
+    for (const a of arr(props.actors)) if (a?.id) ids.add(String(a.id));
+    arr(props.messages).forEach((_, i) => ids.add(String(i)));
+  }
+  if (name === "FlowSteps") arr(props.steps).forEach((s, i) => ids.add(String(s?.id ?? i)));
+  if (name === "LayeredArchitecture") {
+    for (const layer of arr(props.layers)) {
+      if (layer?.id) ids.add(String(layer.id));
+      arr(layer?.items).forEach((it, i) => ids.add(String(it?.id ?? `${layer?.id}-${i}`)));
+    }
+  }
+  if (name === "Mermaid") for (const n of arr(props.nodes)) if (n?.id) ids.add(String(n.id));
+  return ids;
+}
+
+function expectedStepCount(name, props) {
+  const kind = stepwiseKind(props?.stepwise);
+  if (kind === "path") {
+    if (arr(props.primary_path).length) {
+      if (name === "Sequence") {
+        const path = arr(props.primary_path);
+        const numeric = path.every((x) => typeof x === "number" || /^-?\d+$/.test(String(x)));
+        return numeric ? path.length : Math.max(0, path.length);
+      }
+      return arr(props.primary_path).length;
+    }
+    if (name === "FlowSteps") return arr(props.steps).length;
+    if (name === "Sequence") return arr(props.messages).length;
+    return null;
+  }
+  if (kind === "reveal") {
+    if (name === "LayeredArchitecture") return arr(props.layers).length;
+    if (name === "FlowSteps") return arr(props.steps).length;
+    if (name === "Sequence") return arr(props.messages).length;
+  }
+  return null;
+}
+
+function pathFollowsEdges(name, props, path) {
+  if (name === "C4Container") {
+    const rels = arr(props.relations);
+    for (let i = 0; i < path.length - 1; i++) {
+      const from = String(path[i]), to = String(path[i + 1]);
+      if (!rels.some((r) => String(r?.from) === from && String(r?.to) === to)) {
+        return `primary_path hop "${from}" → "${to}" does not follow a declared relation`;
+      }
+    }
+  } else if (name === "Sequence") {
+    const messages = arr(props.messages);
+    const numeric = path.every((x) => typeof x === "number" || /^-?\d+$/.test(String(x)));
+    if (numeric) {
+      for (const i of path) {
+        const n = Number(i);
+        if (!Number.isInteger(n) || n < 0 || n >= messages.length) {
+          return `primary_path message index ${i} does not exist`;
+        }
+      }
+    } else {
+      for (let i = 0; i < path.length - 1; i++) {
+        const from = String(path[i]), to = String(path[i + 1]);
+        if (!messages.some((m) => String(m?.from) === from && String(m?.to) === to)) {
+          return `primary_path hop "${from}" → "${to}" does not follow a declared message`;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/** Hard rules are errors; soft caps and honesty hints are warnings (same style as echartWarnings). */
+function diagramIssues(name, props, slide) {
+  const errors = [];
+  const warnings = [];
+  if (!props || typeof props !== "object") {
+    return { errors: [`${name} needs a mapping of diagram properties`], warnings };
+  }
+  const locName = name;
+  const edges = diagramEdges(name, props);
+  const explicitEdges = name === "FlowSteps" ? [] : edges;
+  for (const e of explicitEdges) {
+    const label = String(e?.label ?? "").trim();
+    if (BARE_EDGE_LABELS.has(label.toLowerCase())) {
+      const pair = e?.from && e?.to ? ` ${e.from} → ${e.to}` : "";
+      errors.push(`${locName} edge${pair} needs a specific verb label (not empty or a bare "uses")`);
+    }
+  }
+  if (name !== "Sequence" && name !== "FlowSteps") {
+    const seen = new Set();
+    for (const e of explicitEdges) {
+      if (!e?.from || !e?.to) continue;
+      const fwd = `${e.from}\0${e.to}`;
+      const rev = `${e.to}\0${e.from}`;
+      if (seen.has(rev)) errors.push(`${locName} has a bidirectional pair ${e.to} ⇄ ${e.from}; use two specifically labelled unidirectional hops on a sequence, not a two-way line`);
+      seen.add(fwd);
+    }
+  }
+  if (name === "C4Container") {
+    const level = props.level;
+    if (!C4_LEVELS.has(level)) errors.push("C4Container needs level: context|container (one zoom level per slide)");
+    const kinds = arr(props.nodes).map((n) => n?.kind);
+    const odd = kinds.filter((k) => k && !C4_KINDS.has(k));
+    if (odd.length) errors.push(`C4Container has unknown kind(s) ${[...new Set(odd)].join(", ")}`);
+    if (level === "context" && kinds.includes("container")) {
+      errors.push("C4Container mixes container boxes onto a context-level figure");
+    }
+  }
+  const ids = nodeIdSet(name, props);
+  const path = arr(props.primary_path);
+  if (path.length) {
+    for (const raw of path) {
+      const id = String(raw);
+      if (!ids.has(id)) errors.push(`${locName} primary_path id "${id}" does not exist`);
+    }
+    if (name === "C4Container" || name === "Sequence") {
+      const hopErr = pathFollowsEdges(name, props, path);
+      if (hopErr) errors.push(`${locName} ${hopErr}`);
+    }
+  }
+  const illustrative = props.illustrative === true;
+  if (!illustrative && ["C4Container", "LayeredArchitecture", "Sequence", "FlowSteps", "Mermaid"].includes(name)) {
+    const nodes = diagramNodes(name, props).filter((n) => n && (n.id || n.label) && n._kind !== "layer");
+    const needsEvidence = name !== "Mermaid" || nodes.length > 0;
+    if (needsEvidence && nodes.length) {
+      const missing = nodes.filter((n) => !n.illustrative && !nodeHasEvidence(n));
+      if (missing.length) {
+        errors.push(`${locName} is not illustrative but ${missing.length} node(s) lack evidence with path+start`);
+      }
+    }
+  }
+  const sources = new Set(arr(slide?.sources).map(String));
+  if (props.cite && !sources.has(String(props.cite))) {
+    errors.push(`${locName} cite "${props.cite}" is not in the slide sources list`);
+  }
+  for (const pin of collectPins(props)) {
+    if (pin.cite && !sources.has(String(pin.cite))) {
+      errors.push(`${locName} evidence cite "${pin.cite}" is not in the slide sources list`);
+    }
+  }
+  // Soft size caps (diagram-guide.md)
+  if (name === "Mermaid") {
+    const n = mermaidNodeCount(props.chart);
+    if (n > 8) warnings.push(`Mermaid has ${n} nodes; keep it to 8 or fewer`);
+    const hasIr = arr(props.nodes).length > 0 || arr(props.edges).length > 0;
+    if (!hasIr && !illustrative && looksLikeRepoChart(props.chart)) {
+      warnings.push("Mermaid describes a real-repo diagram but has no nodes/edges IR; add IR or set illustrative: true");
+    }
+  }
+  if (name === "FlowSteps" && arr(props.steps).length > 6) {
+    warnings.push(`FlowSteps has ${arr(props.steps).length} steps; keep it to 6 or fewer`);
+  }
+  if (name === "LayeredArchitecture") {
+    const layers = arr(props.layers);
+    if (layers.length && (layers.length < 3 || layers.length > 6)) {
+      warnings.push(`LayeredArchitecture has ${layers.length} layers; use 3–6`);
+    }
+    for (const layer of layers) {
+      const c = arr(layer?.items).length;
+      if (c > 5) warnings.push(`LayeredArchitecture layer "${layer?.id || layer?.label}" has ${c} cells; keep it to 5 or fewer`);
+    }
+  }
+  if (name === "Sequence") {
+    const ac = arr(props.actors).length;
+    const mc = arr(props.messages).length;
+    if (ac > 6) warnings.push(`Sequence has ${ac} actors; keep it to 6 or fewer`);
+    if (mc > 8) warnings.push(`Sequence has ${mc} messages; keep it to 8 or fewer`);
+  }
+  if (name === "C4Container") {
+    const nodes = arr(props.nodes);
+    if (nodes.length > 8) warnings.push(`C4Container has ${nodes.length} boxes; keep it to 8 or fewer`);
+    const cols = Number(props.cols) || 3;
+    const maxCol = Math.max(cols, ...nodes.map((n) => (n?.col || 1) + (n?.colSpan || 1) - 1), 1);
+    const maxRow = Math.max(Number(props.rows) || 0, ...nodes.map((n) => (n?.row || 1) + (n?.rowSpan || 1) - 1), 1);
+    if (maxCol > 4 || maxRow > 3) warnings.push(`C4Container grid is ${maxRow}×${maxCol}; keep it to a ≤3×4 grid`);
+  }
+  const pins = collectPins(props);
+  if (pins.some((p) => /^foo\.\w+$/i.test(String(p.path || "").trim()) || /(^|\/)foo\.ts$/i.test(String(p.path || "")))) {
+    warnings.push(`${locName} evidence looks invented (foo.ts); use a path you opened or mark illustrative`);
+  }
+  const evidenced = diagramNodes(name, props).filter((n) => n._kind !== "layer" && nodeHasEvidence(n));
+  if (evidenced.length >= 2 && evidenced.every((n) => evidenceList(n).every((e) => Number(e.start) === 1))) {
+    warnings.push(`${locName} evidence uses line 1 on every node; confirm the ranges were opened, not guessed`);
+  }
+  if (stepwiseKind(props.stepwise) === "path" && !arr(props.primary_path).length && name !== "FlowSteps" && name !== "Sequence") {
+    warnings.push(`${locName} stepwise is path but primary_path is empty`);
+  }
+  return { errors, warnings };
+}
+
 function jsx(s) {
   return `{${JSON.stringify(s ?? "")}}`;
 }
@@ -168,6 +461,29 @@ function validate(raw) {
         if (keys.length !== 1) warnings.push(`${loc} (${s.id}): components entry should have exactly one key`);
         else if (!KNOWN_COMPONENTS.has(keys[0])) warnings.push(`${loc} (${s.id}): unknown component "${keys[0]}"`);
         else if (keys[0] === "EChart") for (const w of echartWarnings(c.EChart)) warnings.push(`${loc} (${s.id}): ${w}`);
+        else if (DIAGRAM_COMPONENTS.has(keys[0])) {
+          const d = diagramIssues(keys[0], c[keys[0]], s);
+          for (const e of d.errors) errors.push(`${loc} (${s.id}): ${e}`);
+          for (const w of d.warnings) warnings.push(`${loc} (${s.id}): ${w}`);
+        }
+      }
+      const mermaidComp = s.components.map((c) => c?.Mermaid?.chart).find((ch) => ch != null);
+      if (s.mermaid && mermaidComp != null && normalizeMermaid(s.mermaid) !== normalizeMermaid(mermaidComp)) {
+        warnings.push(`${loc} (${s.id}): mermaid: string and Mermaid.chart differ`);
+      }
+      const expected = s.components.flatMap((c) => {
+        if (!c || typeof c !== "object") return [];
+        const name = Object.keys(c)[0];
+        if (!DIAGRAM_COMPONENTS.has(name)) return [];
+        const n = expectedStepCount(name, c[name]);
+        return n == null ? [] : [{ name, n }];
+      });
+      if (expected.length && s.steps != null) {
+        const match = expected.some((e) => e.n === Number(s.steps));
+        if (!match) {
+          const desc = expected.map((e) => `${e.name} ${e.n}`).join(", ");
+          warnings.push(`${loc} (${s.id}): steps=${s.steps} disagrees with path length/reveal count (${desc})`);
+        }
       }
     }
     if (s.status === "locked") {
@@ -254,7 +570,60 @@ function frameKind(type) {
   return "content";
 }
 
-function renderComponentPlaceholder(entry, i) {
+function jsxExpr(v, { icons } = {}) {
+  if (v === undefined) return undefined;
+  if (v === null) return "null";
+  if (typeof v === "boolean" || typeof v === "number") return String(v);
+  if (typeof v === "string") return JSON.stringify(v);
+  if (Array.isArray(v)) return `[${v.map((x) => jsxExpr(x, { icons })).join(", ")}]`;
+  if (typeof v === "object") {
+    const parts = [];
+    for (const [k, val] of Object.entries(v)) {
+      if (val === undefined || STUB_STRIP.has(k)) continue;
+      const key = /^[A-Za-z_][\w]*$/.test(k) ? k : JSON.stringify(k);
+      if (k === "icon" && typeof val === "string") {
+        if (icons && LUCIDE_ALLOW.has(val)) {
+          icons.add(val);
+          parts.push(`${key}: ${val}`);
+        }
+        continue;
+      }
+      parts.push(`${key}: ${jsxExpr(val, { icons })}`);
+    }
+    return `{ ${parts.join(", ")} }`;
+  }
+  return JSON.stringify(String(v));
+}
+
+function emitDiagramStub(name, props, i, used) {
+  used.components.add(name);
+  const icons = used.icons;
+  const seen = props && typeof props === "object" ? props : {};
+  const parts = [];
+  for (const [k, val] of Object.entries(seen)) {
+    if (val === undefined || STUB_STRIP.has(k)) continue;
+    if (k === "icon" && typeof val === "string") {
+      if (LUCIDE_ALLOW.has(val)) {
+        icons.add(val);
+        parts.push(`icon={${val}}`);
+      }
+      continue;
+    }
+    if (k === "stepwise") {
+      if (val === true || val === "reveal") parts.push("stepwise");
+      else if (val === "path") parts.push(`stepwise="path"`);
+      continue;
+    }
+    if (k === "legend" && val === true) { parts.push("legend"); continue; }
+    if (k === "showRelationList" && val === true) { parts.push("showRelationList"); continue; }
+    if (k === "highlight" && val === true) { parts.push("highlight"); continue; }
+    parts.push(`${k}={${jsxExpr(val, { icons })}}`);
+  }
+  const propStr = parts.length ? " " + parts.join(" ") : "";
+  return `<${name}${propStr} key={${i}} />`;
+}
+
+function renderComponentPlaceholder(entry, i, used) {
   const name = Object.keys(entry)[0];
   const props = entry[name] || {};
   switch (name) {
@@ -264,13 +633,14 @@ function renderComponentPlaceholder(entry, i) {
           <p style={{ margin: "4px 0 0", fontSize: 42, fontWeight: 650 }}>{${JSON.stringify(String(props.value ?? "—"))}}${props.suffix ? `{${JSON.stringify(props.suffix)}}` : ""}</p>
           <p className="muted" style={{ margin: 0 }}>{${JSON.stringify(props.label || "")}}</p>
         </div>`;
-    case "BarChart":
-    case "EChart":
     case "Mermaid":
     case "LayeredArchitecture":
     case "FlowSteps":
     case "Sequence":
     case "C4Container":
+      return emitDiagramStub(name, props, i, used);
+    case "BarChart":
+    case "EChart":
     case "Code":
     case "Timeline":
     case "Figure":
@@ -298,7 +668,7 @@ ${(props.items || []).slice(0, 5).map((it) => `          <li>{${JSON.stringify(i
   }
 }
 
-function renderStub(s, i) {
+function renderStub(s, i, used) {
   const kind = frameKind(s.type);
   const layout = s.layout || "layout-stack";
   const bullets = s.body.length
@@ -306,7 +676,7 @@ function renderStub(s, i) {
 ${s.body.map((b) => `          <li>${jsx(b)}</li>`).join("\n")}
         </ul>`
     : "";
-  const comps = s.components.map((c, ci) => renderComponentPlaceholder(c, ci)).join("\n        ");
+  const comps = s.components.map((c, ci) => renderComponentPlaceholder(c, ci, used)).join("\n        ");
   const media = s.media.slice(0, 2).map((m, mi) =>
     `<p className="muted" key="m${mi}" style={{ fontSize: 20 }}>Media: {${JSON.stringify(m.path || m.src || "")}} — {${JSON.stringify(m.alt || "")}}</p>`
   ).join("\n        ");
@@ -360,10 +730,14 @@ ${s.body.map((b) => `          <li>${jsx(b)}</li>`).join("\n")}
 
 function renderTsx(spec) {
   const stubs = spec.slides.filter((s) => s.status === "stub");
-  const blocks = stubs.map((s, i) => renderStub(s, i)).join("\n\n");
+  const used = { components: new Set(), icons: new Set() };
+  const blocks = stubs.map((s, i) => renderStub(s, i, used)).join("\n\n");
   const exports = stubs.map((_, i) => `s${i}`).join(", ");
+  const diagramImports = [...used.components];
+  const frameImports = ["SlideFrame", ...diagramImports].join(", ");
+  const lucide = used.icons.size ? `import { ${[...used.icons].join(", ")} } from "lucide-react";\n` : "";
   const imports = stubs.length
-    ? `import { SlideFrame } from "../../deck/components";
+    ? `${lucide}import { ${frameImports} } from "../../deck/components";
 import { defineSlide, type SlideDef } from "../../deck/types";`
     : `import { type SlideDef } from "../../deck/types";`;
   return `/* AUTO-GENERATED by scripts/spec.mjs from content/deck.spec.yaml — do not edit by hand.
@@ -451,17 +825,22 @@ function build() {
   return spec;
 }
 
-const result = build();
-if (watching) {
-  if (!existsSync(specPath)) process.exit(1);
-  console.log(`watching ${specPath}`);
-  let t = null;
-  watch(specPath, () => {
-    clearTimeout(t);
-    t = setTimeout(() => {
-      try { build(); } catch (e) { console.error(e); }
-    }, 80);
-  });
-} else if (result === null && checkOnly) {
-  process.exit(1);
+export { validate, diagramIssues, mermaidNodeCount, expectedStepCount };
+
+const isCli = process.argv[1] && resolve(fileURLToPath(import.meta.url)) === resolve(process.argv[1]);
+if (isCli) {
+  const result = build();
+  if (watching) {
+    if (!existsSync(specPath)) process.exit(1);
+    console.log(`watching ${specPath}`);
+    let t = null;
+    watch(specPath, () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        try { build(); } catch (e) { console.error(e); }
+      }, 80);
+    });
+  } else if (result === null && checkOnly) {
+    process.exit(1);
+  }
 }
