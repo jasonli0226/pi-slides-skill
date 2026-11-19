@@ -45,18 +45,20 @@ const FADE_OUT = 0.5;
  * Highlight reel: layout + diagram spread, in deck order.
  *  1 title            — full-bleed photo hero, light left scrim
  *  4 stack-comparison — packed comparison table hanging from the title
- *  6 layered-platform — LayeredArchitecture, 4 click-steps
- *  7 c4-context       — C4 container diagram
+ *  6 layered-platform — LayeredArchitecture, 4 path-walk click-steps
+ *  7 c4-context       — C4 context, 3 path-walk click-steps
+ *  8 chat-sequence    — Sequence, 6 path-walk click-steps (one hop per click)
  * 11 results          — Stat + horizontal BarChart filling leftover height
  * 17 trend-chart      — EChart trend filling its column
  */
 const REEL = [
-  { slide: 1, id: "title", holdMs: 2400 },
-  { slide: 4, id: "stack-comparison", enterMs: 1400, holdMs: 1700 },
-  { slide: 6, id: "layered-platform", enterMs: 700, steps: 4, stepMs: 850, holdMs: 1400 },
-  { slide: 7, id: "c4-context", enterMs: 1400, holdMs: 1800 },
-  { slide: 11, id: "results", enterMs: 1800, holdMs: 1500 },
-  { slide: 17, id: "trend-chart", enterMs: 1700, holdMs: 2000 },
+  { slide: 1, id: "title", holdMs: 2200 },
+  { slide: 4, id: "stack-comparison", enterMs: 1300, holdMs: 1500 },
+  { slide: 6, id: "layered-platform", enterMs: 1200, steps: 4, stepMs: 800, holdMs: 1100 },
+  { slide: 7, id: "c4-context", enterMs: 1200, steps: 3, stepMs: 800, holdMs: 1100 },
+  { slide: 8, id: "chat-sequence", enterMs: 1200, steps: 6, stepMs: 700, holdMs: 1200 },
+  { slide: 11, id: "results", enterMs: 1600, holdMs: 1300 },
+  { slide: 17, id: "trend-chart", enterMs: 1500, holdMs: 1700 },
 ];
 
 const THEMES = {
