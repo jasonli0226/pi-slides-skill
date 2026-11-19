@@ -41,8 +41,8 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
   - Keep it to 3 to 7 bars. Give it at least about 60% of the width or the lint will flag tiny text. For lines, stacks, distributions, scatter, flows or matrices use `EChart` (`chart-guide.md`).
 - **EChart** `{ option: EChartsOption, label, highlight?: seriesName, height?, caption?, cite | illustrative }`
   - Lazy-loaded ECharts (SVG) for lines, stacked bars, histograms/boxplots, scatter, heatmaps and sankey. Theme colors and fonts come from the tokens; never put colors in `option`. Read `chart-guide.md` first. Example `17-trend-chart.tsx`.
-- **Mermaid** `{ chart: string, height? }`
-  - Colors come from the theme tokens. Keep it to 8 nodes or fewer, use `<br/>` for 2-line labels, and use `-.->` for feedback loops.
+- **Mermaid** `{ chart: string, height?, nodes?, edges?, illustrative?, cite? }`
+  - Colors come from the theme tokens. Keep it to 8 nodes or fewer, use `<br/>` for 2-line labels, and use `-.->` for feedback loops. If the brief is a real repo, add a nodes/edges IR or set `illustrative: true`. A slide-level `mermaid:` string must match `chart` when both exist.
 - **Code** `{ code, lang, filename?, focus?: string[], at? }`
   - Highlighted with Shiki. `focus[i]` is the line range highlighted on step `at + i`.
 - **Timeline** `{ items: {when, title, body?}[], stepwise? }`. Use 3 to 6 items.
@@ -58,13 +58,14 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
 
 Re-exported from `components.tsx`. Read `diagram-guide.md` before picking one.
 
-- **LayeredArchitecture** `{ layers: {id, label, tone?, items: {label, sub?, highlight?, icon?}[]}[], leftRail?, rightRail?, caption?, stepwise? }`
-  - Swimlanes for dense stacks. Soft limit: 3–6 layers, ≤5 cells per layer.
-- **FlowSteps** `{ steps: {title, body?, icon?, tone?}[], stepwise? }` — 3–6 memorable steps.
-- **Sequence** `{ actors: {id, label, tone?}[], messages: {from, to, label, dashed?, note?}[], stepwise? }` — ≤6 actors, ≤8 messages.
-- **C4Container** `{ nodes: {id, label, kind: "person"|"system"|"container"|"external", description?, tech?, highlight?, row, col, rowSpan?, colSpan?}[], relations?: {from, to, label, dashed?}[], cols?, rows?, legend?, showRelationList? }`
-  - Orthogonal SVG elbows + pill edge labels. Nodes fade in (`Appear variant="fade"`) so motion does not shift the grid. `legend` overlays the stage (default on). Keep `showRelationList` false unless there is spare footer space.
+- **LayeredArchitecture** `{ layers: {id, label, tone?, items: {id?, label, sub?, highlight?, icon?}[]}[], leftRail?, rightRail?, caption?, stepwise?, primary_path?, cite?, illustrative?, evidence? }`
+  - Swimlanes for dense stacks. Soft limit: 3–6 layers, ≤5 cells per layer. Give cells a stable `id` when you declare a path. `stepwise`: `false` | `"reveal"` (or `true`) | `"path"`.
+- **FlowSteps** `{ steps: {id?, title, body?, icon?, tone?}[], stepwise?, primary_path?, cite?, illustrative? }` — 3–6 memorable steps.
+- **Sequence** `{ actors: {id, label, tone?}[], messages: {from, to, label, dashed?, note?}[], stepwise?, primary_path?, cite?, illustrative? }` — ≤6 actors, ≤8 messages. `primary_path` is a message-index list or an actor-id walk that follows declared messages.
+- **C4Container** `{ level: "context"|"container", nodes: {id, label, kind: "person"|"system"|"container"|"external", description?, tech?, highlight?, row, col, rowSpan?, colSpan?, evidence?, illustrative?}[], relations?: {from, to, label, dashed?, evidence?}[], cols?, rows?, legend?, showRelationList?, caption?, stepwise?, primary_path?, cite?, illustrative? }`
+  - Orthogonal SVG elbows + pill edge labels. Nodes fade in (`Appear variant="fade"`) so motion does not shift the grid. `legend` overlays the stage (default on). Keep `showRelationList` false unless there is spare footer space. Set `level` (one zoom level per slide). `stepwise: "path"` walks `primary_path`; print shows the complete final state.
 - **DiagramLegend** `{ items: {tone?, label}[] }` — tone/kind key chips.
+- **Evidence and honesty.** On a real-repo brief, each node needs `evidence: [{ cite, path, start, end?, commit? }]` unless the diagram or that node is `illustrative`. `cite` must be a bibliography id from the slide `sources` list. Pins live in the spec / notes / footer — not as tiny `file:line` labels on the stage. Official example architecture slides are illustrative and must stay that way.
 
 ## Layout helpers (deck.css)
 

@@ -29,6 +29,21 @@ export interface SourceRef {
   /** short human label: publisher, title, year */
   label: string;
   url?: string;
+  /** Optional repository (owner/name or URL) when this bibliography entry is a codebase. */
+  repo?: string;
+  /** Optional commit SHA when the source is pinned to a checkout. Per-node pins may override. */
+  commit?: string;
+}
+
+/** Pin a diagram node or edge to a file the agent opened. References a SourceRef id; not a new bibliography entry. */
+export interface SourcePin {
+  cite: string;
+  path: string;
+  /** 1-based start line. */
+  start: number;
+  end?: number;
+  /** Optional commit override for this pin. */
+  commit?: string;
 }
 
 export const defineSlide = (s: SlideDef) => s;

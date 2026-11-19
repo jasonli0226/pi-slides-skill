@@ -53,7 +53,8 @@
       "layout": "layout-stack",
       "status": "locked",
       "sources": [
-        "skillRepo"
+        "c4Diagrams",
+        "azureDiagrams"
       ]
     },
     {
@@ -93,6 +94,29 @@
       "layout": "grid-2",
       "status": "locked",
       "sources": []
+    },
+    {
+      "n": 10,
+      "id": "c4-context",
+      "type": "architecture",
+      "title": "C4 context shows who is in the picture before you open the stack.",
+      "layout": "layout-stack",
+      "status": "locked",
+      "sources": [
+        "c4Diagrams",
+        "c4Notation"
+      ]
+    },
+    {
+      "n": 11,
+      "id": "chat-sequence",
+      "type": "architecture",
+      "title": "After the overview, walk one request so the room can follow the path.",
+      "layout": "layout-stack",
+      "status": "locked",
+      "sources": [
+        "archPresenting"
+      ]
     }
   ]
 }

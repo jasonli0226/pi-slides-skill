@@ -22,7 +22,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test test/checks.test.mjs test/smoke.test.mjs test/present.test.mjs test/style-lib.test.mjs test/critique.test.mjs",
+    "test": "node --test test/checks.test.mjs test/diagram-spec.test.mjs test/smoke.test.mjs test/present.test.mjs test/style-lib.test.mjs test/critique.test.mjs",
     "style-lib": "node skills/style-library/scripts/style-lib.mjs",
     "critique": "node skills/slide-reviewer/scripts/critique.mjs"
   },

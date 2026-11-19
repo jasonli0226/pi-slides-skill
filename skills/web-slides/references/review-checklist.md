@@ -41,7 +41,8 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 - [ ] Charts are labelled with units and timeframes, start at zero, and highlight the bar or series the title mentions. The chart type fits the story (`chart-guide.md`).
 - [ ] Diagram type matches the scenario (see `diagram-guide.md`): Mermaid only if ≤8 nodes; swimlanes / C4 / sequence use the React components.
 - [ ] Layered maps: ≤6 layers, ≤5 cells per layer; C4: one zoom level, ≤8 boxes; Sequence: ≤6 actors, ≤8 messages.
-- [ ] Diagram labels aren't cut off; arrows are unidirectional and specifically labelled; no emoji; text ≥18px.
+- [ ] Diagram labels aren't cut off; arrows are unidirectional and specifically labelled; no emoji; text ≥18px. Path-walk mid-steps may dim unused hops; the **final** (static/print) frame still shows every label, with the primary path softly accented.
+- [ ] Architecture figures are `cite`d or `illustrative`. When the brief is a real repo, evidence paths and line ranges were opened in this session, not guessed, and tiny `file:line` labels were not added to the stage.
 - [ ] Illustrative / generic rebuilds of vendor architectures are marked as such (Pill or caption), never copied proprietary.
 - [ ] The technical deck includes architecture, results, governance and lessons slides.
 - [ ] The final slide has a clear ask or next step and lists references.
@@ -54,7 +55,7 @@ Run `npm run review`, then `npm run critique` (writes `review/critique.md`). Go 
 
 ## Facts
 
-- [ ] Every number appears verbatim in a source you opened. Re-open the source if you're unsure.
+- [ ] Every number appears verbatim in a source you opened. Re-open the source if you're unsure. Architecture claims about a real codebase are pinned the same way, or the figure is marked illustrative.
 - [ ] Every quote is verbatim and attributed.
 - [ ] Nothing is `illustrative` unless the user agreed, and the notes say why.
 - [ ] Example slides and example sources from the template are deleted.

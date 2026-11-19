@@ -88,6 +88,7 @@ slides:
     status: locked
     kicker: Architecture
     sources: [skillRepo]
+    notes: Illustrative workflow — not a real-repo architecture, so there is no file:line evidence.
     mermaid: |
       flowchart LR
         U[User notes] --> S[deck.spec.yaml]
@@ -96,6 +97,7 @@ slides:
         R --> V[review + PDF]
     components:
       - Mermaid:
+          illustrative: true
           chart: |
             flowchart LR
               U[User notes] --> S[deck.spec.yaml]
@@ -110,20 +112,48 @@ slides:
     layout: layout-stack
     status: locked
     kicker: Diagrams
-    sources: [skillRepo]
+    sources: [c4Diagrams, azureDiagrams]
+    steps: 4
+    notes: Illustrative generic stack — no file:line pins. Present mode walks Web app → API gateway → Orchestrator → Vector index.
     components:
       - LayeredArchitecture:
-          caption: Illustrative agent → spec → slides stack
+          illustrative: true
+          stepwise: path
+          primary_path: [web-app, api-gateway, orchestrator, vector-index]
+          caption: Illustrative agent platform stack
+          leftRail: { label: Trust, tone: muted, items: [Identity, Policy] }
+          rightRail: { label: Operate, tone: accent-2, items: [Observe, Deploy] }
           layers:
-            - id: present
-              label: Present
+            - id: experience
+              label: Experience
+              tone: accent
               items:
-                - { label: Vite stage, sub: "1920×1080" }
-            - id: author
-              label: Author
+                - { id: web-app, label: Web app, sub: React, icon: Bot }
+                - { id: admin, label: Admin, sub: "Ops console" }
+                - { id: api-clients, label: API clients, sub: Partners }
+            - id: edge
+              label: Edge
+              tone: accent-2
               items:
-                - { label: Design spec, highlight: true }
-                - { label: React slides }
+                - { id: api-gateway, label: API gateway, sub: "Auth · rate limit", highlight: true, icon: Network }
+                - { id: cdn, label: CDN / WAF, sub: "Edge cache" }
+                - { id: stream-gateway, label: Stream gateway, sub: "SSE / WS" }
+            - id: ai
+              label: AI services
+              tone: accent-3
+              items:
+                - { id: orchestrator, label: Orchestrator, sub: "Agents · tools", highlight: true, icon: Bot }
+                - { id: rag, label: RAG service, sub: "Retrieve · rank" }
+                - { id: model-router, label: Model router, sub: "SLA · cost" }
+                - { id: eval, label: Eval harness, sub: "Offline · online" }
+            - id: data
+              label: Data
+              tone: muted
+              items:
+                - { id: vector-index, label: Vector index, sub: Embeddings, icon: Database }
+                - { id: feature-store, label: Feature store, sub: "Online / offline" }
+                - { id: kubernetes, label: Kubernetes, sub: Services, icon: Server }
+                - { id: gpu-pool, label: GPU pool, sub: Inference }
 
   - n: 6
     id: workflow
@@ -193,3 +223,70 @@ slides:
               - { name: Team A, type: line, data: [14, 12, 9, 7, 5, 4, 3, 2] }
               - { name: Team B, type: line, data: [12, 13, 11, 12, 10, 11, 10, 9] }
               - { name: Team C, type: line, data: [15, 14, 15, 13, 14, 12, 12, 11] }
+
+  - n: 10
+    id: c4-context
+    type: architecture
+    title: C4 context shows who is in the picture before you open the stack.
+    layout: layout-stack
+    status: locked
+    kicker: Diagram · C4 context · illustrative
+    sources: [c4Diagrams, c4Notation]
+    steps: 3
+    notes: Illustrative system context — no file:line evidence. Present mode walks Analyst → AI Platform → Corp docs.
+    components:
+      - C4Container:
+          illustrative: true
+          level: context
+          stepwise: path
+          primary_path: [user, platform, docs]
+          caption: Illustrative system context — one happy-path request
+          cols: 3
+          rows: 3
+          legend: true
+          nodes:
+            - { id: llm, label: Model vendor, kind: external, description: "Hosted LLM API", row: 1, col: 2 }
+            - { id: user, label: Analyst, kind: person, description: "Asks in natural language", row: 2, col: 1 }
+            - { id: platform, label: AI Platform, kind: system, description: "Answers with grounded tools", tech: illustrative, highlight: true, row: 2, col: 2 }
+            - { id: docs, label: Corp docs, kind: external, description: "Wiki · files", row: 3, col: 1 }
+            - { id: ticket, label: ITSM, kind: external, description: "Tickets · CMDB", row: 3, col: 3 }
+          relations:
+            - { from: user, to: platform, label: "Asks / reviews" }
+            - { from: platform, to: llm, label: Completions }
+            - { from: platform, to: docs, label: Retrieves }
+            - { from: platform, to: ticket, label: "Opens ticket", dashed: true }
+
+  - n: 11
+    id: chat-sequence
+    type: architecture
+    title: After the overview, walk one request so the room can follow the path.
+    layout: layout-stack
+    status: locked
+    kicker: Diagram · sequence · illustrative
+    sources: [archPresenting]
+    steps: 6
+    notes: Illustrative chat turn — no file:line evidence. Sequence uses stepwise path; FlowSteps is a static summary.
+    components:
+      - FlowSteps:
+          illustrative: true
+          steps:
+            - { id: ask, title: Ask, body: "User prompt", tone: accent-3 }
+            - { id: ground, title: Ground, body: "Retrieve docs", tone: accent-2 }
+            - { id: reason, title: Reason, body: "Model + tools", tone: accent }
+            - { id: answer, title: Answer, body: "Stream + cite", tone: accent }
+      - Sequence:
+          illustrative: true
+          stepwise: path
+          primary_path: [0, 1, 2, 3, 4, 5]
+          actors:
+            - { id: u, label: User, tone: accent-3 }
+            - { id: gw, label: Gateway, tone: accent-2 }
+            - { id: or, label: Orchestrator, tone: accent }
+            - { id: m, label: Model, tone: muted }
+          messages:
+            - { from: u, to: gw, label: "Chat request" }
+            - { from: gw, to: or, label: "Auth'd prompt" }
+            - { from: or, to: m, label: "Tool-aware call" }
+            - { from: m, to: or, label: Tokens, dashed: true }
+            - { from: or, to: gw, label: "Grounded answer", dashed: true }
+            - { from: gw, to: u, label: "Streamed reply", dashed: true }

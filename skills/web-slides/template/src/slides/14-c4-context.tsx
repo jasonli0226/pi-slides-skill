@@ -4,11 +4,13 @@ import { S } from "./sources";
 
 export default defineSlide({
   id: "c4-context",
-  notes: "C4 system-context of the illustrative platform. Person left, software system centre, externals around. Walk Asks → Completions → Retrieves → Tickets.",
+  steps: 3,
+  notes: "C4 system-context of the illustrative platform — not a real codebase, so there is no file:line evidence. Person left, software system centre, externals around. Present mode walks Analyst → AI Platform → Corp docs; print shows the complete diagram with that path softly accented.",
   Component: () => (
     <SlideFrame kind="architecture" kicker="Diagram · C4 context · illustrative" sources={[S.c4Diagrams, S.c4Notation]}
       title="C4 context shows who is in the picture before you open the stack.">
-      <C4Container cols={3} rows={3} legend
+      <C4Container cols={3} rows={3} legend level="context" stepwise="path" primary_path={["user", "platform", "docs"]}
+        caption="Illustrative system context — one happy-path request"
         nodes={[
           { id: "llm", label: "Model vendor", kind: "external", description: "Hosted LLM API", row: 1, col: 2 },
           { id: "user", label: "Analyst", kind: "person", description: "Asks in natural language", row: 2, col: 1 },
