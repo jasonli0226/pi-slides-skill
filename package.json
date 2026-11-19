@@ -1,6 +1,6 @@
 {
   "name": "pi-slides-skill",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "pi coding-agent skill: research-backed, animated React web slide decks with automated review and PDF export.",
   "keywords": [
     "pi-package",
