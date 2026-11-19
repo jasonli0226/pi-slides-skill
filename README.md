@@ -123,6 +123,7 @@ test/                            scaffold smoke, check, present-mode, style-lib 
 docs/research.md                 stack comparison, decision, sources
 docs/verification.md             what was run and the results
 docs/template-inspiration.md     free-pack inspiration → presets (not vendored PPTX)
+docs/diagram-evidence-plan.md    proposed plan (not yet implemented): source-backed diagrams, validated IR, path walk
 examples/                        example-deck.pdf, review-report.md, screenshots/
 ```
 
