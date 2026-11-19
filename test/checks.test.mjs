@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { npm, repo, run, scaffold, tempDir, template, tryRun } from "./helpers.mjs";
+import { isolatedTemplate, npm, repo, run, scaffold, tempDir, template, tryRun } from "./helpers.mjs";
 
 const checkTokens = join(template, "scripts/check-tokens.mjs");
 
@@ -57,22 +57,17 @@ test("scaffold seeds deck.spec.yaml and from-spec stub module", (t) => {
 });
 
 test("spec.mjs validates the template design spec", (t) => {
-  const out = run(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  const dir = isolatedTemplate(t);
+  const out = run(process.execPath, ["scripts/spec.mjs", "--check"], dir);
   assert.match(out, /spec: OK/);
-  const gen = run(process.execPath, ["scripts/spec.mjs"], template);
+  const gen = run(process.execPath, ["scripts/spec.mjs"], dir);
   assert.match(gen, /locked/);
-  assert.ok(readFileSync(join(template, "src/slides/generated/from-spec.tsx"), "utf8").includes("specSlides"));
+  assert.ok(readFileSync(join(dir, "src/slides/generated/from-spec.tsx"), "utf8").includes("specSlides"));
 });
 
 test("spec.mjs rejects missing approval flag and bad types", (t) => {
-  // Run against the template tree (has `yaml` installed). Use a temp copy of the YAML only.
-  const dir = tempDir(t);
-  // Minimal deck layout: reuse template scripts + node_modules via symlink would be heavy;
-  // write a bad spec into the template content, check, then restore.
-  const specPath = join(template, "content/deck.spec.yaml");
-  const backup = readFileSync(specPath, "utf8");
-  t.after(() => writeFileSync(specPath, backup));
-  writeFileSync(specPath, `title: X
+  const dir = isolatedTemplate(t);
+  writeFileSync(join(dir, "content/deck.spec.yaml"), `title: X
 theme: midnight
 slides:
   - n: 1
@@ -81,7 +76,7 @@ slides:
     title: Too short
     status: stub
 `);
-  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], dir);
   assert.equal(r.status, 1, r.out);
   assert.match(r.out, /approved/);
   assert.match(r.out, /type must be a catalog kind/);
@@ -94,11 +89,8 @@ test("spec.mjs accepts the template EChart entry without warnings", () => {
 });
 
 test("spec.mjs warns on EChart entries that break the guides", (t) => {
-  const specPath = join(template, "content/deck.spec.yaml");
-  const backup = readFileSync(specPath, "utf8");
-  // restore the YAML, then regenerate the stub module from it
-  t.after(() => { writeFileSync(specPath, backup); run(process.execPath, ["scripts/spec.mjs"], template); });
-  writeFileSync(specPath, `title: Charts
+  const dir = isolatedTemplate(t);
+  writeFileSync(join(dir, "content/deck.spec.yaml"), `title: Charts
 theme: midnight
 approved: false
 slides:
@@ -122,13 +114,13 @@ slides:
     status: stub
     chart: { unit: min, highlight: 1, data: [{ label: Before, value: 42 }, { label: After, value: 22 }] }
 `);
-  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], template);
+  const r = tryRun(process.execPath, ["scripts/spec.mjs", "--check"], dir);
   assert.equal(r.status, 0, r.out); // guide problems are warnings, not errors
   for (const re of [/needs `cite`/, /needs a `label`/, /off the chart guide/, /no `highlight`/, /start at zero/, /two value axes/]) assert.match(r.out, re);
   assert.doesNotMatch(r.out, /legacy-bars/);
   // stubs render a placeholder card for EChart
-  run(process.execPath, ["scripts/spec.mjs"], template);
-  const gen = readFileSync(join(template, "src/slides/generated/from-spec.tsx"), "utf8");
+  run(process.execPath, ["scripts/spec.mjs"], dir);
+  const gen = readFileSync(join(dir, "src/slides/generated/from-spec.tsx"), "utf8");
   assert.match(gen, /"EChart"/);
 });
 
