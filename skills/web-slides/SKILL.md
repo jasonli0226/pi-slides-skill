@@ -97,3 +97,4 @@ Do not treat stubs as final deck quality. Diagrams, motion and tight layout stay
 - Don't ship `style-import/captures/*` or any third-party screenshot, logo or font file. They are reference only.
 - Don't skip the design-spec approval gate (`content/deck.spec.yaml`) or the screenshot review. Don't regenerate over `status: locked` slides.
 - Don't nest an Archify (or other) interactive viewer in the slide app. If the user wants a post-talk exploratory leave-behind, you may produce a standalone Archify HTML with their installed skill (Apache-2.0, not vendored here) and still rebuild a frozen React + CSS view, or a cited Figure, for the meeting deck. Build, review, and PDF must work without Archify.
+- Don't paste output from a third-party figure skill such as [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT, inspiration only) into a slide. Rebuild the figure with our React + CSS diagram components; see `diagram-guide.md`.
