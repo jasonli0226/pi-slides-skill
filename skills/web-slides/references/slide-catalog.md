@@ -56,7 +56,7 @@ A technical deck must include `architecture`, `results`, `governance` and `lesso
 
 ## Diagram components (`src/deck/diagrams.tsx`)
 
-Re-exported from `components.tsx`. Read `diagram-guide.md` before picking one.
+Re-exported from `components.tsx`. Read `diagram-guide.md` before picking one. There is no before/after-architecture or nested-containment component yet: split or reuse `LayeredArchitecture` / `C4Container` / `Sequence` / `FlowSteps` as that guide describes.
 
 - **LayeredArchitecture** `{ layers: {id, label, tone?, items: {id?, label, sub?, highlight?, icon?}[]}[], leftRail?, rightRail?, caption?, stepwise?, primary_path?, cite?, illustrative?, evidence? }`
   - Swimlanes for dense stacks. Soft limit: 3–6 layers, ≤5 cells per layer. Give cells a stable `id` when you declare a path. `stepwise`: `false` | `"reveal"` (or `true`) | `"path"`.
