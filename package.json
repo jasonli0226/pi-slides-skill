@@ -1,14 +1,18 @@
 {
   "name": "pi-slides-skill",
-  "version": "0.11.0",
-  "description": "pi coding-agent skill: research-backed, animated React web slide decks with automated review and PDF export.",
+  "version": "0.11.1",
+  "description": "pi coding-agent skill: a PowerPoint alternative for research-backed, animated React web slide decks with automated review and PDF export.",
   "keywords": [
     "pi-package",
     "pi-skill",
     "slides",
     "presentation",
     "react",
-    "motion"
+    "motion",
+    "powerpoint",
+    "deck",
+    "slide-deck",
+    "pitch-deck"
   ],
   "license": "MIT",
   "repository": {

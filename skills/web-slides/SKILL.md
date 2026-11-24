@@ -1,6 +1,6 @@
 ---
 name: web-slides
-description: Build stunning, research-backed web slide decks (React + Vite + Motion, 1920x1080) with cited figures, full-sentence takeaway titles, WCAG contrast checks, Playwright screenshots, automated self-review and PDF/PNG export. Use when the user asks for a presentation, slide deck, keynote, pitch, briefing or "slides" and wants it fancy, animated or web-based, or needs a PDF of a polished deck. Not for editing an existing .pptx file.
+description: Build stunning, research-backed web slide decks (React + Vite + Motion, 1920x1080) with cited figures, full-sentence takeaway titles, WCAG contrast checks, Playwright screenshots, automated self-review and PDF/PNG export. Use when the user asks for a presentation, slide deck, keynote, pitch, briefing, PowerPoint-style decks / presentations, or "slides" and wants it fancy, animated or web-based, or needs a PDF of a polished deck. Not for editing an existing .pptx file.
 license: MIT
 compatibility: Needs Node.js 20+ and npm, network access for npm install, and a Chromium for Playwright (npx playwright install chromium, or CHROME_PATH).
 metadata:
